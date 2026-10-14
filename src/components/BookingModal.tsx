@@ -359,9 +359,9 @@ export default function BookingModal({
           {/* Price summary */}
           <div className="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center justify-between">
             <div>
-              <span className="text-[11px] text-emerald-800 block">{service.testOnly ? `Tổng giá đề xuất (${people} ${service.bookingUnit || 'khách'})` : `Tạm tính (${people} khách)`}</span>
+              <span className="text-[11px] text-emerald-800 block">{service.price === 0 ? 'Giá sẽ được cơ sở xác nhận' : service.testOnly ? `Tổng giá đề xuất (${people} ${service.bookingUnit || 'khách'})` : `Tạm tính (${people} khách)`}</span>
               <span className="text-xl font-black text-forest-900 font-mono">
-                {formatVND(total)}
+                {service.price === 0 ? 'Chưa xác nhận' : formatVND(total)}
               </span>
             </div>
             <div className="text-[10px] text-emerald-700 text-right">

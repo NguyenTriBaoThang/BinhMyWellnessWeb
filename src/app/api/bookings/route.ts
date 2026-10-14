@@ -101,7 +101,9 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       booking,
-      message: 'Đặt lịch thành công! Nhà vườn sẽ sớm liên hệ xác nhận.',
+      message: requestedService.testOnly
+        ? 'Yêu cầu đặt chỗ thử nghiệm đã được ghi nhận; yêu cầu này chưa được gửi đến nhà vườn thật.'
+        : 'Đặt lịch thành công! Nhà vườn sẽ sớm liên hệ xác nhận.',
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

@@ -33,8 +33,8 @@ const LOCATIONS: Record<string, MapLocation> = {
   'kdl-ven-song': {
     id: 'kdl-ven-song',
     name: 'KDL Sinh thái ven sông Bình Mỹ',
-    address: 'XJ7X+258, Xã Bình Mỹ, Thành phố Hồ Chí Minh',
-    description: 'Khu du lịch sinh thái ven sông; vui lòng liên hệ cơ sở để xác nhận giờ mở cửa và dịch vụ trước chuyến đi.',
+    address: 'Số 22 Đường Nguyễn Thị Da, Xã Bình Mỹ, Thành phố Hồ Chí Minh',
+    description: 'Điểm du lịch sinh thái ven sông ở Bình Mỹ; có thông tin hoạt động ao vườn và chèo xuồng. Hãy xác nhận dịch vụ, giờ mở cửa và việc đăng cai chương trình tháng trước khi đi.',
   },
   'vuon-ky-uc': {
     id: 'vuon-ky-uc',
@@ -57,6 +57,12 @@ const LOCATIONS: Record<string, MapLocation> = {
     description: 'Điểm tập trung chèo xuồng Rạch Đáy. Hãy liên hệ điểm đón 298 Sông Lu để được hướng dẫn điểm tập trung theo lịch tour.',
     phone: '0969 380 117',
   },
+  'hai-chau-binh-my': {
+    id: 'hai-chau-binh-my',
+    name: 'Hai Châu Bình Mỹ',
+    address: '8/1 Đường 162, Ấp 5, Xã Bình Mỹ, Thành phố Hồ Chí Minh',
+    description: 'Điểm ăn uống địa phương có trong danh sách điểm đến của dự án; cần kiểm tra giờ mở cửa, thực đơn và nhận đoàn trước khi đi.',
+  },
 };
 
 const MONTH_PLANS: Record<number, { title: string; focus: string; locationIds: string[]; notice: string }> = {
@@ -78,6 +84,24 @@ const MONTH_PLANS: Record<number, { title: string; focus: string; locationIds: s
     locationIds: ['kdl-binh-my', 'cau-rach-day'],
     notice: 'Điểm đón Rạch Đáy đã được xác định; workshop và lịch tham quan cần xác nhận trước khi đi.',
   },
+  4: {
+    title: 'Bình Mỹ – Mùa trái chín',
+    focus: 'Vườn Ký Ức BM tại Khu Du lịch Sinh thái Bình Mỹ là điểm tham khảo thật cho trải nghiệm miệt vườn.',
+    locationIds: ['kdl-binh-my'],
+    notice: 'Địa chỉ 298 Sông Lu là điểm tham khảo; nhà vườn chưa xác nhận đăng cai chương trình tháng 4. Cần hỏi mùa trái, quyền hái và ngày đón khách.',
+  },
+  5: {
+    title: 'Bình Mỹ – Ngày hội gia đình',
+    focus: 'Hai điểm đến sinh thái thật ở Bình Mỹ để tham khảo; đơn vị đăng cai ngày hội chưa được chốt.',
+    locationIds: ['kdl-binh-my', 'kdl-ven-song'],
+    notice: 'Các ghim là địa điểm tham khảo, chưa xác nhận nơi tổ chức ngày hội. Hỏi cơ sở về khu sinh hoạt, tuyến đi bộ/chạy và ngày tổ chức.',
+  },
+  6: {
+    title: 'Hè xanh Bình Mỹ – Khám phá thiên nhiên',
+    focus: 'KDL Sinh thái ven sông Bình Mỹ có thông tin hoạt động ao vườn, phù hợp để tham khảo cho chủ đề hè.',
+    locationIds: ['kdl-ven-song'],
+    notice: 'Đây là điểm tham khảo, cơ sở chưa xác nhận chương trình hè xanh. Xác nhận nơi đón, giám sát trẻ và an toàn hoạt động nước trước khi đi.',
+  },
   7: {
     title: 'Trại hè xanh: Nông dân nhí Bình Mỹ',
     focus: 'Vườn Làng nghề sáng tạo là điểm vườn đang đón khách tham quan tại Bình Mỹ.',
@@ -95,6 +119,24 @@ const MONTH_PLANS: Record<number, { title: string; focus: string; locationIds: s
     focus: 'Vườn Ký Ức BM là một điểm tham quan thật trong hệ sinh thái Bình Mỹ.',
     locationIds: ['vuon-ky-uc'],
     notice: 'Đây là kế hoạch mùa vụ; cần xác nhận ngày Trung thu, sân khấu và chương trình với cơ sở.',
+  },
+  10: {
+    title: 'Halloween & Hoài niệm',
+    focus: 'Vườn Làng nghề sáng tạo là điểm vườn tham khảo cho chủ đề mùa thu và không gian mộc mạc.',
+    locationIds: ['vuon-lang-nghe'],
+    notice: 'Tài liệu chưa chốt nhà vườn đăng cai. Ngày Halloween 30–31/10, trang trí và hoạt động buổi tối chỉ diễn ra nếu cơ sở xác nhận.',
+  },
+  11: {
+    title: 'Gieo trồng & Đất lành',
+    focus: 'Tham khảo Vườn Làng nghề sáng tạo và điểm đón Khu Du lịch Sinh thái Bình Mỹ cho các hoạt động nông nghiệp.',
+    locationIds: ['vuon-lang-nghe', 'kdl-binh-my'],
+    notice: 'Các địa điểm là điểm tham khảo thật, chưa xác nhận lịch tổ chức. Hỏi mùa vụ, hoạt động được phép và giá trước khi đặt.',
+  },
+  12: {
+    title: 'Giáng sinh & Năm mới',
+    focus: 'Kết hợp nhà vườn, điểm ven sông và quán ăn địa phương theo dịch vụ từng nơi đang mở.',
+    locationIds: ['kdl-binh-my', 'kdl-ven-song', 'hai-chau-binh-my'],
+    notice: 'Các điểm đến không đồng nghĩa đã tổ chức sự kiện Noel/Năm mới. Xác nhận trang trí, tiệc, giờ mở cửa và đặt bàn với từng nơi.',
   },
 };
 

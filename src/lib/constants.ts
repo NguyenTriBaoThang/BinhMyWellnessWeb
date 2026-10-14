@@ -459,4 +459,40 @@ SEED_SERVICES.push(
     description: 'Yêu cầu thử nghiệm vé đêm hội. Ngày tổ chức thay đổi theo lịch âm; lịch, sức chứa và giá cần xác nhận.',
     slots: ['16:00'], bookingUnit: 'người', latitude: 10.96, longitude: 106.64,
   }),
+  createCampaignDemoService({
+    id: 's18', providerId: 'p9', name: 'Trải nghiệm mùa trái chín Bình Mỹ', category: 'Nông nghiệp',
+    price: 0, duration: 120, image: '/assets/word/thang-04/image1.png',
+    description: 'Đặt chỗ thử nghiệm theo kế hoạch tháng 4. Nhà vườn, loại trái, quyền hái, ngày đón khách và giá cần xác nhận; đây chưa phải đặt chỗ thật.',
+    slots: ['08:30', '10:30', '14:00'], bookingUnit: 'người',
+  }),
+  createCampaignDemoService({
+    id: 's19', providerId: 'p9', name: 'Ngày hội gia đình Bình Mỹ', category: 'Văn hóa',
+    price: 0, duration: 180, image: '/assets/word/thang-05/image1.png',
+    description: 'Đặt chỗ thử nghiệm theo kế hoạch tháng 5. Địa điểm, workshop, đường chạy, suất ăn, ngày tổ chức và giá cần xác nhận; đây chưa phải đặt chỗ thật.',
+    slots: ['08:30', '10:30', '14:00'], bookingUnit: 'người',
+  }),
+  createCampaignDemoService({
+    id: 's20', providerId: 'p9', name: 'Hè xanh Bình Mỹ · khám phá thiên nhiên', category: 'Nông nghiệp',
+    price: 0, duration: 180, image: '/assets/word/thang-06/image1.png',
+    description: 'Đặt chỗ thử nghiệm theo kế hoạch tháng 6. Nhà vườn, hoạt động nước, giám sát trẻ, thực đơn, ngày tổ chức và giá cần xác nhận; đây chưa phải đặt chỗ thật.',
+    slots: ['08:30', '10:30', '14:00'], bookingUnit: 'người',
+  }),
+  createCampaignDemoService({
+    id: 's21', providerId: 'p9', name: 'Halloween & Hoài niệm Bình Mỹ', category: 'Văn hóa',
+    price: 0, duration: 120, image: '/assets/word/thang-10-12/image1.jpeg',
+    description: 'Đặt chỗ thử nghiệm theo kế hoạch tháng 10. Địa điểm đăng cai, trang trí, hoạt động tối, điều kiện miễn phí và giá vé cần xác nhận; yêu cầu này chưa gửi đến cơ sở thật.',
+    slots: ['07:00', '09:00', '15:00', '17:00'], bookingUnit: 'người',
+  }),
+  createCampaignDemoService({
+    id: 's22', providerId: 'p9', name: 'Gieo trồng & Đất lành Bình Mỹ', category: 'Nông nghiệp',
+    price: 0, duration: 180, image: '/assets/word/thang-10-12/image3.jpeg',
+    description: 'Đặt chỗ thử nghiệm theo kế hoạch tháng 11. Nhà vườn, mùa vụ, workshop, lịch cuối tuần, điều kiện miễn phí và giá vé cần xác nhận; yêu cầu này chưa gửi đến cơ sở thật.',
+    slots: ['07:00', '08:30', '15:00'], bookingUnit: 'người',
+  }),
+  createCampaignDemoService({
+    id: 's23', providerId: 'p9', name: 'Giáng sinh & Năm mới tại Bình Mỹ', category: 'Thiên nhiên',
+    price: 0, duration: 180, image: '/assets/word/thang-10-12/image5.jpeg',
+    description: 'Đặt chỗ thử nghiệm theo kế hoạch tháng 12. Trang trí lễ hội, địa điểm, tiệc, hoạt động cuối năm, điều kiện miễn phí và giá vé cần xác nhận; yêu cầu này chưa gửi đến cơ sở thật.',
+    slots: ['08:00', '10:00', '15:00', '18:00'], bookingUnit: 'người',
+  }),
 );

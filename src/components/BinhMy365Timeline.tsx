@@ -184,7 +184,7 @@ export default function BinhMy365Timeline({
 
                 {linkedService ? (
                   <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-600">
-                    <span>{linkedService.testOnly ? 'Giá đề xuất:' : ''} {formatVND(linkedService.price)} / {linkedService.bookingUnit || 'người'}</span>
+                    <span>{linkedService.price > 0 ? `${linkedService.testOnly ? 'Giá đề xuất: ' : ''}${formatVND(linkedService.price)} / ${linkedService.bookingUnit || 'người'}` : 'Giá cần xác nhận với cơ sở'}</span>
                     <span>{linkedService.duration} phút</span>
                   </div>
                 ) : (
@@ -232,7 +232,7 @@ export default function BinhMy365Timeline({
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-forest-700">
-                  {campaign.month === 10 ? 'Lịch Trung thu theo năm' : `Chương trình tháng ${campaign.month}`}
+                  `Chương trình tháng ${campaign.month}`
                 </p>
                 <h4 id="campaign-details-title" className="mt-1 text-lg font-extrabold text-forest-950 sm:text-xl">Chi tiết chương trình & bảng giá</h4>
               </div>
@@ -288,7 +288,7 @@ export default function BinhMy365Timeline({
                 )}
                 {details.organizer && (
                   <div>
-                    <dt className="font-bold text-zinc-800">Đơn vị phối hợp</dt>
+                  <dt className="font-bold text-zinc-800">Đơn vị tổ chức</dt>
                     <dd className="mt-1 leading-relaxed text-zinc-600">{details.organizer}</dd>
                   </div>
                 )}
@@ -309,7 +309,7 @@ export default function BinhMy365Timeline({
                           <tr key={price.name} className="align-top">
                             <th scope="row" className="px-4 py-3 font-semibold leading-relaxed text-zinc-800">{price.name}</th>
                             <td className="whitespace-nowrap px-4 py-3 font-bold text-forest-800">
-                              <span>{formatVND(price.amount)} / {price.unit}</span>
+                              <span>{price.amount === 0 ? 'Miễn phí' : `${formatVND(price.amount)} / ${price.unit}`}</span>
                               {price.studentAmount && <span className="mt-1 block text-[10px] font-semibold text-amber-800">HS/SV: {formatVND(price.studentAmount)} / người</span>}
                             </td>
                             <td className="px-4 py-3 leading-relaxed text-zinc-600">

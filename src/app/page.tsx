@@ -30,12 +30,20 @@ import BinhMy365Timeline from '@/components/BinhMy365Timeline';
 import MonthlyDestinationMap from '@/components/MonthlyDestinationMap';
 import BookingModal from '@/components/BookingModal';
 import { ACTIVE_CAMPAIGN_MONTHS } from '@/lib/campaigns';
+import { getTodayInVietnam } from '@/lib/utils';
+
+function getCurrentCampaignMonth(): number {
+  const currentMonth = Number(getTodayInVietnam().slice(5, 7));
+  return ACTIVE_CAMPAIGN_MONTHS.includes(currentMonth as (typeof ACTIVE_CAMPAIGN_MONTHS)[number])
+    ? currentMonth
+    : ACTIVE_CAMPAIGN_MONTHS[0];
+}
 
 export default function HomePage() {
   const [services, setServices] = useState<Service[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedCampaignMonth, setSelectedCampaignMonth] = useState<number>(ACTIVE_CAMPAIGN_MONTHS[0]);
+  const [selectedCampaignMonth, setSelectedCampaignMonth] = useState<number>(getCurrentCampaignMonth);
 
   // Filters
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
