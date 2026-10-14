@@ -24,6 +24,7 @@ export default function CustomerDashboardPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
 
   // Modal
@@ -33,15 +34,27 @@ export default function CustomerDashboardPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [meRes, bRes] = await fetch('/api/auth/me').then((r) => r.json()),
-        bookingsData = await fetch('/api/bookings').then((r) => r.json());
+      const [meResponse, bookingsResponse] = await Promise.all([
+        fetch('/api/auth/me', { cache: 'no-store' }),
+        fetch('/api/bookings', { cache: 'no-store' }),
+      ]);
+      const [meData, bookingsData] = await Promise.all([
+        meResponse.json(),
+        bookingsResponse.json(),
+      ]);
 
-      setCurrentUser(meRes.user);
-      if (bookingsData.bookings) {
-        setBookings(bookingsData.bookings);
+      if (!meResponse.ok || !meData.user) {
+        throw new Error(meData.error || 'Vui lòng đăng nhập để xem đơn đặt chỗ.');
       }
+      if (!bookingsResponse.ok) {
+        throw new Error(bookingsData.error || 'Không tải được danh sách đặt chỗ.');
+      }
+
+      setCurrentUser(meData.user);
+      setBookings(Array.isArray(bookingsData.bookings) ? bookingsData.bookings : []);
+      setLoadError(null);
     } catch (err) {
-      console.error(err);
+      setLoadError(err instanceof Error ? err.message : 'Không tải được danh sách đặt chỗ.');
     } finally {
       setLoading(false);
     }
@@ -134,6 +147,18 @@ export default function CustomerDashboardPage() {
 
       {/* Bookings List */}
       <div className="space-y-4">
+        {loadError && (
+          <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">
+            <span>{loadError}</span>
+            <button
+              type="button"
+              onClick={loadData}
+              className="rounded-xl bg-rose-700 px-3 py-2 text-xs font-bold text-white hover:bg-rose-800"
+            >
+              Tải lại
+            </button>
+          </div>
+        )}
         {loading ? (
           <div className="py-12 text-center text-zinc-500 text-sm">
             Đang tải danh sách lịch đặt...

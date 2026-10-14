@@ -34,6 +34,7 @@ export default function BookingModal({
   const [availablePlaces, setAvailablePlaces] = useState<number | null>(null);
   const [checkingCapacity, setCheckingCapacity] = useState(false);
   const [capacityMessage, setCapacityMessage] = useState<string | null>(null);
+  const [capacityErrorBlocksBooking, setCapacityErrorBlocksBooking] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,11 +52,16 @@ export default function BookingModal({
     setCheckingCapacity(true);
     setAvailablePlaces(null);
     setCapacityMessage(null);
+    setCapacityErrorBlocksBooking(false);
 
     fetch(`/api/capacity?date=${encodeURIComponent(date)}&serviceId=${encodeURIComponent(service.id)}&slot=${encodeURIComponent(slot)}`, { cache: 'no-store' })
       .then(async (response) => {
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Không tải được chỗ trống.');
+        if (!response.ok) {
+          const error = new Error(data.error || 'Không tải được chỗ trống.') as Error & { status: number };
+          error.status = response.status;
+          throw error;
+        }
         return data;
       })
       .then((data) => {
@@ -69,6 +75,8 @@ export default function BookingModal({
       .catch((error: unknown) => {
         if (active) {
           setAvailablePlaces(null);
+          const status = error instanceof Error ? (error as Error & { status?: number }).status : undefined;
+          setCapacityErrorBlocksBooking(status === 400 || status === 404 || status === 409);
           setCapacityMessage(error instanceof Error ? error.message : 'Chưa lấy được tình trạng chỗ.');
         }
       })
@@ -366,7 +374,7 @@ export default function BookingModal({
             </button>
             <button
               type="submit"
-              disabled={loading || success || checkingCapacity || availablePlaces === 0 || !!capacityMessage}
+              disabled={loading || success || checkingCapacity || availablePlaces === 0 || capacityErrorBlocksBooking}
               className="px-6 py-2.5 rounded-xl bg-forest-700 hover:bg-forest-800 text-white text-xs sm:text-sm font-bold shadow-md shadow-forest-700/20 disabled:opacity-60 transition-all"
             >
               {loading ? 'Đang gửi...' : 'Xác nhận đặt lịch'}
