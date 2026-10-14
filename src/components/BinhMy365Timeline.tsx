@@ -18,7 +18,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { formatVND } from '@/lib/utils';
-import { CAMPAIGNS_365, type CampaignSpotKind } from '@/lib/campaigns';
+import { CAMPAIGNS_365, CAMPAIGN_DETAILS, type CampaignSpotKind } from '@/lib/campaigns';
 import type { Service } from '@/types';
 
 interface BinhMy365TimelineProps {
@@ -33,6 +33,7 @@ const SPOT_KIND: Record<CampaignSpotKind, { label: string; Icon: LucideIcon }> =
   food: { label: 'Ẩm thực', Icon: Utensils },
   cafe: { label: 'Cà phê', Icon: Coffee },
   farm: { label: 'Miệt vườn', Icon: Leaf },
+  craft: { label: 'Thủ công', Icon: Sparkles },
 };
 
 const SPOT_ROLES = ['Điểm nhấn tháng này', 'Trải nghiệm bổ sung', 'Lựa chọn linh hoạt'];
@@ -43,6 +44,7 @@ const KIND_TO_CATEGORY: Record<CampaignSpotKind, string> = {
   food: 'Ẩm thực',
   cafe: 'Nghỉ ngơi',
   farm: 'Nông nghiệp',
+  craft: 'Văn hóa',
 };
 
 export default function BinhMy365Timeline({
@@ -56,6 +58,7 @@ export default function BinhMy365Timeline({
   }).format(new Date()));
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const campaign = CAMPAIGNS_365.find((item) => item.month === selectedMonth) ?? CAMPAIGNS_365[0];
+  const details = CAMPAIGN_DETAILS[campaign.month];
 
   return (
     <section
@@ -224,6 +227,129 @@ export default function BinhMy365Timeline({
           );
         })}
       </div>
+
+      {details && (
+        <section aria-labelledby="campaign-details-title" className="mt-6 overflow-hidden rounded-2xl border border-forest-200 bg-gradient-to-br from-forest-50 via-white to-amber-50/70">
+          <div className="border-b border-forest-100 px-4 py-4 sm:px-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-forest-700">
+                  {campaign.month === 10 ? 'Kế hoạch chuyển lịch từ tài liệu tháng 9' : `Thông tin từ tài liệu tháng ${campaign.month}`}
+                </p>
+                <h4 id="campaign-details-title" className="mt-1 text-lg font-extrabold text-forest-950 sm:text-xl">Chi tiết chương trình & bảng giá</h4>
+              </div>
+              <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-[10px] font-bold text-amber-900 sm:text-xs">
+                <ShieldCheck className="h-3.5 w-3.5" /> {details.status}
+              </span>
+            </div>
+            {details.message && <p className="mt-3 max-w-4xl text-sm leading-relaxed text-zinc-700">{details.message}</p>}
+          </div>
+
+          <div className="grid gap-5 p-4 sm:p-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <div className="space-y-4">
+              <dl className="space-y-3 rounded-xl border border-zinc-200 bg-white/90 p-4 text-xs">
+                <div>
+                  <dt className="font-bold text-zinc-800">Địa điểm</dt>
+                  <dd className="mt-1 flex items-start gap-1.5 leading-relaxed text-zinc-600"><MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-forest-700" />{details.place}</dd>
+                </div>
+                <div>
+                  <dt className="font-bold text-zinc-800">Thời gian</dt>
+                  <dd className="mt-1 flex items-start gap-1.5 leading-relaxed text-zinc-600"><CalendarDays className="mt-0.5 h-3.5 w-3.5 shrink-0 text-forest-700" />{details.time}</dd>
+                </div>
+                {details.audience && (
+                  <div>
+                    <dt className="font-bold text-zinc-800">Đối tượng</dt>
+                    <dd className="mt-1 flex items-start gap-1.5 leading-relaxed text-zinc-600"><Users className="mt-0.5 h-3.5 w-3.5 shrink-0 text-forest-700" />{details.audience}</dd>
+                  </div>
+                )}
+                {details.organizer && (
+                  <div>
+                    <dt className="font-bold text-zinc-800">Đơn vị phối hợp theo tài liệu</dt>
+                    <dd className="mt-1 leading-relaxed text-zinc-600">{details.organizer}</dd>
+                  </div>
+                )}
+              </dl>
+
+              {details.prices && details.prices.length > 0 ? (
+                <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+                  <div className="border-b border-zinc-100 px-4 py-3">
+                    <h5 className="text-sm font-bold text-zinc-900">Bảng giá trong tài liệu</h5>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[30rem] text-left text-xs">
+                      <thead className="bg-zinc-50 text-[10px] uppercase tracking-wide text-zinc-500">
+                        <tr><th scope="col" className="px-4 py-2.5 font-bold">Gói / hoạt động</th><th scope="col" className="px-4 py-2.5 font-bold">Giá</th><th scope="col" className="px-4 py-2.5 font-bold">Quyền lợi / đối tượng</th></tr>
+                      </thead>
+                      <tbody className="divide-y divide-zinc-100">
+                        {details.prices.map((price) => (
+                          <tr key={price.name} className="align-top">
+                            <th scope="row" className="px-4 py-3 font-semibold leading-relaxed text-zinc-800">{price.name}</th>
+                            <td className="whitespace-nowrap px-4 py-3 font-bold text-forest-800">{formatVND(price.amount)} / {price.unit}</td>
+                            <td className="px-4 py-3 leading-relaxed text-zinc-600">
+                              {price.includes?.length ? <ul className="list-disc space-y-1 pl-4">{price.includes.map((item) => <li key={item}>{item}</li>)}</ul> : null}
+                              {price.audience && <p className={price.includes?.length ? 'mt-1.5' : ''}>{price.audience}</p>}
+                              {!price.includes?.length && !price.audience && <span>Chi tiết quyền lợi cần xác nhận.</span>}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {details.pricingNote && <p className="border-t border-amber-100 bg-amber-50/70 px-4 py-3 text-[11px] leading-relaxed text-amber-950">{details.pricingNote}</p>}
+                </div>
+              ) : (
+                <div className="rounded-xl border border-dashed border-amber-300 bg-amber-50/70 p-4">
+                  <h5 className="text-sm font-bold text-amber-950">Giá vé</h5>
+                  <p className="mt-1 text-xs leading-relaxed text-amber-900">{details.pricingNote}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              {details.activities && details.activities.length > 0 && (
+                <div>
+                  <h5 className="mb-2 text-sm font-bold text-zinc-900">Hoạt động dự kiến</h5>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {details.activities.map((activity, index) => (
+                      <article key={activity.title} className="rounded-xl border border-zinc-200 bg-white/90 p-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-forest-700">Hoạt động {index + 1}</p>
+                        <h6 className="mt-1 text-xs font-bold text-zinc-900">{activity.title}</h6>
+                        <p className="mt-1 text-xs leading-relaxed text-zinc-600">{activity.description}</p>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {details.schedule && details.schedule.length > 0 && (
+                <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white/90">
+                  <h5 className="border-b border-zinc-100 px-4 py-3 text-sm font-bold text-zinc-900">Lịch trình mẫu</h5>
+                  <table className="w-full text-left text-xs">
+                    <tbody className="divide-y divide-zinc-100">
+                      {details.schedule.map((item) => (
+                        <tr key={`${item.time}-${item.activity}`}>
+                          <th scope="row" className="w-28 whitespace-nowrap px-4 py-2.5 font-semibold text-forest-800">{item.time}</th>
+                          <td className="px-4 py-2.5 leading-relaxed text-zinc-700">{item.activity}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {details.dateNote && <p className="rounded-xl border border-sky-200 bg-sky-50 p-3 text-xs leading-relaxed text-sky-950">{details.dateNote}</p>}
+              {details.operationNotes && details.operationNotes.length > 0 && (
+                <details className="rounded-xl border border-zinc-200 bg-white/90 p-3">
+                  <summary className="cursor-pointer text-xs font-bold text-zinc-800">Lưu ý tổ chức và an toàn</summary>
+                  <ul className="mt-2 list-disc space-y-1.5 pl-4 text-xs leading-relaxed text-zinc-600">
+                    {details.operationNotes.map((note) => <li key={note}>{note}</li>)}
+                  </ul>
+                </details>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-amber-200 bg-amber-50/80 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
         <div className="flex items-start gap-2.5">

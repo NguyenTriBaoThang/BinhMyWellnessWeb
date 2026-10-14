@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import RoleSwitcherBar from '@/components/RoleSwitcherBar';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { getCurrentUser } from '@/lib/auth';
 
@@ -34,10 +33,6 @@ export default async function RootLayout({
     <html lang="vi" className="scroll-smooth">
       <body className="min-h-screen flex flex-col antialiased selection:bg-emerald-200 selection:text-emerald-950 font-sans">
         <AnalyticsTracker />
-        <RoleSwitcherBar
-          currentRole={currentUser?.role}
-          currentEmail={currentUser?.email}
-        />
         <Header currentUser={currentUser} />
         <main className="flex-1">{children}</main>
         <Footer />
