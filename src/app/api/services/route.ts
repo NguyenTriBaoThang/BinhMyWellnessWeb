@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db, isPersistentDatabaseConfigured } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(req: Request) {
   try {
+    if (process.env.NODE_ENV === 'production' && !isPersistentDatabaseConfigured()) {
+      return NextResponse.json({ error: 'Website chưa được kết nối cơ sở dữ liệu dịch vụ.' }, { status: 503 });
+    }
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category') || undefined;
     const budget = searchParams.get('budget') ? Number(searchParams.get('budget')) : undefined;

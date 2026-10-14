@@ -1,15 +1,35 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { verifyPassword, encodeSession } from '@/lib/auth';
+import { db, isPersistentDatabaseConfigured, isTestBookingModeEnabled } from '@/lib/db';
+import { verifyPassword, encodeSession, isSessionSecretConfigured } from '@/lib/auth';
+import { DEFAULT_ACCOUNTS } from '@/lib/constants';
 
 export async function POST(req: Request) {
   try {
+    if (process.env.NODE_ENV === 'production' && !isPersistentDatabaseConfigured()) {
+      return NextResponse.json({ error: 'Website chưa được kết nối cơ sở dữ liệu tài khoản.' }, { status: 503 });
+    }
+    if (process.env.NODE_ENV === 'production' && !isSessionSecretConfigured()) {
+      return NextResponse.json({ error: 'Website chưa được cấu hình SESSION_SECRET.' }, { status: 503 });
+    }
     const { email, password } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Vui lòng nhập email và mật khẩu.' },
         { status: 400 }
+      );
+    }
+
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const demoAccount = DEFAULT_ACCOUNTS.find((account) => account.email.toLowerCase() === normalizedEmail);
+    const approvedTestLogin = isTestBookingModeEnabled() && (
+      (demoAccount?.role === 'CUSTOMER' && demoAccount.id === 'user-customer-1') ||
+      (demoAccount?.role === 'PROVIDER' && /^provider\.p(?:[2-9]|10)@binhmy\.test$/.test(normalizedEmail))
+    );
+    if (process.env.NODE_ENV === 'production' && demoAccount && !approvedTestLogin) {
+      return NextResponse.json(
+        { error: 'Tài khoản mẫu chỉ dùng trong môi trường thử nghiệm.' },
+        { status: 401 }
       );
     }
 

@@ -33,8 +33,22 @@ const LOCATIONS: Record<string, MapLocation> = {
   'kdl-ven-song': {
     id: 'kdl-ven-song',
     name: 'KDL Sinh thái ven sông Bình Mỹ',
-    address: 'Số 22 Đường Nguyễn Thị Da, Xã Bình Mỹ, Thành phố Hồ Chí Minh',
+    address: 'XJ7X+258, Xã Bình Mỹ, Thành phố Hồ Chí Minh',
     description: 'Khu du lịch sinh thái ven sông; vui lòng liên hệ cơ sở để xác nhận giờ mở cửa và dịch vụ trước chuyến đi.',
+  },
+  'vuon-ky-uc': {
+    id: 'vuon-ky-uc',
+    name: 'Vườn Ký Ức BM · Vườn trái cây Tư Huỳnh',
+    address: 'Vườn Ký Ức BM (Vườn trái cây Tư Huỳnh), Xã Bình Mỹ, Thành phố Hồ Chí Minh',
+    description: 'Vườn trái cây đang đón khách tham quan trong hệ sinh thái Bình Mỹ. Điểm hỗ trợ du lịch ở số 298 Sông Lu; hãy xác nhận lối vào và lịch sự kiện trước khi đi.',
+    hours: 'Liên hệ điểm hỗ trợ 08:00–17:00; lịch sự kiện cần xác nhận',
+    phone: '0969 380 117',
+  },
+  'vuon-lang-nghe': {
+    id: 'vuon-lang-nghe',
+    name: 'Vườn Làng nghề sáng tạo Bình Mỹ',
+    address: 'Vườn Làng nghề sáng tạo, Xã Bình Mỹ, Thành phố Hồ Chí Minh',
+    description: 'Nhà vườn có không gian tham quan, mái che, khu nghỉ và gian hàng sản phẩm địa phương. Bản đồ tìm theo tên điểm vì chưa có số nhà được xác nhận.',
   },
   'cau-rach-day': {
     id: 'cau-rach-day',
@@ -66,20 +80,20 @@ const MONTH_PLANS: Record<number, { title: string; focus: string; locationIds: s
   },
   7: {
     title: 'Trại hè xanh: Nông dân nhí Bình Mỹ',
-    focus: 'Hoạt động làm vườn, vào bếp và trò chơi cho trẻ em theo tài liệu tháng 7.',
-    locationIds: ['kdl-binh-my'],
-    notice: 'Địa điểm thật được hiển thị; ngày tổ chức, sức chứa và hoạt động cho đoàn cần cơ sở xác nhận.',
+    focus: 'Vườn Làng nghề sáng tạo là điểm vườn đang đón khách tham quan tại Bình Mỹ.',
+    locationIds: ['vuon-lang-nghe'],
+    notice: 'Bản đồ tìm theo tên điểm do chưa có số nhà chính xác. Ngày trại hè, sức chứa và địa điểm đăng cai cần xác nhận.',
   },
   8: {
     title: 'Bếp quê Bình Mỹ: Về Bình Mỹ – Thưởng thức vị quê',
-    focus: 'Phiên chợ món quê và workshop nấu ăn theo kế hoạch tháng 8.',
+    focus: 'Khu Du lịch Sinh thái Bình Mỹ có điểm đón và dịch vụ du lịch tại số 298 Sông Lu.',
     locationIds: ['kdl-binh-my'],
-    notice: 'Địa điểm tổ chức lễ hội và danh sách gian hàng chưa được xác nhận; vui lòng liên hệ trước.',
+    notice: 'Ngày hội, khu vực tổ chức và các hộ tham gia chưa được xác nhận; hãy liên hệ trước khi đi.',
   },
   9: {
     title: 'Trăng về Bình Mỹ: Đêm hội Trung thu',
-    focus: 'Workshop đèn lồng, rước đèn và hoạt động Trung thu theo tài liệu tháng 9.',
-    locationIds: ['kdl-binh-my'],
+    focus: 'Vườn Ký Ức BM là một điểm tham quan thật trong hệ sinh thái Bình Mỹ.',
+    locationIds: ['vuon-ky-uc'],
     notice: 'Đây là kế hoạch mùa vụ; cần xác nhận ngày Trung thu, sân khấu và chương trình với cơ sở.',
   },
 };

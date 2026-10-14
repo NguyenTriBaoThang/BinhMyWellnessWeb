@@ -1,6 +1,7 @@
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -80,8 +81,10 @@ model Service {
   duration       Int
   capacity       Int             @default(16)
   image          String
-  latitude       Float
-  longitude      Float
+  latitude       Float?
+  longitude      Float?
+  testOnly       Boolean         @default(false)
+  bookingUnit    String?
   groups         String[]        @default(["family", "friends"])
   indoor         Boolean         @default(false)
   description    String

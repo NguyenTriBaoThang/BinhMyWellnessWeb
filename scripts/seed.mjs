@@ -1,112 +1,126 @@
-import { PrismaClient } from '@prisma/client';
+import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 import bcrypt from 'bcryptjs';
+import ts from 'typescript';
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+let prisma;
 
-const DEFAULT_ACCOUNTS = [
-  {
-    id: 'user-customer-1',
-    email: 'baothang@gmail.com',
-    name: 'Bảo Thắng',
-    phone: '0901234567',
-    role: 'CUSTOMER',
-  },
-  {
-    id: 'user-provider-1',
-    email: 'nhavuona@gmail.com',
-    name: 'Chủ Vườn Xanh A',
-    phone: '0908123456',
-    role: 'PROVIDER',
-  },
-  {
-    id: 'user-admin-1',
-    email: 'binhmy@admin.com',
-    name: 'Ban Quản Trị Bình Mỹ',
-    phone: '0988888888',
-    role: 'ADMIN',
-  },
-];
+async function loadEnvironment() {
+  let source;
+  try {
+    source = await readFile(new URL('../.env', import.meta.url), 'utf8');
+  } catch {
+    return;
+  }
+  for (const line of source.split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/);
+    if (!match || match[1] in process.env) continue;
+    const value = match[2].replace(/^(?:"([\s\S]*)"|'([\s\S]*)')$/, (_, doubleQuoted, singleQuoted) => doubleQuoted ?? singleQuoted);
+    process.env[match[1]] = value;
+  }
+}
 
-const SEED_PROVIDERS = [
-  {
-    id: 'p1',
-    code: 'p1',
-    userId: 'user-provider-1',
-    name: 'Vườn xanh Bình Mỹ',
-    story: 'Vườn xanh Bình Mỹ là mô hình nông trại sinh thái thực nghiệm tại Ấp 6 xã Bình Mỹ. Tại đây du khách được trải nghiệm tự tay thu hoạch rau củ hữu cơ, tìm hiểu phương pháp chăm sóc cây trồng tự nhiên và tận hưởng bầu không khí trong lành của miệt vườn Củ Chi ven sông Sài Gòn.',
-    contact: '0908 123 456 · vuonxanh.binhmy@gmail.com',
-    address: '185/2 Đường Hà Duy Phiên (Tỉnh lộ 9), Ấp 6, Xã Bình Mỹ, Huyện Củ Chi, TP.HCM',
-    active: true,
-  },
-  {
-    id: 'p2',
-    code: 'p2',
-    userId: 'user-customer-1', // fallback reference
-    name: 'Khu ẩm thực Rạch Dứa',
-    story: 'Tọa lạc ngay cạnh dòng Rạch Dứa tự nhiên nhiều bóng mát, Khu ẩm thực sinh thái Rạch Dứa mang đến trải nghiệm ẩm thực đồng quê Nam Bộ chuẩn vị: cá lóc nướng trui cuốn bánh tráng, gà thả vườn và lẩu miệt vườn đậm đà tình quê.',
-    contact: '0932 789 123 · rachdua.binhmy@gmail.com',
-    address: 'Khu vực Cầu Rạch Dứa, Đường Hà Duy Phiên (Tỉnh lộ 9), Ấp 4A, Xã Bình Mỹ, Huyện Củ Chi, TP.HCM',
-    active: true,
-  },
-];
+async function loadSeedData() {
+  const filePath = fileURLToPath(new URL('../src/lib/constants.ts', import.meta.url));
+  const source = await readFile(filePath, 'utf8');
+  const compiled = ts.transpileModule(source, {
+    compilerOptions: {
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2020,
+      importsNotUsedAsValues: ts.ImportsNotUsedAsValues.Remove,
+    },
+  }).outputText;
+  const module = { exports: {} };
+  new Function('exports', 'module', compiled)(module.exports, module);
+  return module.exports;
+}
 
 async function main() {
-  console.log('🌱 Bắt đầu nạp dữ liệu vào PostgreSQL...');
+  await loadEnvironment();
+  if (!process.env.DATABASE_URL) {
+    throw new Error('Chưa khai báo DATABASE_URL trong .env hoặc môi trường chạy.');
+  }
 
-  const passwordHash = bcrypt.hashSync('password@123', 10);
+  prisma = new PrismaClient();
+  const { DEFAULT_ACCOUNTS, DEFAULT_PASSWORD, SEED_PROVIDERS, SEED_SERVICES } = await loadSeedData();
+  const passwordHash = bcrypt.hashSync(DEFAULT_PASSWORD, 10);
 
-  for (const acc of DEFAULT_ACCOUNTS) {
+  for (const account of DEFAULT_ACCOUNTS) {
     await prisma.user.upsert({
-      where: { email: acc.email },
+      where: { email: account.email.toLowerCase() },
       update: {
-        name: acc.name,
-        role: acc.role,
+        name: account.name,
+        phone: account.phone ?? null,
+        role: account.role,
         password: passwordHash,
       },
       create: {
-        id: acc.id,
-        email: acc.email,
+        id: account.id,
+        email: account.email.toLowerCase(),
+        name: account.name,
+        phone: account.phone ?? null,
+        role: account.role,
         password: passwordHash,
-        name: acc.name,
-        phone: acc.phone,
-        role: acc.role,
       },
     });
-    console.log(`✅ Đã tạo/cập nhật tài khoản: ${acc.email} (${acc.role})`);
   }
 
-  for (const prov of SEED_PROVIDERS) {
+  for (const provider of SEED_PROVIDERS) {
     await prisma.providerProfile.upsert({
-      where: { code: prov.code },
+      where: { code: provider.code },
       update: {
-        name: prov.name,
-        story: prov.story,
-        address: prov.address,
-        contact: prov.contact,
-        active: prov.active,
+        userId: provider.userId,
+        name: provider.name,
+        story: provider.story,
+        contact: provider.contact,
+        address: provider.address,
+        active: provider.active,
       },
-      create: {
-        id: prov.id,
-        code: prov.code,
-        userId: prov.userId,
-        name: prov.name,
-        story: prov.story,
-        contact: prov.contact,
-        address: prov.address,
-        active: prov.active,
-      },
+      create: provider,
     });
-    console.log(`✅ Đã tạo/cập nhật nhà vườn: ${prov.name}`);
   }
 
-  console.log('🎉 Hoàn tất nạp dữ liệu PostgreSQL thành công!');
+  for (const service of SEED_SERVICES) {
+    const data = {
+      providerId: service.providerId,
+      name: service.name,
+      category: service.category,
+      price: service.price,
+      duration: service.duration,
+      capacity: service.capacity,
+      image: service.image,
+      latitude: service.latitude ?? null,
+      longitude: service.longitude ?? null,
+      groups: service.groups,
+      indoor: service.indoor,
+      description: service.description,
+      status: service.status,
+      slots: service.slots,
+      amenities: service.amenities,
+      included: service.included ?? null,
+      excluded: service.excluded ?? null,
+      conditions: service.conditions ?? null,
+      moderationNote: service.moderationNote ?? null,
+      testOnly: service.testOnly ?? false,
+      bookingUnit: service.bookingUnit ?? null,
+    };
+    await prisma.service.upsert({
+      where: { code: service.code },
+      update: data,
+      create: { id: service.id, code: service.code, ...data },
+    });
+  }
+
+  console.log(`Đã nạp ${DEFAULT_ACCOUNTS.length} tài khoản thử nghiệm, ${SEED_PROVIDERS.length} cơ sở và ${SEED_SERVICES.length} dịch vụ.`);
+  console.log(`Mật khẩu tài khoản thử nghiệm: ${DEFAULT_PASSWORD}`);
 }
 
 main()
-  .catch((e) => {
-    console.error('Lỗi khi nạp dữ liệu:', e);
-    process.exit(1);
+  .catch((error) => {
+    console.error('Không nạp được dữ liệu khởi tạo:', error.message || error);
+    process.exitCode = 1;
   })
   .finally(async () => {
-    await prisma.$disconnect();
+    await prisma?.$disconnect();
   });

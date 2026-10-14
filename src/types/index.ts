@@ -48,8 +48,8 @@ export interface Service {
   duration: number; // in minutes
   capacity: number;
   image: string;
-  latitude: number;
-  longitude: number;
+  latitude?: number;
+  longitude?: number;
   groups: string[];
   indoor: boolean;
   description: string;
@@ -60,6 +60,8 @@ export interface Service {
   excluded?: string;
   conditions?: string;
   moderationNote?: string;
+  bookingUnit?: string;
+  testOnly?: boolean;
   updatedAt: string;
 }
 

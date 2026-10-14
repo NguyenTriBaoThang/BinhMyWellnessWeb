@@ -5,7 +5,15 @@ import { Role } from '@/types';
 
 export async function POST(req: Request) {
   try {
-    const { role } = await req.json();
+    const productionTestMode = process.env.NODE_ENV === 'production' && process.env.BM_ENABLE_TEST_BOOKINGS === 'true';
+    if (process.env.NODE_ENV === 'production' && !productionTestMode) {
+      return NextResponse.json({ error: 'Đăng nhập nhanh chỉ bật trong môi trường thử nghiệm.' }, { status: 404 });
+    }
+
+    const { role, providerEmail } = await req.json();
+    if (!['CUSTOMER', 'PROVIDER', 'ADMIN'].includes(role) || (productionTestMode && role === 'ADMIN')) {
+      return NextResponse.json({ error: 'Vai trò không hợp lệ.' }, { status: 400 });
+    }
 
     const emailMap: Record<Role, string> = {
       CUSTOMER: 'baothang@gmail.com',
@@ -13,10 +21,15 @@ export async function POST(req: Request) {
       ADMIN: 'binhmy@admin.com',
     };
 
-    const targetEmail = emailMap[role as Role] || 'baothang@gmail.com';
+    const targetEmail = role === 'PROVIDER' && typeof providerEmail === 'string'
+      ? providerEmail
+      : emailMap[role as Role];
+    if (productionTestMode && role === 'PROVIDER' && !/^provider\.p(?:[2-9]|10)@binhmy\.test$/i.test(targetEmail)) {
+      return NextResponse.json({ error: 'Chỉ tài khoản nhà vườn thử nghiệm được dùng ở chế độ này.' }, { status: 403 });
+    }
     const user = await db.findUserByEmail(targetEmail);
 
-    if (!user) {
+    if (!user || user.role !== role) {
       return NextResponse.json(
         { error: 'Không tìm thấy tài khoản tương ứng với vai trò này.' },
         { status: 404 }
@@ -34,7 +47,7 @@ export async function POST(req: Request) {
 
     response.cookies.set('bm_session', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60,

@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db, isPersistentDatabaseConfigured } from '@/lib/db';
 
 export async function POST(req: Request) {
   try {
-    const { email, password, name, phone, role } = await req.json();
+    if (process.env.NODE_ENV === 'production' && !isPersistentDatabaseConfigured()) {
+      return NextResponse.json({ error: 'Website chưa được kết nối cơ sở dữ liệu tài khoản.' }, { status: 503 });
+    }
+    const { email, password, name, phone } = await req.json();
 
     if (!email || !password || !name) {
       return NextResponse.json(
@@ -17,7 +20,7 @@ export async function POST(req: Request) {
       password,
       name,
       phone,
-      role: role || 'CUSTOMER',
+      role: 'CUSTOMER',
     });
 
     return NextResponse.json({

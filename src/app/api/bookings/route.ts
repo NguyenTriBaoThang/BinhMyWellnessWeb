@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db, isPersistentDatabaseConfigured, isTestBookingModeEnabled } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 import { getTodayInVietnam, isBookableSlotInVietnam } from '@/lib/utils';
 
 export async function GET(req: Request) {
   try {
+    if (process.env.NODE_ENV === 'production' && !isPersistentDatabaseConfigured()) {
+      return NextResponse.json({ error: 'Website chưa được kết nối cơ sở dữ liệu đặt chỗ.' }, { status: 503 });
+    }
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json(
@@ -30,6 +33,9 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
+    if (process.env.NODE_ENV === 'production' && !isPersistentDatabaseConfigured()) {
+      return NextResponse.json({ error: 'Website chưa được kết nối cơ sở dữ liệu đặt chỗ.' }, { status: 503 });
+    }
     const user = await getCurrentUser();
     if (!user || user.role !== 'CUSTOMER') {
       return NextResponse.json(
@@ -50,6 +56,11 @@ export async function POST(req: Request) {
         { error: 'Vui lòng chọn dịch vụ, ngày, khung giờ và số người tham gia.' },
         { status: 400 }
       );
+    }
+
+    const requestedService = await db.getServiceById(body.serviceId);
+    if (!requestedService || (requestedService.testOnly && process.env.NODE_ENV === 'production' && !isTestBookingModeEnabled())) {
+      return NextResponse.json({ error: 'Hoạt động thử nghiệm hiện không nhận đặt chỗ thực tế.' }, { status: 404 });
     }
 
     const parsedDate = new Date(`${date}T00:00:00.000Z`);

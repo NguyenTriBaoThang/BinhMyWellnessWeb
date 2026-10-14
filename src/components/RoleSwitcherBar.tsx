@@ -17,6 +17,8 @@ export default function RoleSwitcherBar({
   const router = useRouter();
   const [loadingRole, setLoadingRole] = useState<Role | null>(null);
 
+  if (process.env.NODE_ENV === 'production') return null;
+
   const switchRole = async (role: Role) => {
     try {
       setLoadingRole(role);

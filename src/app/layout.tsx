@@ -7,6 +7,11 @@ import { getCurrentUser } from '@/lib/auth';
 
 export const metadata: Metadata = {
   title: 'Bình Mỹ Wellness Web | Khám Phá Nông Nghiệp & Miệt Vườn Củ Chi 365',
+  icons: {
+    icon: '/favicon.png',
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
+  },
   description:
     'Nền tảng kết nối du lịch nông nghiệp, sinh thái miệt vườn, chèo SUP hoàng hôn ven sông Sài Gòn và ẩm thực đồng quê tại Xã Bình Mỹ, Huyện Củ Chi, TP.HCM.',
   keywords: [

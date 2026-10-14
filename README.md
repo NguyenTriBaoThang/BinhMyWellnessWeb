@@ -453,7 +453,7 @@ docker ps
 # 3. Đẩy cấu trúc lược đồ Prisma vào cơ sở dữ liệu PostgreSQL
 npm run prisma:push
 
-# 4. Nạp dữ liệu hạt giống (Seed 3 tài khoản, 8 nhà vườn, 8 dịch vụ, đánh giá mẫu)
+# 4. Nạp tài khoản thử nghiệm, nhà vườn và dịch vụ từ constants.ts
 npm run prisma:seed
 
 # 5. Khởi chạy ứng dụng
@@ -462,19 +462,18 @@ npm run dev
 
 ---
 
-### 4. Cấu Hình Biến Môi Trường (`.env`)
-Tệp `.env` cấu hình mẫu đã được thiết lập sẵn trong mã nguồn:
+### 4. Cấu Hình PostgreSQL / Supabase
+Sao chép `.env.example` thành `.env`, sau đó điền connection string trong Supabase. Website dùng URL pooler; Prisma dùng direct URL để cập nhật schema và nạp dữ liệu. Không commit `.env`.
 
 ```env
-# URL Kết nối Cơ sở dữ liệu PostgreSQL
-DATABASE_URL="postgresql://binhmy_user:binhmy_secure_password_2026@localhost:5432/binhmy_wellness_db?schema=public"
-
-# Môi trường thực thi
-NODE_ENV="development"
-
-# Khóa bảo mật ký Session (Tùy chọn cho Production)
-SESSION_SECRET="binh-my-wellness-super-secret-key-2026"
+DATABASE_URL="<Supabase pooled connection string>"
+DIRECT_URL="<Supabase direct connection string>"
+SESSION_SECRET="<unique random value with at least 32 characters>"
+BM_ENABLE_TEST_BOOKINGS="false"
+NEXT_PUBLIC_BM_ENABLE_TEST_BOOKINGS="false"
 ```
+
+Sau khi điền biến môi trường, chạy `npm run prisma:generate`, `npm run prisma:push`, rồi `npm run prisma:seed`. Trong môi trường đã đăng, thêm các biến này vào cấu hình của dịch vụ hosting. Tạo SESSION_SECRET riêng, tối thiểu 32 ký tự; cookie đăng nhập được ký bằng khóa này. Mặc định các tài khoản và dịch vụ thử nghiệm không hoạt động ở production. Chỉ bật đồng thời `BM_ENABLE_TEST_BOOKINGS` và `NEXT_PUBLIC_BM_ENABLE_TEST_BOOKINGS` thành `true` khi cần thử đặt chỗ trên website; chế độ này cho phép đăng nhập nhanh khách/nhà vườn thử nghiệm, không mở tài khoản quản trị và không thu tiền.
 
 ---
 

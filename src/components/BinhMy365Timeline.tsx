@@ -120,7 +120,13 @@ export default function BinhMy365Timeline({
       <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {campaign.spots.map((spot, index) => {
           const { Icon, label } = SPOT_KIND[spot.kind];
-          const images = spot.images ?? (spot.image ? [{ src: spot.image, alt: spot.imageAlt || `Ảnh ${spot.name}` }] : []);
+          const fallbackImages = details?.media
+            ?.filter((media) => media.orientation === 'landscape' && !/poster|giá/i.test(media.title))
+            .slice(index * 2, index * 2 + 2)
+            .map((media) => ({ src: media.src, alt: media.alt })) ?? [];
+          const images = spot.images ?? (spot.image
+            ? [{ src: spot.image, alt: spot.imageAlt || `Ảnh ${spot.name}` }]
+            : fallbackImages);
           const linkedService = spot.serviceId
             ? services.find((service) => service.id === spot.serviceId && service.status === 'PUBLISHED')
             : undefined;
@@ -158,7 +164,7 @@ export default function BinhMy365Timeline({
                     {SPOT_ROLES[index]}
                   </span>
                   <span className={`inline-flex items-center gap-1 text-[10px] font-semibold ${linkedService ? 'text-emerald-700' : 'text-amber-700'}`}>
-                    <CalendarDays className="h-3 w-3" /> {linkedService ? 'Có thể đặt' : 'Cần xác nhận'}
+                    <CalendarDays className="h-3 w-3" /> {linkedService ? (linkedService.testOnly ? 'Đặt thử nghiệm' : 'Có thể đặt') : 'Cần xác nhận'}
                   </span>
                 </div>
 
@@ -178,7 +184,7 @@ export default function BinhMy365Timeline({
 
                 {linkedService ? (
                   <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-600">
-                    <span>{formatVND(linkedService.price)} / người</span>
+                    <span>{linkedService.testOnly ? 'Giá đề xuất:' : ''} {formatVND(linkedService.price)} / {linkedService.bookingUnit || 'người'}</span>
                     <span>{linkedService.duration} phút</span>
                   </div>
                 ) : (
@@ -226,7 +232,7 @@ export default function BinhMy365Timeline({
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-forest-700">
-                  {campaign.month === 10 ? 'Kế hoạch chuyển lịch từ tài liệu tháng 9' : `Thông tin từ tài liệu tháng ${campaign.month}`}
+                  {campaign.month === 10 ? 'Lịch Trung thu theo năm' : `Chương trình tháng ${campaign.month}`}
                 </p>
                 <h4 id="campaign-details-title" className="mt-1 text-lg font-extrabold text-forest-950 sm:text-xl">Chi tiết chương trình & bảng giá</h4>
               </div>
@@ -240,7 +246,7 @@ export default function BinhMy365Timeline({
           {details.media && details.media.length > 0 && (
             <details className="border-b border-forest-100 px-4 py-3 sm:px-6">
               <summary className="cursor-pointer text-xs font-bold text-forest-900">
-                Xem {details.media.length} ảnh và poster trích từ Word
+                Xem {details.media.length} ảnh và poster chương trình
               </summary>
               <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
                 {details.media.map((media) => (
@@ -256,7 +262,7 @@ export default function BinhMy365Timeline({
                         />
                       </div>
                     </a>
-                    <figcaption className="px-2.5 py-2 text-[10px] font-semibold leading-snug text-zinc-700">Ảnh tham khảo · {media.title}</figcaption>
+                    <figcaption className="px-2.5 py-2 text-[10px] font-semibold leading-snug text-zinc-700">{media.title}</figcaption>
                   </figure>
                 ))}
               </div>
@@ -282,7 +288,7 @@ export default function BinhMy365Timeline({
                 )}
                 {details.organizer && (
                   <div>
-                    <dt className="font-bold text-zinc-800">Đơn vị phối hợp theo tài liệu</dt>
+                    <dt className="font-bold text-zinc-800">Đơn vị phối hợp</dt>
                     <dd className="mt-1 leading-relaxed text-zinc-600">{details.organizer}</dd>
                   </div>
                 )}
@@ -291,7 +297,7 @@ export default function BinhMy365Timeline({
               {details.prices && details.prices.length > 0 ? (
                 <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
                   <div className="border-b border-zinc-100 px-4 py-3">
-                    <h5 className="text-sm font-bold text-zinc-900">Bảng giá trong tài liệu</h5>
+                    <h5 className="text-sm font-bold text-zinc-900">Bảng giá chương trình</h5>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full min-w-[30rem] text-left text-xs">

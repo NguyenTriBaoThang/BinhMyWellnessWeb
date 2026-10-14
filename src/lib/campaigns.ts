@@ -73,6 +73,7 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
         activity: 'Tham quan Vườn Ký Ức BM, trải nghiệm khoai mì và hoạt động du xuân theo lịch cơ sở xác nhận.',
         audience: 'Gia đình, nhóm bạn, đoàn học sinh',
         kind: 'farm',
+        serviceId: 's10',
         images: [{ src: '/assets/KDL_Binh_My_cheo_xuong.jpg', alt: 'Hoạt động trải nghiệm tại khu du lịch sinh thái Bình Mỹ' }],
       },
     ],
@@ -81,14 +82,15 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
     month: 2,
     theme: 'Valentine & Hẹn hò',
     title: 'Valentine bên sông Bình Mỹ',
-    summary: 'Hai khu du lịch có địa chỉ công khai; chương trình Valentine trong tài liệu vẫn cần xác nhận.',
+    summary: 'Hai khu du lịch tại Bình Mỹ; chương trình Valentine cần cơ sở xác nhận trước khi đặt.',
     spots: [
       {
         name: 'KDL Sinh thái ven sông Bình Mỹ',
-        location: 'Số 22 Đường Nguyễn Thị Da, Xã Bình Mỹ, TP.HCM',
+        location: 'Mã vị trí XJ7X+258, Xã Bình Mỹ, TP.HCM',
         activity: 'Không gian sinh thái ven sông; set menu Valentine và đêm nhạc acoustic là đề xuất, cần cơ sở xác nhận.',
         audience: 'Cặp đôi, gia đình, nhóm bạn',
         kind: 'nature',
+        serviceId: 's11',
         images: [{ src: '/assets/KDL_Binh_My_choi_la.jpg', alt: 'Không gian nhà chòi ven hồ tại khu du lịch sinh thái Bình Mỹ' }],
       },
       {
@@ -97,6 +99,7 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
         activity: 'Tham quan vườn, chèo xuồng và dùng dịch vụ tại điểm. Hoạt động riêng dịp Valentine cần xác nhận.',
         audience: 'Cặp đôi yêu thiên nhiên',
         kind: 'nature',
+        serviceId: 's12',
         images: [{ src: '/assets/KDL_Binh_My_cau_go.jpg', alt: 'Cầu gỗ bắc qua ao tại khu du lịch sinh thái Bình Mỹ' }],
       },
     ],
@@ -105,7 +108,7 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
     month: 3,
     theme: 'Tháng Thanh niên',
     title: 'Tháng Thanh niên: Trải nghiệm làng nghề',
-    summary: 'Dùng điểm đón và workshop có địa chỉ công khai; lịch trải nghiệm cần xác nhận trước chuyến đi.',
+    summary: 'Điểm đón du lịch và bến Rạch Đáy có địa chỉ; lịch workshop cần xác nhận trước chuyến đi.',
     spots: [
       {
         name: 'Khu Du lịch Sinh thái Bình Mỹ · Workshop thủ công',
@@ -113,6 +116,7 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
         activity: 'Điểm đến có workshop khoai mì, gốm và hoạt động tìm hiểu địa phương; nội dung cụ thể theo lịch cơ sở xác nhận.',
         audience: 'Học sinh, sinh viên, gia đình',
         kind: 'craft',
+        serviceId: 's13',
         images: [{ src: '/assets/KDL_Binh_My_cheo_xuong.jpg', alt: 'Du khách trải nghiệm tại khu du lịch sinh thái Bình Mỹ' }],
       },
       {
@@ -121,6 +125,7 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
         activity: 'Chèo xuồng Rạch Đáy theo tour đã đặt; liên hệ điểm đón để được hướng dẫn vị trí tập trung.',
         audience: 'Học sinh, sinh viên, gia đình, nhóm bạn',
         kind: 'nature',
+        serviceId: 's14',
         images: [{ src: '/assets/KDL_Binh_My_cheo_xuong.jpg', alt: 'Chèo xuồng trên tuyến Rạch Đáy tại Bình Mỹ' }],
       },
     ],
@@ -228,16 +233,20 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
     month: 7,
     theme: 'Trại hè xanh · Nông dân nhí',
     title: 'Trại hè xanh: Nông dân nhí Bình Mỹ',
-    summary: 'Kế hoạch trại hè tại điểm du lịch có địa chỉ; cơ sở cần xác nhận ngày và sức chứa đoàn.',
+    summary: 'Trại hè gợi ý tại Vườn Làng nghề sáng tạo; vị trí chính xác, ngày và sức chứa cần xác nhận.',
     spots: [
       {
-        name: 'Khu Du lịch Sinh thái Bình Mỹ · Trại hè xanh',
-        location: 'Số 298, Đường Sông Lu, Ấp An Hòa, Xã Bình Mỹ, TP.HCM',
+        name: 'Vườn Làng nghề sáng tạo Bình Mỹ · Trại hè xanh',
+        location: 'Vườn Làng nghề sáng tạo, Xã Bình Mỹ · cần xác nhận vị trí chính xác',
         activity: 'Kế hoạch gồm làm vườn, vào bếp và trò chơi cho trẻ; cần cơ sở xác nhận hoạt động, ngày tổ chức và sức chứa.',
         audience: 'Trẻ 6–14 tuổi cùng gia đình hoặc trường học',
         kind: 'farm',
-        imageCaption: 'Ảnh tham khảo trong tài liệu',
-        images: [{ src: '/assets/word/thang-07-09/image2.jpg', alt: 'Trẻ em trồng cây tại vườn trong trại hè' }],
+        serviceId: 's15',
+        imageCaption: 'Trại hè xanh',
+        images: [
+          { src: '/assets/word/thang-07-09/image2.jpg', alt: 'Trẻ em trồng cây tại vườn trong trại hè' },
+          { src: '/assets/word/thang-07-09/image6.jpg', alt: 'Trẻ em chơi trò chơi đồng đội ngoài trời' },
+        ],
       },
     ],
   },
@@ -245,16 +254,20 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
     month: 8,
     theme: 'Lễ hội ẩm thực Nam Bộ',
     title: 'Bếp quê Bình Mỹ: Về Bình Mỹ – Thưởng thức vị quê',
-    summary: 'Kế hoạch lễ hội ẩm thực tại một địa điểm thật; lịch tổ chức và hộ tham gia chưa được xác nhận.',
+    summary: 'Lễ hội ẩm thực dự kiến tại Khu Du lịch Sinh thái Bình Mỹ; ngày tổ chức và hộ tham gia chưa được xác nhận.',
     spots: [
       {
-        name: 'Khu Du lịch Sinh thái Bình Mỹ · Lễ hội ẩm thực',
+        name: 'Khu Du lịch Sinh thái Bình Mỹ · Bếp quê',
         location: 'Số 298, Đường Sông Lu, Ấp An Hòa, Xã Bình Mỹ, TP.HCM',
         activity: 'Kế hoạch gồm phiên chợ món quê, workshop nấu ăn và trải nghiệm từ vườn đến bàn ăn; cần xác nhận ngày và đơn vị tham gia.',
         audience: 'Gia đình, nhóm bạn, du khách yêu ẩm thực',
         kind: 'food',
-        imageCaption: 'Ảnh tham khảo trong tài liệu',
-        images: [{ src: '/assets/word/thang-07-09/image8.jpg', alt: 'Gian hàng ẩm thực trong không gian nhà vườn' }],
+        serviceId: 's16',
+        imageCaption: 'Bếp quê Bình Mỹ',
+        images: [
+          { src: '/assets/word/thang-07-09/image8.jpg', alt: 'Không gian gian hàng ẩm thực trong nhà vườn' },
+          { src: '/assets/word/thang-07-09/image10.jpg', alt: 'Khách tham gia workshop nấu món dân gian' },
+        ],
       },
     ],
   },
@@ -265,13 +278,17 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
     summary: 'Kế hoạch Trung thu tại địa điểm thật; ngày tổ chức và chương trình sân khấu cần được xác nhận.',
     spots: [
       {
-        name: 'Khu Du lịch Sinh thái Bình Mỹ · Đêm hội Trung thu',
-        location: 'Số 298, Đường Sông Lu, Ấp An Hòa, Xã Bình Mỹ, TP.HCM',
+        name: 'Vườn Ký Ức BM · Đêm hội Trung thu',
+        location: 'Vườn Ký Ức BM, Xã Bình Mỹ · điểm hỗ trợ du lịch tại số 298 Đường Sông Lu',
         activity: 'Kế hoạch gồm làm lồng đèn, rước đèn, múa lân và phá cỗ; cần xác nhận lịch và hoạt động với điểm đến.',
         audience: 'Trẻ em, gia đình, nhóm bạn',
         kind: 'heritage',
-        imageCaption: 'Ảnh tham khảo trong tài liệu',
-        images: [{ src: '/assets/word/thang-07-09/image15.jpg', alt: 'Trẻ em tự tay làm lồng đèn Trung thu' }],
+        serviceId: 's17',
+        imageCaption: 'Đêm hội Trung thu',
+        images: [
+          { src: '/assets/word/thang-07-09/image14.jpg', alt: 'Trẻ em tham gia rước đèn Trung thu buổi tối' },
+          { src: '/assets/word/thang-07-09/image17.jpg', alt: 'Múa lân cho thiếu nhi trong đêm hội' },
+        ],
       },
     ],
   },
@@ -371,11 +388,11 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
 // and poster prices remain labeled as proposals or references until confirmed.
 export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
   1: {
-    status: 'Giá theo tài liệu · cần nhà vườn xác nhận',
+    status: 'Giá đề xuất · cần nhà vườn xác nhận',
     place: 'Khu Du lịch Sinh thái Bình Mỹ, số 298 Đường Sông Lu, Ấp An Hòa, Xã Bình Mỹ, TP.HCM',
     time: '08:00–17:00 · từ mùng 2 đến hết Rằm tháng Giêng âm lịch',
     organizer: 'Lịch chương trình Tết cần được xác nhận với đơn vị vận hành Du lịch Bình Mỹ.',
-    message: 'Địa chỉ điểm đến đã xác định. Các hoạt động check-in, hái lộc và hội xuân là đề xuất trong tài liệu, chưa phải lịch đã được cơ sở xác nhận.',
+    message: 'Địa chỉ điểm đến đã xác định. Các hoạt động check-in, hái lộc và hội xuân đang ở dạng đề xuất, chưa phải lịch đã được cơ sở xác nhận.',
     audience: 'Khách thích chụp ảnh; gia đình và nhóm bạn muốn trải nghiệm nhà vườn.',
     prices: [
       {
@@ -400,7 +417,7 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
         audience: 'Gia đình có trẻ em hoặc nhóm bạn đi dịp Tết.',
       },
     ],
-    pricingNote: 'Poster có thêm quyền lợi bản đồ hành trình, trong khi phần mô tả gói ghi tặng trà thảo mộc; cần chốt quyền lợi cuối cùng với nhà vườn. Hotline 09xx.xxx.xxx là số mẫu, không phải số liên hệ dùng được.',
+    pricingNote: 'Quyền lợi các gói cần được nhà vườn thống nhất trước khi nhận đặt chỗ. Số hotline 09xx.xxx.xxx chưa phải số liên hệ sử dụng được.',
     media: [
       { src: '/assets/word/thang-01/image1.png', alt: 'Poster Du xuân Bình Mỹ và hái lộc đầu năm', title: 'Poster Du xuân Bình Mỹ', orientation: 'portrait' },
       { src: '/assets/word/thang-01/image2.png', alt: 'Poster các hoạt động du xuân tại Bình Mỹ', title: 'Hoạt động du xuân', orientation: 'portrait' },
@@ -413,11 +430,11 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
     ],
   },
   2: {
-    status: 'Giá theo tài liệu · cần điểm đến xác nhận',
-    place: 'KDL Sinh thái ven sông Bình Mỹ, số 22 Nguyễn Thị Da; hoặc Khu Du lịch Sinh thái Bình Mỹ, số 298 Đường Sông Lu',
+    status: 'Giá đề xuất · cần điểm đến xác nhận',
+    place: 'KDL Sinh thái ven sông Bình Mỹ (mã vị trí XJ7X+258); hoặc Khu Du lịch Sinh thái Bình Mỹ, số 298 Đường Sông Lu',
     time: '17:00–22:00 · chương trình dự kiến trong tháng 2',
     organizer: 'Đơn vị tổ chức chương trình Valentine chưa được xác nhận.',
-    message: 'Hai địa chỉ khu du lịch có thật được liệt kê ở trên. Set menu, góc check-in và đêm nhạc acoustic là đề xuất trong tài liệu; xác nhận dịch vụ và lịch với điểm đến trước khi đặt.',
+    message: 'Hai địa chỉ khu du lịch được liệt kê ở trên. Set menu, góc check-in và đêm nhạc acoustic cần điểm đến xác nhận trước khi đặt.',
     audience: 'Cặp đôi, gia đình, nhóm bạn.',
     prices: [
       { name: 'Vé trải nghiệm Valentine', amount: 150000, unit: 'người' },
@@ -426,7 +443,7 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
       { src: '/assets/word/thang-02/image1.png', alt: 'Poster hoạt động Valentine và hẹn hò ven sông Bình Mỹ', title: 'Poster Valentine & hẹn hò', orientation: 'portrait' },
       { src: '/assets/word/thang-02/image2.png', alt: 'Poster giá 150.000 đồng mỗi người cho trải nghiệm Valentine', title: 'Giá và thông tin nhà hàng', orientation: 'portrait' },
     ],
-    pricingNote: 'Tài liệu chưa nêu rõ quyền lợi bao gồm trong vé. Hotline 09xx.xxx.xxx là số mẫu; xác nhận giá, menu, chương trình, lịch biểu diễn và số liên hệ với nhà hàng trước khi đặt.',
+    pricingNote: 'Quyền lợi trong vé chưa được xác nhận. Hãy hỏi nhà hàng về giá, menu, lịch biểu diễn và số liên hệ trước khi đặt.',
     activities: [
       { title: 'Check-in & lưu giữ khoảnh khắc', description: 'Cổng trái tim, góc chụp ảnh bên sông, tiểu cảnh hoa xuân và mini game ảnh đôi.' },
       { title: 'Thưởng thức ẩm thực ven sông', description: 'Đề xuất set menu cho hai người; ưu đãi đặt bàn sớm hoặc món tráng miệng là phương án cần nhà hàng xác nhận.' },
@@ -434,18 +451,18 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
     ],
   },
   3: {
-    status: 'Giá theo tài liệu · cần đơn vị tổ chức xác nhận',
+    status: 'Giá đề xuất · cần đơn vị tổ chức xác nhận',
     place: 'Khu Du lịch Sinh thái Bình Mỹ, số 298 Đường Sông Lu; điểm chèo xuồng tại Cầu Rạch Đáy, Đường Đỗ Thị Nhặt, Ấp An Hòa',
     time: '07:30–17:00 · chương trình dự kiến trong tháng 3',
     organizer: 'Workshop và điểm đón cần được xác nhận trực tiếp với đơn vị vận hành Du lịch Bình Mỹ.',
-    message: 'Điểm đón và điểm chèo xuồng Rạch Đáy có địa chỉ cụ thể. Giá, hoạt động làng nghề và nội dung tham quan trong tài liệu cần được cơ sở xác nhận trước khi quảng bá.',
+    message: 'Điểm đón và điểm chèo xuồng Rạch Đáy có địa chỉ cụ thể. Giá, hoạt động làng nghề và nội dung tham quan cần được đơn vị tổ chức xác nhận.',
     audience: 'Học sinh, sinh viên, câu lạc bộ và đoàn thể.',
     prices: [
       { name: 'Trải nghiệm làng nghề đan lục bình', amount: 100000, studentAmount: 50000, unit: 'người', includes: ['Tìm hiểu nghề và tự tay đan sản phẩm', 'Có quà mang về'] },
       { name: 'Khám phá làng gốm truyền thống', amount: 120000, studentAmount: 60000, unit: 'người', includes: ['Tạo hình và trang trí sản phẩm đất sét', 'Có quà mang về'] },
       { name: 'Tham quan hầm thủy đạo Rạch Đáy', amount: 80000, studentAmount: 40000, unit: 'người' },
     ],
-    pricingNote: 'Poster ghi giá học sinh, sinh viên lần lượt 50.000đ, 60.000đ và 40.000đ; dòng ghi chú nêu áp dụng cho đoàn từ 10 người. Xác nhận điều kiện này với đơn vị tổ chức trước khi quảng bá. Hotline 09xx.xxx.xxx là số mẫu.',
+    pricingNote: 'Giá học sinh, sinh viên và điều kiện đoàn từ 10 người cần được đơn vị tổ chức xác nhận trước khi đặt.',
     media: [
       { src: '/assets/word/thang-03/image1.png', alt: 'Poster Tháng 3 khám phá Bình Mỹ và ưu đãi học sinh sinh viên', title: 'Poster Tháng Thanh niên', orientation: 'portrait' },
       { src: '/assets/word/thang-03/image2.jpeg', alt: 'Infographic hoạt động và giá tham khảo tháng 3', title: 'Hoạt động và giá tham khảo', orientation: 'landscape' },
@@ -457,17 +474,17 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
     ],
   },
   7: {
-    status: 'Giá tham khảo trên poster · cần đơn vị xác nhận',
-    place: 'Điểm dự kiến: Khu Du lịch Sinh thái Bình Mỹ, số 298 Đường Sông Lu, Ấp An Hòa',
+    status: 'Giá đề xuất · cần đơn vị xác nhận',
+    place: 'Điểm dự kiến: Vườn Làng nghề sáng tạo Bình Mỹ; cần xác nhận vị trí cụ thể với đơn vị phụ trách',
     time: 'Lịch mẫu 08:00–15:30 · ưu tiên hoạt động ngoài trời buổi sáng',
-    message: 'Trại hè xanh “Nông dân nhí Bình Mỹ” theo tài liệu. Cần xác nhận cơ sở đăng cai, ngày tổ chức, hoạt động và sức chứa đoàn.',
+    message: 'Trại hè xanh “Nông dân nhí Bình Mỹ” đang ở dạng kế hoạch. Cần xác nhận cơ sở đăng cai, ngày tổ chức, hoạt động và sức chứa đoàn.',
     audience: 'Gia đình có trẻ 6–14 tuổi, trường học và câu lạc bộ thiếu nhi.',
     prices: [
       { name: 'Gói Nửa Ngày', amount: 149000, unit: 'bé', includes: ['Trồng cây và thu hoạch rau cùng chủ vườn', 'Nón lá, giỏ nhỏ và dụng cụ làm vườn', 'Mang về chậu cây tự trồng và hộ chiếu nông dân nhí'] },
       { name: 'Gói Nông Dân Nhí Trọn Ngày', amount: 299000, unit: 'bé', includes: ['Vườn rau, gian bếp, thủ công và trò chơi', 'Làm bánh dân gian, ăn trưa và nước uống', 'Giấy chứng nhận “Nông dân nhí Bình Mỹ” và quà'] },
       { name: 'Combo Gia Đình', amount: 899000, unit: '2 người lớn + 2 bé', includes: ['Trọn gói hoạt động cho gia đình 2 người lớn và 2 bé', 'Ăn trưa và nước uống', '4 hộ chiếu, chứng nhận và quà lưu niệm'] },
     ],
-    pricingNote: 'Mức giá trên poster được ghi là giá tham khảo. Địa điểm, hotline, lịch cuối tuần và giá cuối cùng cần được nhà vườn xác nhận.',
+    pricingNote: 'Địa điểm, ngày tổ chức và giá cuối cùng cần được nhà vườn xác nhận.',
     media: [
       { src: '/assets/word/thang-07-09/image1.jpg', alt: 'Nhóm trẻ tham gia trải nghiệm nông nghiệp ngoài trời', title: 'Trải nghiệm tại vườn', orientation: 'landscape' },
       { src: '/assets/word/thang-07-09/image2.jpg', alt: 'Trẻ em trồng cây và làm vườn', title: 'Một ngày làm nông dân', orientation: 'landscape' },
@@ -498,17 +515,17 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
     ],
   },
   8: {
-    status: 'Giá tham khảo trên poster · cần đơn vị xác nhận',
-    place: 'Điểm dự kiến: Khu Du lịch Sinh thái Bình Mỹ, số 298 Đường Sông Lu, Ấp An Hòa',
+    status: 'Giá đề xuất · cần đơn vị xác nhận',
+    place: 'Khu Du lịch Sinh thái Bình Mỹ, số 298 Đường Sông Lu, Ấp An Hòa, Xã Bình Mỹ',
     time: 'Lịch mẫu 09:00–17:00 · có thể tổ chức trong hai ngày cuối tuần',
-    message: 'Lễ hội ẩm thực Nam Bộ “Bếp quê Bình Mỹ” theo tài liệu. Cần xác nhận ngày, khu vực tổ chức và các hộ tham gia với cơ sở.',
+    message: 'Lễ hội ẩm thực Nam Bộ “Bếp quê Bình Mỹ” đang ở dạng kế hoạch. Cần xác nhận ngày, khu vực tổ chức và các hộ tham gia với cơ sở.',
     audience: 'Gia đình, nhóm bạn trẻ, người yêu ẩm thực và du khách quốc tế.',
     prices: [
       { name: 'Gói Chợ Quê', amount: 99000, unit: 'người', includes: ['Vào cổng chợ quê, tham quan gian hàng tre và lá dừa', 'Phiếu thưởng thức nhiều món truyền thống', 'Check-in không gian làng quê'] },
       { name: 'Gói Vào Bếp Cùng Người Bình Mỹ', amount: 249000, unit: 'người', includes: ['Tham quan vườn và chọn nguyên liệu', 'Tự tay chế biến, thưởng thức thành phẩm', 'Nhận công thức mang về'] },
       { name: 'Combo Mâm Cơm Đoàn Viên', amount: 999000, unit: 'nhóm 4 người', includes: ['Tham quan vườn và workshop nấu ăn', 'Mâm cơm quê và câu chuyện bếp quê', 'Phiếu chợ quê, tham gia cuộc thi “Một món quê – Một câu chuyện”'] },
     ],
-    pricingNote: 'Poster ghi đây là giá tham khảo. Cần xác nhận giá, menu, ngày tổ chức, địa điểm và hotline với các hộ tham gia.',
+    pricingNote: 'Giá, menu, ngày tổ chức và địa điểm cần được xác nhận với các hộ tham gia.',
     media: [
       { src: '/assets/word/thang-07-09/image7.jpg', alt: 'Người dân chuẩn bị nguyên liệu cho hoạt động ẩm thực', title: 'Chuẩn bị món quê', orientation: 'landscape' },
       { src: '/assets/word/thang-07-09/image8.jpg', alt: 'Không gian gian hàng ẩm thực trong nhà vườn', title: 'Phiên chợ hương vị quê', orientation: 'landscape' },
@@ -539,17 +556,17 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
     ],
   },
   9: {
-    status: 'Giá tham khảo trên poster · cần đơn vị xác nhận',
-    place: 'Điểm dự kiến: Khu Du lịch Sinh thái Bình Mỹ, số 298 Đường Sông Lu, Ấp An Hòa',
+    status: 'Giá đề xuất · cần đơn vị xác nhận',
+    place: 'Điểm hỗ trợ du lịch: số 298 Đường Sông Lu, Ấp An Hòa; chương trình dự kiến tại Vườn Ký Ức BM',
     time: 'Lịch mẫu 16:00–20:30 · ngày dương lịch thay đổi theo Rằm tháng 8 âm lịch',
-    message: 'Đêm hội Trung thu “Trăng về Bình Mỹ” theo tài liệu. Cần xác nhận ngày âm lịch tương ứng, địa điểm tổ chức và chương trình với cơ sở.',
+    message: 'Đêm hội Trung thu “Trăng về Bình Mỹ” đang ở dạng kế hoạch. Cần xác nhận ngày âm lịch tương ứng, địa điểm tổ chức và chương trình với cơ sở.',
     audience: 'Gia đình có trẻ nhỏ, cặp đôi, nhóm bạn và du khách yêu văn hóa truyền thống.',
     prices: [
       { name: 'Vé Đêm Hội', amount: 79000, unit: 'người', includes: ['Vào Vườn trăng ký ức và các góc chụp ảnh', 'Rước đèn theo con đường ánh trăng', 'Múa lân, phá cỗ và kể chuyện dưới trăng'] },
       { name: 'Gói Tự Tay Làm Ánh Trăng', amount: 199000, unit: 'người', includes: ['Vé đêm hội và workshop', 'Làm lồng đèn, bánh Trung thu đơn giản và đèn LED mang về', 'Gửi điều ước lên cây điều ước'] },
       { name: 'Combo Gia Đình', amount: 699000, unit: 'nhóm 4 người', includes: ['Vé đêm hội và workshop cho 4 người', 'Bàn trà và bánh tại nhà vườn', 'Quà lưu niệm nhỏ cho cả nhà'] },
     ],
-    pricingNote: 'Poster ghi đây là giá tham khảo. Ngày 25/09/2026 đã qua; cần xác nhận lịch âm, ngày tổ chức, địa điểm và giá mới cho từng năm.',
+    pricingNote: 'Ngày dự kiến 25/09/2026 đã qua; cần xác nhận lịch âm, ngày tổ chức, địa điểm và giá mới cho từng năm.',
     media: [
       { src: '/assets/word/thang-07-09/image14.jpg', alt: 'Trẻ em tham gia rước đèn Trung thu buổi tối', title: 'Đêm hội Trung thu', orientation: 'landscape' },
       { src: '/assets/word/thang-07-09/image15.jpg', alt: 'Trẻ em tự làm lồng đèn Trung thu', title: 'Workshop làm đèn lồng', orientation: 'landscape' },
@@ -573,7 +590,7 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
       { time: '19:15–20:00', activity: 'Phá cỗ, kể chuyện dưới trăng' },
       { time: '20:00–20:30', activity: 'Chụp ảnh, giao lưu, kết thúc' },
     ],
-    dateNote: 'Tài liệu lấy năm 2026 làm ví dụ: Rằm tháng 8 rơi vào 25/09/2026 (đã qua tính đến 14/10/2026). Các năm sau cần đối chiếu lịch âm; nếu ngày lễ rơi vào tháng 10 thì chuyển chương trình sang tháng 10.',
+    dateNote: 'Rằm tháng 8 năm 2026 rơi vào 25/09/2026 (đã qua). Các năm sau cần đối chiếu lịch âm; nếu ngày lễ rơi vào tháng 10 thì chuyển chương trình sang tháng 10.',
     operationNotes: [
       'Ưu tiên đèn LED cho trẻ nhỏ; không thả đèn xuống sông hoặc thả đèn trời.',
       'Bố trí tuyến rước đèn xa mép nước, hệ thống điện ngoài trời an toàn, lối thoát hiểm và phương án trú mưa.',
@@ -587,5 +604,5 @@ CAMPAIGN_DETAILS[10] = {
   ...CAMPAIGN_DETAILS[9]!,
   status: 'Chỉ chuyển sang tháng 10 nếu Rằm tháng 8 âm lịch rơi vào tháng này',
   time: 'Dùng lịch trình mẫu 16:00–20:30; đối chiếu ngày dương lịch theo lịch âm từng năm',
-  dateNote: 'Theo tài liệu, nếu ngày Trung thu dương lịch rơi vào tháng 10 thì chuyển đêm hội từ tháng 9 sang tháng 10. Xác nhận ngày và lịch tổ chức cho từng năm.',
+  dateNote: 'Nếu ngày Trung thu dương lịch rơi vào tháng 10 thì chuyển đêm hội từ tháng 9 sang tháng 10. Xác nhận ngày và lịch tổ chức cho từng năm.',
 };

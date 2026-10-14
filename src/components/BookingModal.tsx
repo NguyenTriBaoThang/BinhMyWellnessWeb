@@ -204,10 +204,16 @@ export default function BookingModal({
             </div>
           )}
 
+          {service.testOnly && (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-950">
+              Đây là yêu cầu đặt chỗ thử nghiệm. Ngày, địa điểm và giá đang chờ đơn vị vận hành xác nhận; lượt thử này không thu tiền.
+            </div>
+          )}
+
           {success && (
             <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center gap-2 font-semibold">
               <Check className="w-5 h-5 shrink-0 text-emerald-600" />
-              <span>Gửi yêu cầu thành công! Đang chuyển đến trang quản lý đơn...</span>
+              <span>{service.testOnly ? 'Tạo yêu cầu thử nghiệm thành công! Đang chuyển đến trang quản lý đơn...' : 'Gửi yêu cầu thành công! Đang chuyển đến trang quản lý đơn...'}</span>
             </div>
           )}
 
@@ -353,13 +359,13 @@ export default function BookingModal({
           {/* Price summary */}
           <div className="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center justify-between">
             <div>
-              <span className="text-[11px] text-emerald-800 block">Tạm tính ({people} khách)</span>
+              <span className="text-[11px] text-emerald-800 block">{service.testOnly ? `Tổng giá đề xuất (${people} ${service.bookingUnit || 'khách'})` : `Tạm tính (${people} khách)`}</span>
               <span className="text-xl font-black text-forest-900 font-mono">
                 {formatVND(total)}
               </span>
             </div>
             <div className="text-[10px] text-emerald-700 text-right">
-              Thanh toán trực tiếp <br /> khi đến nhà vườn
+              {service.testOnly ? <>Không thu tiền<br />trong lượt thử</> : <>Thanh toán trực tiếp <br /> khi đến nhà vườn</>}
             </div>
           </div>
 
@@ -377,7 +383,7 @@ export default function BookingModal({
               disabled={loading || success || checkingCapacity || availablePlaces === 0 || capacityErrorBlocksBooking}
               className="px-6 py-2.5 rounded-xl bg-forest-700 hover:bg-forest-800 text-white text-xs sm:text-sm font-bold shadow-md shadow-forest-700/20 disabled:opacity-60 transition-all"
             >
-              {loading ? 'Đang gửi...' : 'Xác nhận đặt lịch'}
+              {loading ? 'Đang gửi...' : service.testOnly ? 'Gửi yêu cầu thử nghiệm' : 'Xác nhận đặt lịch'}
             </button>
           </div>
         </form>

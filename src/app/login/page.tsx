@@ -5,13 +5,18 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { LogIn, Key, Shield, Trees, User, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Role } from '@/types';
+import { DEFAULT_ACCOUNTS } from '@/lib/constants';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('baothang@gmail.com');
-  const [password, setPassword] = useState('password@123');
+  const [email, setEmail] = useState(process.env.NODE_ENV !== 'production' ? 'baothang@gmail.com' : '');
+  const [password, setPassword] = useState(process.env.NODE_ENV !== 'production' ? 'password@123' : '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const demoProviders = DEFAULT_ACCOUNTS.filter((account) =>
+    account.role === 'PROVIDER' &&
+    (process.env.NODE_ENV !== 'production' || account.email.endsWith('@binhmy.test'))
+  );
 
   const getRedirectPath = (role: Role) => {
     const requestedPath = new URLSearchParams(window.location.search).get('returnTo');
@@ -48,14 +53,14 @@ export default function LoginPage() {
     }
   };
 
-  const quickLoginAs = async (role: Role) => {
+  const quickLoginAs = async (role: Role, providerEmail?: string) => {
     setError(null);
     setLoading(true);
     try {
       const res = await fetch('/api/auth/switch-role', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role }),
+        body: JSON.stringify({ role, providerEmail }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Lỗi đăng nhập nhanh');
@@ -85,12 +90,12 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* 1-Click Quick Demo Accounts Box */}
-        <div className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200/80 space-y-2.5">
+        {/* Development-only accounts for local workflow checks */}
+        {(process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_BM_ENABLE_TEST_BOOKINGS === 'true') && <div className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200/80 space-y-2.5">
           <div className="flex items-center justify-between text-xs font-bold text-emerald-900">
             <span className="flex items-center gap-1.5">
               <Key className="w-4 h-4 text-emerald-700" />
-              Tài khoản mẫu được cấu hình:
+              {process.env.NODE_ENV === 'production' ? 'Tài khoản thử nghiệm (website đang bật chế độ thử):' : 'Tài khoản thử nghiệm (máy phát triển):'}
             </span>
             <span className="font-mono text-[11px] text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded">
               pass: password@123
@@ -115,24 +120,30 @@ export default function LoginPage() {
               <span className="text-[11px] font-semibold text-emerald-700">1-Chạm →</span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => quickLoginAs('PROVIDER')}
-              className="flex items-center justify-between p-2.5 bg-white hover:bg-amber-100/50 rounded-xl border border-amber-200 text-left transition-all text-xs"
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center">
-                  <Trees className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="font-bold text-zinc-900 block">Chủ nhà vườn: Vườn Xanh A</span>
-                  <span className="text-[11px] text-zinc-500 font-mono">nhavuona@gmail.com</span>
-                </div>
+            <details className="rounded-xl border border-amber-200 bg-white p-2.5 text-xs">
+              <summary className="cursor-pointer font-bold text-amber-900">Tài khoản nhà vườn ({demoProviders.length})</summary>
+              <div className="mt-2 grid gap-2">
+                {demoProviders.map((provider) => (
+                  <button
+                    key={provider.email}
+                    type="button"
+                    onClick={() => quickLoginAs('PROVIDER', provider.email)}
+                    className="flex items-center justify-between gap-2 rounded-lg border border-amber-100 bg-amber-50/50 p-2 text-left hover:bg-amber-100/70"
+                  >
+                    <span className="flex min-w-0 items-center gap-2">
+                      <Trees className="h-4 w-4 shrink-0 text-amber-800" />
+                      <span className="min-w-0">
+                        <span className="block truncate font-bold text-zinc-900">{provider.name.replace('Tài khoản thử nghiệm · ', '')}</span>
+                        <span className="block truncate font-mono text-[10px] text-zinc-500">{provider.email}</span>
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-[10px] font-semibold text-amber-700">Đăng nhập →</span>
+                  </button>
+                ))}
               </div>
-              <span className="text-[11px] font-semibold text-amber-700">1-Chạm →</span>
-            </button>
+            </details>
 
-            <button
+            {process.env.NODE_ENV !== 'production' && <button
               type="button"
               onClick={() => quickLoginAs('ADMIN')}
               className="flex items-center justify-between p-2.5 bg-white hover:bg-rose-100/50 rounded-xl border border-rose-200 text-left transition-all text-xs"
@@ -147,9 +158,9 @@ export default function LoginPage() {
                 </div>
               </div>
               <span className="text-[11px] font-semibold text-rose-700">1-Chạm →</span>
-            </button>
+            </button>}
           </div>
-        </div>
+        </div>}
 
         {/* Regular Login Form */}
         <form onSubmit={handleLogin} className="space-y-4">

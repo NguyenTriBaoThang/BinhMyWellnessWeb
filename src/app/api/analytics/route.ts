@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     }
 
     const source = typeof body.source === 'string' ? body.source.trim().slice(0, 60) : 'Trực tiếp';
-    db.trackEvent('view', body.target, source || 'Trực tiếp');
+    await db.trackEvent('view', body.target, source || 'Trực tiếp');
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ success: false });

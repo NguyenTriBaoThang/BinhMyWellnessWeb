@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db, isPersistentDatabaseConfigured, isTestBookingModeEnabled } from '@/lib/db';
 import { getTodayInVietnam, isBookableSlotInVietnam } from '@/lib/utils';
 
 export async function GET(req: Request) {
+  if (process.env.NODE_ENV === 'production' && !isPersistentDatabaseConfigured()) {
+    return NextResponse.json({ error: 'Website chưa được kết nối cơ sở dữ liệu đặt chỗ.' }, { status: 503 });
+  }
   const searchParams = new URL(req.url).searchParams;
   const requestedDate = searchParams.get('date') || getTodayInVietnam();
   const parsedDate = new Date(`${requestedDate}T00:00:00.000Z`);
@@ -24,7 +27,7 @@ export async function GET(req: Request) {
 
       const service = await db.getServiceById(serviceId);
       const provider = service ? await db.getProviderById(service.providerId) : null;
-      if (!service || service.status !== 'PUBLISHED' || !provider?.active || !service.slots.includes(slot)) {
+      if (!service || (service.testOnly && process.env.NODE_ENV === 'production' && !isTestBookingModeEnabled()) || service.status !== 'PUBLISHED' || !provider?.active || !service.slots.includes(slot)) {
         return NextResponse.json({ error: 'Khung giờ này hiện không khả dụng.' }, { status: 404 });
       }
       if (!isBookableSlotInVietnam(requestedDate, slot)) {
@@ -37,7 +40,7 @@ export async function GET(req: Request) {
           serviceId,
           slot,
           capacity: service.capacity,
-          availablePlaces: db.getRemainingCapacity(serviceId, requestedDate, slot),
+          availablePlaces: await db.getRemainingCapacity(serviceId, requestedDate, slot),
           updatedAt: new Date().toISOString(),
         },
         { headers: { 'Cache-Control': 'no-store, max-age=0' } }

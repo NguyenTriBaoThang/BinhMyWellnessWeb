@@ -1,6 +1,6 @@
-import { Role } from '@/types';
+import { Role, Service } from '@/types';
 
-export const DEFAULT_ACCOUNTS = [
+const CORE_DEFAULT_ACCOUNTS = [
   {
     id: 'user-customer-1',
     email: 'baothang@gmail.com',
@@ -12,7 +12,7 @@ export const DEFAULT_ACCOUNTS = [
   {
     id: 'user-provider-1',
     email: 'nhavuona@gmail.com',
-    name: 'Chủ Vườn Xanh A',
+    name: 'Vườn xanh Bình Mỹ · tài khoản thử nghiệm',
     phone: '0908123456',
     role: 'PROVIDER' as Role,
     providerProfileId: 'p1',
@@ -106,7 +106,7 @@ export const SEED_PROVIDERS = [
     name: 'Bình Mỹ Riverside',
     story: 'Khu du lịch sinh thái ven sông Bình Mỹ Riverside là điểm đến nổi tiếng bậc nhất xã Bình Mỹ. Cơ sở sở hữu bến sông thoáng rộng, hoạt động chèo SUP ven sông, chòi nghỉ dã ngoại và khuôn viên giải trí sinh thái phong phú.',
     contact: '0918 396 396 · info@binhmyriverside.com',
-    address: '22 Nguyễn Thị Da (Đường 179 cũ), Ấp 18, Xã Bình Mỹ, Huyện Củ Chi, TP.HCM',
+    address: 'XJ7X+258, Xã Bình Mỹ, TP.HCM',
     active: true,
   },
   {
@@ -119,9 +119,40 @@ export const SEED_PROVIDERS = [
     address: 'Đường Hà Duy Phiên (Tỉnh lộ 9), Ấp 6B, Xã Bình Mỹ, Huyện Củ Chi, TP.HCM',
     active: true,
   },
+  {
+    id: 'p9',
+    code: 'p9',
+    userId: 'user-provider-9',
+    name: 'Khu Du lịch Sinh thái Bình Mỹ',
+    story: 'Tài khoản thử nghiệm cho các yêu cầu trải nghiệm theo kế hoạch tháng tại Khu Du lịch Sinh thái Bình Mỹ.',
+    contact: '0969 380 117 · binhmycorp@gmail.com',
+    address: 'Số 298, Đường Sông Lu, Ấp An Hòa, Xã Bình Mỹ, TP. Hồ Chí Minh',
+    active: true,
+  },
+  {
+    id: 'p10',
+    code: 'p10',
+    userId: 'user-provider-10',
+    name: 'Vườn Làng nghề sáng tạo Bình Mỹ',
+    story: 'Tài khoản thử nghiệm cho hoạt động ẩm thực và tham quan tại Vườn Làng nghề sáng tạo Bình Mỹ. Vị trí và lịch tổ chức cần xác nhận với đơn vị phụ trách.',
+    contact: 'Tài khoản thử nghiệm · chưa có thông tin liên hệ thực tế',
+    address: 'Vườn Làng nghề sáng tạo, Xã Bình Mỹ, TP. Hồ Chí Minh · cần xác nhận vị trí chính xác',
+    active: true,
+  },
 ];
 
-export const SEED_SERVICES = [
+export const DEFAULT_ACCOUNTS = [
+  ...CORE_DEFAULT_ACCOUNTS,
+  ...SEED_PROVIDERS.filter((provider) => provider.id !== 'p1').map((provider) => ({
+    id: provider.userId,
+    email: `provider.${provider.id}@binhmy.test`,
+    name: `Tài khoản thử nghiệm · ${provider.name}`,
+    role: 'PROVIDER' as Role,
+    providerProfileId: provider.id,
+  })),
+];
+
+export const SEED_SERVICES: Service[] = [
   {
     id: 's1',
     code: 's1',
@@ -277,7 +308,7 @@ export const SEED_SERVICES = [
     code: 's7',
     providerId: 'p7',
     providerName: 'Bình Mỹ Riverside',
-    providerAddress: '22 Nguyễn Thị Da (Đường 179 cũ), Ấp 18, Xã Bình Mỹ',
+    providerAddress: 'XJ7X+258, Xã Bình Mỹ, TP.HCM',
     name: 'Chèo SUP hoàng hôn & trải nghiệm sinh thái ven sông Sài Gòn',
     category: 'Thiên nhiên',
     price: 250000,
@@ -347,3 +378,85 @@ export const SEED_SERVICES = [
     updatedAt: new Date().toISOString(),
   },
 ];
+
+function createCampaignDemoService(input: {
+  id: string;
+  providerId: string;
+  name: string;
+  category: Service['category'];
+  price: number;
+  duration: number;
+  image: string;
+  description: string;
+  slots: string[];
+  bookingUnit?: string;
+  latitude?: number;
+  longitude?: number;
+}): Service {
+  const provider = SEED_PROVIDERS.find((item) => item.id === input.providerId)!;
+  return {
+    ...input,
+    code: input.id,
+    providerName: provider.name,
+    providerAddress: provider.address,
+    capacity: 16,
+    groups: ['family', 'friends'],
+    indoor: false,
+    status: 'PUBLISHED',
+    testOnly: true,
+    amenities: [],
+    conditions: 'Đặt chỗ thử nghiệm. Lịch, địa điểm và mức giá đang chờ đơn vị vận hành xác nhận; không thu tiền qua lượt thử này.',
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+SEED_SERVICES.push(
+  createCampaignDemoService({
+    id: 's10', providerId: 'p9', name: 'Du xuân và trải nghiệm Vườn Ký Ức BM', category: 'Nông nghiệp',
+    price: 99000, duration: 90, image: '/assets/word/thang-01/image1.png',
+    description: 'Yêu cầu thử nghiệm theo kế hoạch tháng 1. Nhà vườn cần xác nhận ngày, hoạt động và giá cuối cùng.',
+    slots: ['08:30', '10:30', '14:00'], bookingUnit: 'người', latitude: 10.96, longitude: 106.64,
+  }),
+  createCampaignDemoService({
+    id: 's11', providerId: 'p7', name: 'Trải nghiệm Valentine bên sông Bình Mỹ', category: 'Thiên nhiên',
+    price: 150000, duration: 120, image: '/assets/word/thang-02/image1.png',
+    description: 'Yêu cầu thử nghiệm tại KDL Sinh thái ven sông Bình Mỹ. Chương trình Valentine cần cơ sở xác nhận.',
+    slots: ['17:00', '18:00', '19:00'], bookingUnit: 'người', latitude: 10.9642, longitude: 106.6575,
+  }),
+  createCampaignDemoService({
+    id: 's12', providerId: 'p9', name: 'Valentine tại Khu Du lịch Sinh thái Bình Mỹ', category: 'Thiên nhiên',
+    price: 150000, duration: 120, image: '/assets/KDL_Binh_My_cau_go.jpg',
+    description: 'Yêu cầu thử nghiệm theo kế hoạch tháng 2. Nhà vườn cần xác nhận lịch và nội dung chương trình.',
+    slots: ['17:00', '18:00', '19:00'], bookingUnit: 'người', latitude: 10.96, longitude: 106.64,
+  }),
+  createCampaignDemoService({
+    id: 's13', providerId: 'p9', name: 'Workshop làng nghề Bình Mỹ', category: 'Văn hóa',
+    price: 100000, duration: 90, image: '/assets/word/thang-03/image1.png',
+    description: 'Yêu cầu thử nghiệm cho hoạt động thủ công tháng 3. Đơn vị tổ chức sẽ xác nhận nghề, thời gian và giá.',
+    slots: ['08:30', '10:30', '14:00'], bookingUnit: 'người', latitude: 10.96, longitude: 106.64,
+  }),
+  createCampaignDemoService({
+    id: 's14', providerId: 'p9', name: 'Chèo xuồng và khám phá Rạch Đáy', category: 'Thiên nhiên',
+    price: 80000, duration: 60, image: '/assets/KDL_Binh_My_cheo_xuong.jpg',
+    description: 'Yêu cầu thử nghiệm chuyến xuồng Rạch Đáy. Điểm đón và điều kiện an toàn cần được xác nhận.',
+    slots: ['08:30', '10:30', '14:00'], bookingUnit: 'người', latitude: 10.96, longitude: 106.64,
+  }),
+  createCampaignDemoService({
+    id: 's15', providerId: 'p10', name: 'Trại hè xanh · Nông dân nhí Bình Mỹ', category: 'Nông nghiệp',
+    price: 149000, duration: 90, image: '/assets/word/thang-07-09/image2.jpg',
+    description: 'Yêu cầu thử nghiệm cho gói nửa ngày. Số trẻ, độ tuổi, lịch và giá cuối cùng cần được đơn vị vận hành xác nhận.',
+    slots: ['08:30', '10:30', '14:00'], bookingUnit: 'bé', latitude: 10.96, longitude: 106.64,
+  }),
+  createCampaignDemoService({
+    id: 's16', providerId: 'p9', name: 'Lễ hội ẩm thực Bếp quê Bình Mỹ', category: 'Ẩm thực',
+    price: 99000, duration: 90, image: '/assets/word/thang-07-09/image8.jpg',
+    description: 'Yêu cầu thử nghiệm cho gói chợ quê. Vị trí chính xác, ngày hội, gian hàng và giá cần xác nhận.',
+    slots: ['09:00', '11:00', '13:00', '15:00'], bookingUnit: 'người',
+  }),
+  createCampaignDemoService({
+    id: 's17', providerId: 'p9', name: 'Đêm hội Trung thu Trăng về Bình Mỹ', category: 'Văn hóa',
+    price: 79000, duration: 270, image: '/assets/word/thang-07-09/image14.jpg',
+    description: 'Yêu cầu thử nghiệm vé đêm hội. Ngày tổ chức thay đổi theo lịch âm; lịch, sức chứa và giá cần xác nhận.',
+    slots: ['16:00'], bookingUnit: 'người', latitude: 10.96, longitude: 106.64,
+  }),
+);
