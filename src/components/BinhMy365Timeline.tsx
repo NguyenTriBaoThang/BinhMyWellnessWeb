@@ -149,7 +149,7 @@ export default function BinhMy365Timeline({
                     </div>
                   ))}
                   <span className="absolute bottom-2 left-2 rounded-md bg-black/55 px-2 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
-                    Ảnh địa điểm
+                    {spot.imageCaption || 'Ảnh địa điểm'}
                   </span>
                 </div>
               ) : (
@@ -245,6 +245,32 @@ export default function BinhMy365Timeline({
             {details.message && <p className="mt-3 max-w-4xl text-sm leading-relaxed text-zinc-700">{details.message}</p>}
           </div>
 
+          {details.media && details.media.length > 0 && (
+            <details className="border-b border-forest-100 px-4 py-3 sm:px-6">
+              <summary className="cursor-pointer text-xs font-bold text-forest-900">
+                Xem {details.media.length} ảnh và poster trích từ Word
+              </summary>
+              <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
+                {details.media.map((media) => (
+                  <figure key={media.src} className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+                    <a href={media.src} target="_blank" rel="noreferrer" aria-label={`Mở ảnh gốc: ${media.title}`}>
+                      <div className={`relative bg-zinc-100 ${media.orientation === 'portrait' ? 'aspect-[3/4]' : 'aspect-[4/3]'}`}>
+                        <Image
+                          src={media.src}
+                          alt={media.alt}
+                          fill
+                          sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                          className="object-contain transition-transform duration-300 hover:scale-[1.02]"
+                        />
+                      </div>
+                    </a>
+                    <figcaption className="px-2.5 py-2 text-[10px] font-semibold leading-snug text-zinc-700">Ảnh tham khảo · {media.title}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            </details>
+          )}
+
           <div className="grid gap-5 p-4 sm:p-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
             <div className="space-y-4">
               <dl className="space-y-3 rounded-xl border border-zinc-200 bg-white/90 p-4 text-xs">
@@ -284,7 +310,10 @@ export default function BinhMy365Timeline({
                         {details.prices.map((price) => (
                           <tr key={price.name} className="align-top">
                             <th scope="row" className="px-4 py-3 font-semibold leading-relaxed text-zinc-800">{price.name}</th>
-                            <td className="whitespace-nowrap px-4 py-3 font-bold text-forest-800">{formatVND(price.amount)} / {price.unit}</td>
+                            <td className="whitespace-nowrap px-4 py-3 font-bold text-forest-800">
+                              <span>{formatVND(price.amount)} / {price.unit}</span>
+                              {price.studentAmount && <span className="mt-1 block text-[10px] font-semibold text-amber-800">HS/SV: {formatVND(price.studentAmount)} / người</span>}
+                            </td>
                             <td className="px-4 py-3 leading-relaxed text-zinc-600">
                               {price.includes?.length ? <ul className="list-disc space-y-1 pl-4">{price.includes.map((item) => <li key={item}>{item}</li>)}</ul> : null}
                               {price.audience && <p className={price.includes?.length ? 'mt-1.5' : ''}>{price.audience}</p>}

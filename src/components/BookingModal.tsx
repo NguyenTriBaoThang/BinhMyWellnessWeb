@@ -79,7 +79,7 @@ export default function BookingModal({
     return () => {
       active = false;
     };
-  }, [currentUser?.role, date, service?.id, slot]);
+  }, [currentUser?.role, date, service, slot]);
 
   if (!service) return null;
 

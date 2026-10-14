@@ -8,6 +8,7 @@ export interface CampaignSpot {
   kind: CampaignSpotKind;
   image?: string;
   imageAlt?: string;
+  imageCaption?: string;
   images?: { src: string; alt: string }[];
   serviceId?: string;
 }
@@ -24,8 +25,16 @@ export interface CampaignPrice {
   name: string;
   amount: number;
   unit: string;
+  studentAmount?: number;
   includes?: string[];
   audience?: string;
+}
+
+export interface CampaignMediaItem {
+  src: string;
+  alt: string;
+  title: string;
+  orientation: 'portrait' | 'landscape';
 }
 
 export interface CampaignScheduleItem {
@@ -42,6 +51,7 @@ export interface CampaignDetails {
   audience?: string;
   prices?: CampaignPrice[];
   pricingNote?: string;
+  media?: CampaignMediaItem[];
   activities?: { title: string; description: string }[];
   schedule?: CampaignScheduleItem[];
   dateNote?: string;
@@ -252,6 +262,8 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
         activity: 'Gieo hạt, chăm rau, thu hoạch nông sản và mang về chậu cây tự trồng.',
         audience: 'Trẻ 6–14 tuổi cùng gia đình hoặc trường học',
         kind: 'farm',
+        imageCaption: 'Ảnh tham khảo trong tài liệu',
+        images: [{ src: '/assets/word/thang-07-09/image2.jpg', alt: 'Trẻ em trồng cây tại vườn trong trại hè' }],
       },
       {
         name: 'Gian bếp nông dân nhí',
@@ -259,6 +271,8 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
         activity: 'Rửa rau, chuẩn bị nguyên liệu và làm bánh dân gian dưới sự giám sát của người lớn.',
         audience: 'Trẻ em và người thân',
         kind: 'food',
+        imageCaption: 'Ảnh tham khảo trong tài liệu',
+        images: [{ src: '/assets/word/thang-07-09/image3.jpg', alt: 'Trẻ em cùng người hướng dẫn chuẩn bị món ăn' }],
       },
       {
         name: 'Hộ chiếu nông dân nhí',
@@ -266,6 +280,8 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
         activity: 'Tích dấu qua bốn thử thách; hoàn thành chương trình sẽ nhận giấy chứng nhận và quà nhỏ.',
         audience: 'Trẻ em tham gia trại hè',
         kind: 'craft',
+        imageCaption: 'Ảnh tham khảo trong tài liệu',
+        images: [{ src: '/assets/word/thang-07-09/image6.jpg', alt: 'Trẻ em tham gia trò chơi đồng đội ngoài trời' }],
       },
     ],
   },
@@ -281,6 +297,8 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
         activity: 'Gian hàng ẩm thực do người dân giới thiệu và chế biến; danh sách món cần xác nhận với hộ tham gia.',
         audience: 'Gia đình, nhóm bạn, du khách yêu ẩm thực',
         kind: 'food',
+        imageCaption: 'Ảnh tham khảo trong tài liệu',
+        images: [{ src: '/assets/word/thang-07-09/image8.jpg', alt: 'Gian hàng ẩm thực trong không gian nhà vườn' }],
       },
       {
         name: 'Vào bếp cùng người Bình Mỹ',
@@ -288,6 +306,8 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
         activity: 'Tìm hiểu nguyên liệu, tự tay chế biến món dân gian và nhận công thức mang về.',
         audience: 'Gia đình, nhóm bạn',
         kind: 'food',
+        imageCaption: 'Ảnh tham khảo trong tài liệu',
+        images: [{ src: '/assets/word/thang-07-09/image10.jpg', alt: 'Khách thực hành nấu món dân gian trong workshop' }],
       },
       {
         name: 'Từ khu vườn đến bàn ăn',
@@ -295,6 +315,8 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
         activity: 'Tham quan vườn, tìm hiểu cách chăm sóc cây trồng và thu hoạch nguyên liệu.',
         audience: 'Gia đình, nhóm bạn và khách yêu ẩm thực',
         kind: 'farm',
+        imageCaption: 'Ảnh tham khảo trong tài liệu',
+        images: [{ src: '/assets/word/thang-07-09/image11.jpg', alt: 'Rau củ và nông sản tươi được thu hoạch từ vườn' }],
       },
     ],
   },
@@ -310,6 +332,8 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
         activity: 'Tự làm đèn ông sao hoặc đèn giấy; thành phẩm có thể mang về làm kỷ niệm.',
         audience: 'Trẻ em và gia đình',
         kind: 'craft',
+        imageCaption: 'Ảnh tham khảo trong tài liệu',
+        images: [{ src: '/assets/word/thang-07-09/image15.jpg', alt: 'Trẻ em tự tay làm lồng đèn Trung thu' }],
       },
       {
         name: 'Con đường ánh trăng',
@@ -317,6 +341,8 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
         activity: 'Dạo tuyến vườn trang trí đèn lồng và tiểu cảnh trăng rằm.',
         audience: 'Gia đình, cặp đôi, nhóm bạn',
         kind: 'nature',
+        imageCaption: 'Ảnh tham khảo trong tài liệu',
+        images: [{ src: '/assets/word/thang-07-09/image16.jpg', alt: 'Trẻ em rước đèn trên con đường ánh trăng' }],
       },
       {
         name: 'Đêm hội múa lân & phá cỗ',
@@ -324,6 +350,8 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
         activity: 'Dự kiến múa lân, trò chơi dân gian, rước đèn, phá cỗ và kể chuyện dưới trăng.',
         audience: 'Gia đình có trẻ nhỏ và du khách yêu văn hóa truyền thống',
         kind: 'heritage',
+        imageCaption: 'Ảnh tham khảo trong tài liệu',
+        images: [{ src: '/assets/word/thang-07-09/image17.jpg', alt: 'Đội múa lân biểu diễn trong đêm hội Trung thu' }],
       },
     ],
   },
@@ -419,8 +447,8 @@ export const CAMPAIGNS_365: MonthlyCampaign[] = [
   },
 ];
 
-// Operational details transcribed from the supplied month 1, 2, 3 and 7–9
-// planning documents. Planned events and unconfirmed prices remain labeled as such.
+// Details and media are drawn from the supplied monthly documents. Draft events
+// and poster prices remain labeled as proposals or references until confirmed.
 export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
   1: {
     status: 'Giá theo tài liệu · cần nhà vườn xác nhận',
@@ -452,7 +480,12 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
         audience: 'Gia đình có trẻ em hoặc nhóm bạn đi dịp Tết.',
       },
     ],
-    pricingNote: 'Hotline trong tài liệu là số mẫu (09xx.xxx.xxx), nên không hiển thị như số liên hệ. Xác nhận giá, lịch âm và địa điểm trước khi đặt.',
+    pricingNote: 'Poster có thêm quyền lợi bản đồ hành trình, trong khi phần mô tả gói ghi tặng trà thảo mộc; cần chốt quyền lợi cuối cùng với nhà vườn. Hotline 09xx.xxx.xxx là số mẫu, không phải số liên hệ dùng được.',
+    media: [
+      { src: '/assets/word/thang-01/image1.png', alt: 'Poster Du xuân Bình Mỹ và hái lộc đầu năm', title: 'Poster Du xuân Bình Mỹ', orientation: 'portrait' },
+      { src: '/assets/word/thang-01/image2.png', alt: 'Poster các hoạt động du xuân tại Bình Mỹ', title: 'Hoạt động du xuân', orientation: 'portrait' },
+      { src: '/assets/word/thang-01/image3.png', alt: 'Infographic giá ba gói trải nghiệm tháng 1', title: 'Các gói và giá tham khảo', orientation: 'landscape' },
+    ],
     activities: [
       { title: 'Check-in vườn hoa & hái lộc', description: 'Tản bộ, chụp ảnh áo dài và nhận lộc đầu năm.' },
       { title: 'Trải nghiệm nhà vườn', description: 'Tham quan cây ăn trái, tự hái trái chín theo mùa và thưởng thức đặc sản quê.' },
@@ -469,6 +502,10 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
     prices: [
       { name: 'Vé trải nghiệm Valentine', amount: 150000, unit: 'người' },
     ],
+    media: [
+      { src: '/assets/word/thang-02/image1.png', alt: 'Poster hoạt động Valentine và hẹn hò ven sông Bình Mỹ', title: 'Poster Valentine & hẹn hò', orientation: 'portrait' },
+      { src: '/assets/word/thang-02/image2.png', alt: 'Poster giá 150.000 đồng mỗi người cho trải nghiệm Valentine', title: 'Giá và thông tin nhà hàng', orientation: 'portrait' },
+    ],
     pricingNote: 'Tài liệu chưa nêu rõ quyền lợi bao gồm trong vé. Hotline 09xx.xxx.xxx là số mẫu; xác nhận giá, menu, chương trình, lịch biểu diễn và số liên hệ với nhà hàng trước khi đặt.',
     activities: [
       { title: 'Check-in & lưu giữ khoảnh khắc', description: 'Cổng trái tim, góc chụp ảnh bên sông, tiểu cảnh hoa xuân và mini game ảnh đôi.' },
@@ -484,11 +521,15 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
     message: 'Chương trình Tháng Thanh niên kết hợp làng nghề, trải nghiệm gốm và học tập thực tế tại hầm thủy đạo Rạch Đáy.',
     audience: 'Học sinh, sinh viên, câu lạc bộ và đoàn thể.',
     prices: [
-      { name: 'Trải nghiệm làng nghề đan lục bình', amount: 100000, unit: 'người', includes: ['Thử đan sản phẩm thủ công', 'Có quà mang về'] },
-      { name: 'Khám phá làng gốm truyền thống', amount: 120000, unit: 'người', includes: ['Trải nghiệm tạo hình và trang trí đất sét', 'Có quà mang về'] },
-      { name: 'Tham quan hầm thủy đạo Rạch Đáy', amount: 80000, unit: 'người' },
+      { name: 'Trải nghiệm làng nghề đan lục bình', amount: 100000, studentAmount: 50000, unit: 'người', includes: ['Tìm hiểu nghề và tự tay đan sản phẩm', 'Có quà mang về'] },
+      { name: 'Khám phá làng gốm truyền thống', amount: 120000, studentAmount: 60000, unit: 'người', includes: ['Tạo hình và trang trí sản phẩm đất sét', 'Có quà mang về'] },
+      { name: 'Tham quan hầm thủy đạo Rạch Đáy', amount: 80000, studentAmount: 40000, unit: 'người' },
     ],
-    pricingNote: 'Tài liệu có nêu ưu đãi 50% cho học sinh, sinh viên nhưng chưa ghi điều kiện và phạm vi áp dụng. Hotline 09xx.xxx.xxx là số mẫu; xác nhận thông tin với đơn vị tổ chức trước khi quảng bá.',
+    pricingNote: 'Poster ghi giá học sinh, sinh viên lần lượt 50.000đ, 60.000đ và 40.000đ; dòng ghi chú nêu áp dụng cho đoàn từ 10 người. Xác nhận điều kiện này với đơn vị tổ chức trước khi quảng bá. Hotline 09xx.xxx.xxx là số mẫu.',
+    media: [
+      { src: '/assets/word/thang-03/image1.png', alt: 'Poster Tháng 3 khám phá Bình Mỹ và ưu đãi học sinh sinh viên', title: 'Poster Tháng Thanh niên', orientation: 'portrait' },
+      { src: '/assets/word/thang-03/image2.jpeg', alt: 'Infographic hoạt động và giá tham khảo tháng 3', title: 'Hoạt động và giá tham khảo', orientation: 'landscape' },
+    ],
     activities: [
       { title: 'Làng nghề đan lục bình', description: 'Tìm hiểu nghề thủ công và tự tay đan sản phẩm từ lục bình.' },
       { title: 'Làng gốm truyền thống', description: 'Quan sát quy trình, thử tạo hình và trang trí sản phẩm đất sét.' },
@@ -496,12 +537,26 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
     ],
   },
   7: {
-    status: 'Đề xuất sự kiện · chưa có giá và địa điểm xác nhận',
+    status: 'Giá tham khảo trên poster · cần đơn vị xác nhận',
     place: 'Nhà vườn tại Bình Mỹ · cần xác nhận cơ sở đăng cai',
     time: 'Lịch mẫu 08:00–15:30 · ưu tiên hoạt động ngoài trời buổi sáng',
     message: 'Trại hè xanh “Nông dân nhí Bình Mỹ” với thông điệp “Một ngày về quê – Ngàn điều để học”.',
     audience: 'Gia đình có trẻ 6–14 tuổi, trường học và câu lạc bộ thiếu nhi.',
-    pricingNote: 'Tài liệu chưa cung cấp giá vé, địa chỉ cụ thể, hotline hoặc lịch tổ chức đã xác nhận.',
+    prices: [
+      { name: 'Gói Nửa Ngày', amount: 149000, unit: 'bé', includes: ['Trồng cây và thu hoạch rau cùng chủ vườn', 'Nón lá, giỏ nhỏ và dụng cụ làm vườn', 'Mang về chậu cây tự trồng và hộ chiếu nông dân nhí'] },
+      { name: 'Gói Nông Dân Nhí Trọn Ngày', amount: 299000, unit: 'bé', includes: ['Vườn rau, gian bếp, thủ công và trò chơi', 'Làm bánh dân gian, ăn trưa và nước uống', 'Giấy chứng nhận “Nông dân nhí Bình Mỹ” và quà'] },
+      { name: 'Combo Gia Đình', amount: 899000, unit: '2 người lớn + 2 bé', includes: ['Trọn gói hoạt động cho gia đình 2 người lớn và 2 bé', 'Ăn trưa và nước uống', '4 hộ chiếu, chứng nhận và quà lưu niệm'] },
+    ],
+    pricingNote: 'Mức giá trên poster được ghi là giá tham khảo. Địa điểm, hotline, lịch cuối tuần và giá cuối cùng cần được nhà vườn xác nhận.',
+    media: [
+      { src: '/assets/word/thang-07-09/image1.jpg', alt: 'Nhóm trẻ tham gia trải nghiệm nông nghiệp ngoài trời', title: 'Trải nghiệm tại vườn', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image2.jpg', alt: 'Trẻ em trồng cây và làm vườn', title: 'Một ngày làm nông dân', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image3.jpg', alt: 'Trẻ em học chuẩn bị món ăn dân gian', title: 'Gian bếp nông dân nhí', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image4.jpg', alt: 'Trẻ em tham gia hoạt động thủ công', title: 'Hoạt động thủ công', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image5.jpg', alt: 'Poster Trại hè xanh Nông dân nhí Bình Mỹ', title: 'Poster Trại hè xanh', orientation: 'portrait' },
+      { src: '/assets/word/thang-07-09/image6.jpg', alt: 'Trẻ em chơi trò chơi đồng đội ngoài trời', title: 'Trò chơi miền quê', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image21.png', alt: 'Infographic ba gói giá tham khảo Trại hè xanh', title: 'Các gói và giá tham khảo', orientation: 'landscape' },
+    ],
     activities: [
       { title: 'Một ngày làm nông dân', description: 'Nhận nón lá, giỏ và dụng cụ; học gieo hạt, chăm rau, thu hoạch và mang về chậu cây tự trồng.' },
       { title: 'Gian bếp nông dân nhí', description: 'Sơ chế nguyên liệu và làm bánh dân gian dưới sự giám sát của người lớn.' },
@@ -523,12 +578,26 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
     ],
   },
   8: {
-    status: 'Đề xuất lễ hội · chưa có giá và địa điểm xác nhận',
+    status: 'Giá tham khảo trên poster · cần đơn vị xác nhận',
     place: 'Không gian lễ hội tại Bình Mỹ · cần xác nhận cơ sở đăng cai',
     time: 'Lịch mẫu 09:00–17:00 · có thể tổ chức trong hai ngày cuối tuần',
     message: 'Lễ hội ẩm thực Nam Bộ “Bếp quê Bình Mỹ” với thông điệp “Về Bình Mỹ – Thưởng thức vị quê”.',
     audience: 'Gia đình, nhóm bạn trẻ, người yêu ẩm thực và du khách quốc tế.',
-    pricingNote: 'Tài liệu chưa cung cấp giá vé, giá workshop, menu, hotline hoặc ngày tổ chức xác nhận.',
+    prices: [
+      { name: 'Gói Chợ Quê', amount: 99000, unit: 'người', includes: ['Vào cổng chợ quê, tham quan gian hàng tre và lá dừa', 'Phiếu thưởng thức nhiều món truyền thống', 'Check-in không gian làng quê'] },
+      { name: 'Gói Vào Bếp Cùng Người Bình Mỹ', amount: 249000, unit: 'người', includes: ['Tham quan vườn và chọn nguyên liệu', 'Tự tay chế biến, thưởng thức thành phẩm', 'Nhận công thức mang về'] },
+      { name: 'Combo Mâm Cơm Đoàn Viên', amount: 999000, unit: 'nhóm 4 người', includes: ['Tham quan vườn và workshop nấu ăn', 'Mâm cơm quê và câu chuyện bếp quê', 'Phiếu chợ quê, tham gia cuộc thi “Một món quê – Một câu chuyện”'] },
+    ],
+    pricingNote: 'Poster ghi đây là giá tham khảo. Cần xác nhận giá, menu, ngày tổ chức, địa điểm và hotline với các hộ tham gia.',
+    media: [
+      { src: '/assets/word/thang-07-09/image7.jpg', alt: 'Người dân chuẩn bị nguyên liệu cho hoạt động ẩm thực', title: 'Chuẩn bị món quê', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image8.jpg', alt: 'Không gian gian hàng ẩm thực trong nhà vườn', title: 'Phiên chợ hương vị quê', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image10.jpg', alt: 'Khách tham gia workshop nấu món dân gian', title: 'Workshop vào bếp', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image11.jpg', alt: 'Nông sản và rau củ thu hoạch từ vườn', title: 'Từ vườn đến bàn ăn', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image12.jpg', alt: 'Mâm cơm quê với các món ăn truyền thống', title: 'Mâm cơm đoàn viên', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image13.jpg', alt: 'Poster Lễ hội ẩm thực Nam Bộ Bếp Quê Bình Mỹ', title: 'Poster Bếp quê Bình Mỹ', orientation: 'portrait' },
+      { src: '/assets/word/thang-07-09/image22.png', alt: 'Infographic ba gói giá tham khảo Lễ hội Bếp quê', title: 'Các gói và giá tham khảo', orientation: 'landscape' },
+    ],
     activities: [
       { title: 'Phiên chợ hương vị quê nhà', description: 'Dự kiến có bánh xèo, bánh ít, bánh dân gian, món kho, món canh và rau củ theo mùa; thực đơn cần xác nhận với các hộ tham gia.' },
       { title: 'Workshop “Vào bếp cùng người Bình Mỹ”', description: 'Tìm hiểu nguyên liệu, tự chế biến món dân gian và nhận công thức mang về.' },
@@ -550,12 +619,26 @@ export const CAMPAIGN_DETAILS: Partial<Record<number, CampaignDetails>> = {
     ],
   },
   9: {
-    status: 'Đề xuất sự kiện · chưa có giá và địa điểm xác nhận',
+    status: 'Giá tham khảo trên poster · cần đơn vị xác nhận',
     place: 'Vườn hoặc không gian tổ chức tại Bình Mỹ · cần xác nhận cơ sở đăng cai',
     time: 'Lịch mẫu 16:00–20:30 · ngày dương lịch thay đổi theo Rằm tháng 8 âm lịch',
     message: 'Đêm hội Trung thu “Trăng về Bình Mỹ” với thông điệp “Trăng sáng miền quê – Đong đầy ký ức”.',
     audience: 'Gia đình có trẻ nhỏ, cặp đôi, nhóm bạn và du khách yêu văn hóa truyền thống.',
-    pricingNote: 'Tài liệu chưa cung cấp giá vé, giá workshop, hotline hoặc ngày tổ chức xác nhận.',
+    prices: [
+      { name: 'Vé Đêm Hội', amount: 79000, unit: 'người', includes: ['Vào Vườn trăng ký ức và các góc chụp ảnh', 'Rước đèn theo con đường ánh trăng', 'Múa lân, phá cỗ và kể chuyện dưới trăng'] },
+      { name: 'Gói Tự Tay Làm Ánh Trăng', amount: 199000, unit: 'người', includes: ['Vé đêm hội và workshop', 'Làm lồng đèn, bánh Trung thu đơn giản và đèn LED mang về', 'Gửi điều ước lên cây điều ước'] },
+      { name: 'Combo Gia Đình', amount: 699000, unit: 'nhóm 4 người', includes: ['Vé đêm hội và workshop cho 4 người', 'Bàn trà và bánh tại nhà vườn', 'Quà lưu niệm nhỏ cho cả nhà'] },
+    ],
+    pricingNote: 'Poster ghi đây là giá tham khảo. Ngày 25/09/2026 đã qua; cần xác nhận lịch âm, ngày tổ chức, địa điểm và giá mới cho từng năm.',
+    media: [
+      { src: '/assets/word/thang-07-09/image14.jpg', alt: 'Trẻ em tham gia rước đèn Trung thu buổi tối', title: 'Đêm hội Trung thu', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image15.jpg', alt: 'Trẻ em tự làm lồng đèn Trung thu', title: 'Workshop làm đèn lồng', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image16.jpg', alt: 'Đoàn trẻ em cầm đèn lồng đi trong vườn', title: 'Con đường ánh trăng', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image17.jpg', alt: 'Múa lân cho thiếu nhi trong đêm hội', title: 'Múa lân và phá cỗ', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image18.jpg', alt: 'Gia đình cùng làm bánh Trung thu', title: 'Góc bếp đêm trăng', orientation: 'landscape' },
+      { src: '/assets/word/thang-07-09/image20.jpg', alt: 'Poster Đêm hội Trung thu Trăng về Bình Mỹ', title: 'Poster Trăng về Bình Mỹ', orientation: 'portrait' },
+      { src: '/assets/word/thang-07-09/image23.png', alt: 'Infographic ba gói giá tham khảo Đêm hội Trung thu', title: 'Các gói và giá tham khảo', orientation: 'landscape' },
+    ],
     activities: [
       { title: 'Workshop “Tự tay làm ánh trăng”', description: 'Tự làm đèn ông sao hoặc đèn giấy, trang trí họa tiết dân gian và mang thành phẩm về.' },
       { title: 'Con đường ánh trăng & Vườn trăng ký ức', description: 'Dạo tuyến vườn trang trí đèn lồng, tiểu cảnh trăng rằm và góc kể chuyện dưới trăng.' },

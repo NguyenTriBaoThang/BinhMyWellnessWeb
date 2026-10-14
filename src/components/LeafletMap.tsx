@@ -20,6 +20,8 @@ import { Service } from '@/types';
 import { formatVND } from '@/lib/utils';
 import 'leaflet/dist/leaflet.css';
 
+import type L from 'leaflet';
+
 interface LeafletMapProps {
   services: Service[];
   onSelectService: (service: Service) => void;
@@ -41,7 +43,7 @@ const MAP_LAYERS = {
   },
   satellite: {
     name: 'Vệ tinh Sông Nước',
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{x}/{y}',
     attribution: '&copy; Esri &copy; Maxar, Earthstar Geographics',
   },
   osm: {
@@ -60,12 +62,9 @@ export default function LeafletMap({ services, onSelectService }: LeafletMapProp
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapInstanceRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const tileLayerRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const markersRef = useRef<Map<string, any>>(new Map());
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const markersRef = useRef<Map<string, L.Marker>>(new Map());
 
   // Filter services by category for map view
   const mapServices = services.filter((s) => {
@@ -94,9 +93,9 @@ export default function LeafletMap({ services, onSelectService }: LeafletMapProp
 
       L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-      // Add Tile Layer
-      const initialTile = L.tileLayer(MAP_LAYERS[activeLayer].url, {
-        attribution: MAP_LAYERS[activeLayer].attribution,
+      // Add Initial Tile Layer
+      const initialTile = L.tileLayer(MAP_LAYERS.voyager.url, {
+        attribution: MAP_LAYERS.voyager.attribution,
         maxZoom: 19,
       }).addTo(map);
 
