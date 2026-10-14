@@ -27,7 +27,7 @@ import { CATEGORIES } from '@/lib/constants';
 import ExperienceCard from '@/components/ExperienceCard';
 import RealtimeCapacityWidget from '@/components/RealtimeCapacityWidget';
 import BinhMy365Timeline from '@/components/BinhMy365Timeline';
-import LeafletMap from '@/components/LeafletMap';
+import MonthlyDestinationMap from '@/components/MonthlyDestinationMap';
 import BookingModal from '@/components/BookingModal';
 
 export default function HomePage() {
@@ -255,11 +255,8 @@ export default function HomePage() {
           }}
         />
 
-        {/* Interactive Leaflet Map Section */}
-        <LeafletMap
-          services={services}
-          onSelectService={(s) => setBookingService(s)}
-        />
+        {/* Monthly destination map */}
+        <MonthlyDestinationMap />
 
         {/* Experiences Showcase Section */}
         <section id="experiences-grid" className="space-y-8 scroll-mt-24">
