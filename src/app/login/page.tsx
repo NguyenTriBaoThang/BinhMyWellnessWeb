@@ -13,6 +13,16 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const getRedirectPath = (role: Role) => {
+    const requestedPath = new URLSearchParams(window.location.search).get('returnTo');
+    if (role === 'CUSTOMER' && requestedPath?.startsWith('/') && !requestedPath.startsWith('//')) {
+      return requestedPath;
+    }
+    if (role === 'ADMIN') return '/admin';
+    if (role === 'PROVIDER') return '/provider';
+    return '/customer';
+  };
+
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setError(null);
@@ -28,10 +38,7 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Đăng nhập không thành công');
 
-      // Redirect based on role
-      if (data.user.role === 'ADMIN') router.push('/admin');
-      else if (data.user.role === 'PROVIDER') router.push('/provider');
-      else router.push('/customer');
+      router.push(getRedirectPath(data.user.role));
 
       router.refresh();
     } catch (err: any) {
@@ -53,9 +60,7 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Lỗi đăng nhập nhanh');
 
-      if (role === 'ADMIN') router.push('/admin');
-      else if (role === 'PROVIDER') router.push('/provider');
-      else router.push('/customer');
+      router.push(getRedirectPath(role));
 
       router.refresh();
     } catch (err: any) {

@@ -22,6 +22,44 @@ export function formatDateVN(dateStr: string): string {
   }
 }
 
+export function getTodayInVietnam(): string {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date());
+  const value = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${value.year}-${value.month}-${value.day}`;
+}
+
+export function getTomorrowInVietnam(): string {
+  const tomorrow = new Date(`${getTodayInVietnam()}T00:00:00.000Z`);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  return tomorrow.toISOString().slice(0, 10);
+}
+
+export function isBookableSlotInVietnam(date: string, slot: string, minimumLeadMinutes = 30): boolean {
+  const today = getTodayInVietnam();
+  if (date < today) return false;
+  if (date > today) return true;
+
+  const [slotHour, slotMinute] = slot.split(':').map(Number);
+  if (!Number.isInteger(slotHour) || !Number.isInteger(slotMinute) || slotHour > 23 || slotMinute > 59) {
+    return false;
+  }
+
+  const nowParts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(new Date());
+  const now = Object.fromEntries(nowParts.map((part) => [part.type, part.value]));
+  const currentMinutes = Number(now.hour) * 60 + Number(now.minute);
+  return slotHour * 60 + slotMinute >= currentMinutes + minimumLeadMinutes;
+}
+
 export function getStatusBadge(status: string) {
   const map: Record<
     string,

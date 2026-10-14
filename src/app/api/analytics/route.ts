@@ -25,8 +25,18 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const { type, target, source } = await req.json();
-    db.trackEvent(type || 'view', target, source || 'Trực tiếp');
+    const body = await req.json();
+    if (
+      body.type !== 'view' ||
+      typeof body.target !== 'string' ||
+      !body.target.startsWith('/') ||
+      body.target.length > 200
+    ) {
+      return NextResponse.json({ success: false, error: 'Lượt xem không hợp lệ.' }, { status: 400 });
+    }
+
+    const source = typeof body.source === 'string' ? body.source.trim().slice(0, 60) : 'Trực tiếp';
+    db.trackEvent('view', body.target, source || 'Trực tiếp');
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ success: false });

@@ -18,6 +18,7 @@ import {
   DEFAULT_PASSWORD,
 } from './constants';
 import { hashPassword } from './auth';
+import { getTodayInVietnam, isBookableSlotInVietnam } from './utils';
 
 // In-Memory Data Store (Initialized with seeds, persists across hot reloads in globalThis)
 interface Store {
@@ -386,14 +387,41 @@ export const db = {
       .filter(
         (b) =>
           b.serviceId === serviceId &&
-          b.date === date &&
-          b.slot === slot &&
-          ['CONFIRMED', 'COMPLETED'].includes(b.status) &&
-          b.id !== excludeBookingId
+          b.id !== excludeBookingId &&
+          ((['PENDING', 'CONFIRMED', 'COMPLETED'].includes(b.status) &&
+            b.date === date &&
+            b.slot === slot) ||
+            (b.status === 'PROPOSED' &&
+              !!b.proposal &&
+              b.proposal.date === date &&
+              b.proposal.slot === slot))
       )
       .reduce((sum, b) => sum + b.people, 0);
 
     return Math.max(0, service.capacity - used);
+  },
+
+  async getCapacitySummary(date: string) {
+    const services = await this.getPublicServices();
+    const slots = services.flatMap((service) =>
+      service.slots.filter((slot) => isBookableSlotInVietnam(date, slot)).map((slot) => ({
+        serviceId: service.id,
+        slot,
+        capacity: service.capacity,
+        remaining: this.getRemainingCapacity(service.id, date, slot),
+      }))
+    );
+    const totalCapacity = slots.reduce((sum, item) => sum + item.capacity, 0);
+    const availablePlaces = slots.reduce((sum, item) => sum + item.remaining, 0);
+
+    return {
+      serviceCount: new Set(slots.map((item) => item.serviceId)).size,
+      slotCount: slots.length,
+      openSlots: slots.filter((item) => item.remaining > 0).length,
+      totalCapacity,
+      availablePlaces,
+      bookedPlaces: totalCapacity - availablePlaces,
+    };
   },
 
   async getBookings(filters?: {
@@ -446,6 +474,10 @@ export const db = {
 
     const provider = await this.getProviderById(service.providerId);
     if (!provider || !provider.active) throw new Error('Cơ sở nhà vườn đang tạm ngưng đón khách.');
+    if (!service.slots.includes(data.slot)) throw new Error('Khung giờ này không nằm trong lịch đón khách của dịch vụ.');
+    if (!Number.isInteger(data.people) || data.people < 1 || data.people > service.capacity) {
+      throw new Error(`Số khách phải từ 1 đến ${service.capacity}.`);
+    }
 
     const remaining = this.getRemainingCapacity(service.id, data.date, data.slot);
     if (data.people > remaining) {
@@ -510,6 +542,10 @@ export const db = {
         if (actorRole !== 'PROVIDER' && actorRole !== 'ADMIN') {
           throw new Error('Chỉ nhà vườn hoặc quản trị mới có quyền xác nhận yêu cầu.');
         }
+        if (booking.status !== 'PENDING') throw new Error('Chỉ có thể xác nhận yêu cầu đang chờ xử lý.');
+        if (!isBookableSlotInVietnam(booking.date, booking.slot)) {
+          throw new Error('Khung giờ này đã qua thời hạn nhận khách. Hãy đề xuất lịch khác.');
+        }
         nextStatus = 'CONFIRMED';
         historyMsg = 'Nhà vườn đã xác nhận lịch hẹn và chuẩn bị đón tiếp.';
         break;
@@ -521,10 +557,33 @@ export const db = {
         if (!extra?.date || !extra?.slot || !extra?.reason) {
           throw new Error('Vui lòng cung cấp ngày, giờ mới và lý do đề xuất.');
         }
+        if (!['PENDING', 'CONFIRMED'].includes(booking.status)) {
+          throw new Error('Chỉ có thể đề xuất lịch mới cho yêu cầu đang chờ hoặc đã xác nhận.');
+        }
+        const proposedDate = new Date(`${extra.date}T00:00:00.000Z`);
+        if (
+          !/^\d{4}-\d{2}-\d{2}$/.test(extra.date) ||
+          Number.isNaN(proposedDate.getTime()) ||
+          proposedDate.toISOString().slice(0, 10) !== extra.date ||
+          extra.date < getTodayInVietnam()
+        ) throw new Error('Ngày đề xuất không hợp lệ hoặc đã qua.');
+        const service = await this.getServiceById(booking.serviceId);
+        if (!service || !service.slots.includes(extra.slot)) {
+          throw new Error('Khung giờ đề xuất không có trong lịch đón khách của dịch vụ.');
+        }
+        if (!isBookableSlotInVietnam(extra.date, extra.slot)) {
+          throw new Error('Lịch đề xuất phải bắt đầu ít nhất 30 phút sau thời điểm hiện tại.');
+        }
+        if (booking.people > this.getRemainingCapacity(booking.serviceId, extra.date, extra.slot, booking.id)) {
+          throw new Error('Khung giờ đề xuất không còn đủ chỗ cho đoàn khách này.');
+        }
+        if (extra.reason.trim().length < 2 || extra.reason.trim().length > 500) {
+          throw new Error('Lý do đề xuất phải từ 2 đến 500 ký tự.');
+        }
         booking.proposal = {
           date: extra.date,
           slot: extra.slot,
-          reason: extra.reason,
+          reason: extra.reason.trim(),
         };
         nextStatus = 'PROPOSED';
         historyMsg = `Nhà vườn đề xuất chuyển sang ${extra.date} (${extra.slot}). Lý do: ${extra.reason}`;
@@ -537,6 +596,13 @@ export const db = {
         if (!booking.proposal) {
           throw new Error('Không có lịch đề xuất nào cần chấp thuận.');
         }
+        if (booking.status !== 'PROPOSED') throw new Error('Yêu cầu hiện không chờ xác nhận lịch mới.');
+        if (!isBookableSlotInVietnam(booking.proposal.date, booking.proposal.slot)) {
+          throw new Error('Thời hạn nhận khách cho lịch đề xuất đã qua. Vui lòng yêu cầu nhà vườn đề xuất ca khác.');
+        }
+        if (booking.people > this.getRemainingCapacity(booking.serviceId, booking.proposal.date, booking.proposal.slot, booking.id)) {
+          throw new Error('Khung giờ đề xuất vừa hết chỗ. Vui lòng liên hệ nhà vườn.');
+        }
         booking.date = booking.proposal.date;
         booking.slot = booking.proposal.slot;
         booking.proposal = undefined;
@@ -548,12 +614,19 @@ export const db = {
         if (actorRole !== 'PROVIDER' && actorRole !== 'ADMIN') {
           throw new Error('Chỉ nhà vườn mới có thể từ chối yêu cầu.');
         }
+        if (!['PENDING', 'PROPOSED'].includes(booking.status)) throw new Error('Yêu cầu này không còn chờ phản hồi.');
         nextStatus = 'REJECTED';
         booking.cancelReason = extra?.reason || 'Nhà vườn không thể phục vụ vào khung giờ này.';
         historyMsg = `Nhà vườn từ chối yêu cầu. Lý do: ${booking.cancelReason}`;
         break;
 
       case 'cancel':
+        if (actorRole !== 'CUSTOMER' && actorRole !== 'ADMIN') {
+          throw new Error('Chỉ khách hàng hoặc quản trị mới có thể hủy yêu cầu.');
+        }
+        if (!['PENDING', 'PROPOSED', 'CONFIRMED'].includes(booking.status)) {
+          throw new Error('Không thể hủy yêu cầu ở trạng thái hiện tại.');
+        }
         nextStatus = 'CANCELLED';
         booking.cancelReason = extra?.reason || 'Khách hủy yêu cầu.';
         historyMsg = `Yêu cầu bị hủy. Lý do: ${booking.cancelReason}`;
@@ -563,6 +636,7 @@ export const db = {
         if (actorRole !== 'PROVIDER' && actorRole !== 'ADMIN') {
           throw new Error('Chỉ nhà vườn hoặc quản trị mới có quyền đánh dấu hoàn thành.');
         }
+        if (booking.status !== 'CONFIRMED') throw new Error('Chỉ có thể hoàn thành lịch đã xác nhận.');
         nextStatus = 'COMPLETED';
         historyMsg = 'Trải nghiệm đã hoàn thành thành công. Mời khách hàng để lại đánh giá!';
         break;
@@ -586,7 +660,7 @@ export const db = {
     if (serviceId) {
       return store.reviews.filter((r) => r.serviceId === serviceId && r.status === 'visible');
     }
-    return store.reviews;
+    return store.reviews.filter((r) => r.status === 'visible');
   },
 
   async createReview(data: {
@@ -598,7 +672,15 @@ export const db = {
   }): Promise<Review> {
     const booking = await this.getBookingById(data.bookingId);
     if (!booking) throw new Error('Không tìm thấy đơn đặt chỗ.');
+    if (booking.customerId !== data.userId) throw new Error('Bạn không có quyền đánh giá yêu cầu này.');
     if (booking.status !== 'COMPLETED') throw new Error('Chỉ có thể đánh giá dịch vụ đã hoàn thành.');
+    if (!Number.isInteger(data.rating) || data.rating < 1 || data.rating > 5) {
+      throw new Error('Số sao đánh giá phải từ 1 đến 5.');
+    }
+    const reviewText = data.text.trim();
+    if (reviewText.length < 3 || reviewText.length > 2000) {
+      throw new Error('Nội dung đánh giá phải từ 3 đến 2.000 ký tự.');
+    }
 
     const existing = store.reviews.find((r) => r.bookingId === data.bookingId);
     if (existing) throw new Error('Đơn đặt chỗ này đã được đánh giá.');
@@ -611,8 +693,8 @@ export const db = {
       providerId: booking.providerId,
       userId: data.userId,
       userName: data.userName,
-      rating: Math.min(5, Math.max(1, Math.round(data.rating))),
-      text: data.text,
+      rating: data.rating,
+      text: reviewText,
       status: 'visible',
       createdAt: new Date().toISOString(),
     };
@@ -651,6 +733,19 @@ export const db = {
       this.trackEvent('favorite', serviceId, 'Người dùng');
       return true;
     }
+  },
+
+  async setFavorite(userId: string, serviceId: string, isFavorite: boolean): Promise<boolean> {
+    const idx = store.favorites.findIndex(
+      (f) => f.userId === userId && f.serviceId === serviceId
+    );
+    if (isFavorite && idx < 0) {
+      store.favorites.push({ userId, serviceId });
+      this.trackEvent('favorite', serviceId, 'Website');
+    } else if (!isFavorite && idx >= 0) {
+      store.favorites.splice(idx, 1);
+    }
+    return isFavorite;
   },
 
   // --- LOGS & ANALYTICS ---
@@ -693,16 +788,16 @@ export const db = {
     const conversion = views > 0 ? ((requests / views) * 100).toFixed(1) : '0';
 
     const sourceBreakdown: Record<string, number> = {};
-    for (const ev of store.events) {
+    for (const ev of store.events.filter((event) => event.type === 'view')) {
       sourceBreakdown[ev.source] = (sourceBreakdown[ev.source] || 0) + 1;
     }
 
     return {
-      views: views || 128,
-      requests: requests || store.bookings.length,
-      confirmed: confirmed || 1,
-      completed: completed || 1,
-      conversion: conversion || '12.5',
+      views,
+      requests,
+      confirmed,
+      completed,
+      conversion,
       sourceBreakdown,
       providersCount: store.providers.length,
       activeProvidersCount: store.providers.filter((p) => p.active).length,

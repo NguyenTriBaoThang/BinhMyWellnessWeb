@@ -1,0 +1,46 @@
+# Configuration for .github/workflows/labeler.yml
+
+frontend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/app/**'
+          - 'src/components/**'
+          - 'src/styles/**'
+          - 'tailwind.config.ts'
+          - 'postcss.config.js'
+
+api:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/app/api/**'
+
+database/prisma:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'prisma/**'
+          - 'scripts/seed.mjs'
+
+ci/cd:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**'
+          - 'docker-compose*.yml'
+          - '.gitattributes'
+          - '.gitignore'
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '*.md'
+          - 'docs/**'
+
+assets:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'public/**'
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'tests.mjs'
+          - 'scripts/test_*.mjs'

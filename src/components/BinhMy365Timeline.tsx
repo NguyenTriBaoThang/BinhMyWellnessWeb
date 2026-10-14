@@ -2,141 +2,251 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Calendar, Sparkles, ArrowRight, Sun, Leaf, Droplets } from 'lucide-react';
-import { MONTHS_365 } from '@/lib/constants';
+import Link from 'next/link';
+import {
+  ArrowRight,
+  CalendarDays,
+  Coffee,
+  Landmark,
+  Leaf,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+  Trees,
+  Utensils,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
+import { formatVND } from '@/lib/utils';
+import { CAMPAIGNS_365, type CampaignSpotKind } from '@/lib/campaigns';
+import type { Service } from '@/types';
 
 interface BinhMy365TimelineProps {
+  services: Service[];
   onSelectService?: (serviceId: string) => void;
+  onExploreCategory?: (category: string) => void;
 }
 
-export default function BinhMy365Timeline({ onSelectService }: BinhMy365TimelineProps) {
-  const currentMonthNum = new Date().getMonth() + 1;
-  const [selectedMonth, setSelectedMonth] = useState<number>(currentMonthNum);
+const SPOT_KIND: Record<CampaignSpotKind, { label: string; Icon: LucideIcon }> = {
+  nature: { label: 'Thiên nhiên', Icon: Trees },
+  heritage: { label: 'Văn hóa – lịch sử', Icon: Landmark },
+  food: { label: 'Ẩm thực', Icon: Utensils },
+  cafe: { label: 'Cà phê', Icon: Coffee },
+  farm: { label: 'Miệt vườn', Icon: Leaf },
+};
 
-  const monthData = MONTHS_365.find((m) => m.month === selectedMonth) || MONTHS_365[0];
+const SPOT_ROLES = ['Điểm nhấn tháng này', 'Trải nghiệm bổ sung', 'Lựa chọn linh hoạt'];
+
+const KIND_TO_CATEGORY: Record<CampaignSpotKind, string> = {
+  nature: 'Thiên nhiên',
+  heritage: 'Văn hóa',
+  food: 'Ẩm thực',
+  cafe: 'Nghỉ ngơi',
+  farm: 'Nông nghiệp',
+};
+
+export default function BinhMy365Timeline({
+  services,
+  onSelectService,
+  onExploreCategory,
+}: BinhMy365TimelineProps) {
+  const currentMonth = Number(new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    month: 'numeric',
+  }).format(new Date()));
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const campaign = CAMPAIGNS_365.find((item) => item.month === selectedMonth) ?? CAMPAIGNS_365[0];
 
   return (
-    <div id="binhmy-365" className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-emerald-100">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-forest-100 text-forest-800 text-xs font-semibold mb-2">
-            <Calendar className="w-3.5 h-3.5" />
-            HÀNH TRÌNH 12 THÁNG
+    <section
+      id="binhmy-365"
+      aria-labelledby="binhmy-365-title"
+      className="rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-8"
+    >
+      <div className="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="max-w-3xl">
+          <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-forest-100 px-3 py-1 text-xs font-semibold text-forest-800">
+            <CalendarDays className="h-3.5 w-3.5" />
+            BÌNH MỸ 365 · 12 THÁNG
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-forest-950 tracking-tight">
-            Khám Phá Bình Mỹ 365 Ngày Theo Mùa
+          <h2 id="binhmy-365-title" className="text-2xl font-extrabold tracking-tight text-forest-950 sm:text-3xl">
+            Khám phá Bình Mỹ theo 12 tháng
           </h2>
-          <p className="text-zinc-600 text-sm mt-1">
-            Mỗi mùa một sắc thái riêng: từ đầm sen ngát hương, trái cây trĩu cành đến ráng chiều chèo SUP ven sông Sài Gòn.
+          <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+            Mỗi tháng một lý do để đến Bình Mỹ. Chọn chủ đề phù hợp và xem các điểm đến được gợi ý.
           </p>
         </div>
 
-        {/* Current month indicator badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold self-start md:self-auto">
-          <Sparkles className="w-4 h-4 text-emerald-600" />
-          <span>Tháng hiện tại: Tháng {currentMonthNum}</span>
+        <div className="inline-flex items-center gap-2 self-start rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-xs font-semibold text-emerald-800 md:self-auto">
+          <Sparkles className="h-4 w-4 text-emerald-600" />
+          <span>Tháng hiện tại: {currentMonth}</span>
         </div>
       </div>
 
-      {/* 12-Month horizontal pill buttons */}
-      <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar border-b border-zinc-100">
-        {MONTHS_365.map((item) => {
+      <nav aria-label="Chọn tháng" className="-mx-1 flex gap-2 overflow-x-auto border-b border-zinc-100 px-1 pb-4 no-scrollbar">
+        {CAMPAIGNS_365.map((item) => {
           const isActive = item.month === selectedMonth;
-          const isCurrent = item.month === currentMonthNum;
+          const isCurrent = item.month === currentMonth;
 
           return (
             <button
               key={item.month}
+              type="button"
+              aria-pressed={isActive}
               onClick={() => setSelectedMonth(item.month)}
-              className={`flex-shrink-0 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex flex-col items-center gap-0.5 ${
+              className={`flex min-w-[5.25rem] shrink-0 flex-col items-center gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold transition-all ${
                 isActive
-                  ? 'bg-forest-700 text-white shadow-md shadow-forest-700/20 scale-105'
-                  : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200/60'
+                  ? 'bg-forest-700 text-white shadow-md shadow-forest-700/20'
+                  : 'border border-zinc-200/70 bg-zinc-50 text-zinc-700 hover:bg-zinc-100'
               }`}
             >
-              <span className="text-[11px] uppercase tracking-wider">Tháng {item.month}</span>
+              <span>Tháng {item.month}</span>
               {isCurrent && (
-                <span className={`text-[9px] px-1.5 py-0.2 rounded-full font-semibold ${
-                  isActive ? 'bg-emerald-300 text-forest-950' : 'bg-emerald-100 text-emerald-800'
-                }`}>
+                <span className={`rounded-full px-1.5 py-0.5 text-[9px] ${isActive ? 'bg-emerald-300 text-forest-950' : 'bg-emerald-100 text-emerald-800'}`}>
                   Hiện tại
                 </span>
               )}
             </button>
           );
         })}
+      </nav>
+
+      <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-700">{campaign.theme}</p>
+          <h3 className="mt-1 text-xl font-bold text-zinc-900 sm:text-2xl">{campaign.title}</h3>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600">{campaign.summary}</p>
+        </div>
+        <span className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg bg-zinc-100 px-2.5 py-1.5 text-xs font-semibold text-zinc-600 sm:self-auto">
+          <MapPin className="h-3.5 w-3.5" /> {campaign.spots.length} điểm gợi ý
+        </span>
       </div>
 
-      {/* Featured Month Content Card */}
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-        <div className="lg:col-span-5 relative h-64 sm:h-80 rounded-2xl overflow-hidden shadow-lg border border-zinc-100 group">
-          <Image
-            src={monthData.image}
-            alt={monthData.title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          <div className="absolute bottom-4 left-4 right-4 text-white">
-            <span className="text-xs font-semibold bg-emerald-600/90 backdrop-blur-sm px-2.5 py-1 rounded-lg">
-              {monthData.theme}
-            </span>
-            <p className="font-bold text-lg mt-1.5 text-white leading-snug drop-shadow-sm">
-              {monthData.title}
-            </p>
-          </div>
+      <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {campaign.spots.map((spot, index) => {
+          const { Icon, label } = SPOT_KIND[spot.kind];
+          const images = spot.images ?? (spot.image ? [{ src: spot.image, alt: spot.imageAlt || `Ảnh ${spot.name}` }] : []);
+          const linkedService = spot.serviceId
+            ? services.find((service) => service.id === spot.serviceId && service.status === 'PUBLISHED')
+            : undefined;
+
+          return (
+            <article key={`${campaign.month}-${spot.name}`} className="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-shadow hover:shadow-lg">
+              {images.length ? (
+                <div className={`relative grid h-40 overflow-hidden bg-forest-50 ${images.length > 1 ? 'grid-cols-2 gap-0.5' : 'grid-cols-1'}`}>
+                  {images.slice(0, 2).map((image) => (
+                    <div key={image.src} className="relative min-w-0 overflow-hidden">
+                      <Image
+                        src={image.src}
+                        alt={image.alt}
+                        fill
+                        sizes={images.length > 1 ? '(max-width: 768px) 50vw, 25vw' : '(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw'}
+                        className="object-cover transition-transform duration-500 hover:scale-105"
+                      />
+                    </div>
+                  ))}
+                  <span className="absolute bottom-2 left-2 rounded-md bg-black/55 px-2 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
+                    Ảnh địa điểm
+                  </span>
+                </div>
+              ) : (
+                <div className="flex h-40 items-center justify-center bg-gradient-to-br from-forest-50 via-emerald-50 to-amber-50">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white bg-white/85 text-forest-700 shadow-sm">
+                    <Icon className="h-7 w-7" aria-hidden="true" />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-1 flex-col p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="rounded-full bg-forest-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-forest-800">
+                    {SPOT_ROLES[index]}
+                  </span>
+                  <span className={`inline-flex items-center gap-1 text-[10px] font-semibold ${linkedService ? 'text-emerald-700' : 'text-amber-700'}`}>
+                    <CalendarDays className="h-3 w-3" /> {linkedService ? 'Có thể đặt' : 'Cần xác nhận'}
+                  </span>
+                </div>
+
+                <div className="mt-3 flex items-start gap-2">
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-forest-600" aria-hidden="true" />
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">{label}</span>
+                    <h4 className="mt-0.5 text-base font-bold leading-snug text-zinc-900">{spot.name}</h4>
+                  </div>
+                </div>
+
+                <p className="mt-3 flex items-start gap-1.5 text-xs leading-relaxed text-zinc-500">
+                  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-700" />
+                  <span>{spot.location}</span>
+                </p>
+                <p className="mt-3 flex-1 text-sm leading-relaxed text-zinc-700">{spot.activity}</p>
+
+                {linkedService ? (
+                  <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-600">
+                    <span>{formatVND(linkedService.price)} / người</span>
+                    <span>{linkedService.duration} phút</span>
+                  </div>
+                ) : (
+                  <p className="mt-3 text-xs text-amber-800">Lịch và giá sẽ được cập nhật sau khi địa điểm xác nhận.</p>
+                )}
+
+                <div className="mt-4 flex items-start gap-1.5 border-t border-zinc-100 pt-3 text-xs text-zinc-600">
+                  <Users className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" />
+                  <span><strong className="font-semibold text-zinc-700">Phù hợp:</strong> {spot.audience}</span>
+                </div>
+
+                {linkedService && onSelectService ? (
+                  <button
+                    type="button"
+                    onClick={() => onSelectService(linkedService.id)}
+                    className="mt-3 inline-flex items-center gap-1.5 self-start rounded-lg bg-forest-700 px-3 py-2 text-xs font-bold text-white hover:bg-forest-800"
+                  >
+                    Đặt trải nghiệm <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                ) : onExploreCategory ? (
+                  <button
+                    type="button"
+                    onClick={() => onExploreCategory(KIND_TO_CATEGORY[spot.kind])}
+                    className="mt-3 inline-flex items-center gap-1.5 self-start text-xs font-bold text-forest-700 hover:text-forest-900"
+                  >
+                    Xem dịch vụ cùng chủ đề <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                ) : (
+                  <Link
+                    href="/#experiences-grid"
+                    className="mt-3 inline-flex items-center gap-1.5 self-start text-xs font-bold text-forest-700 hover:text-forest-900"
+                  >
+                    Xem dịch vụ cùng chủ đề <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-amber-200 bg-amber-50/80 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+        <div className="flex items-start gap-2.5">
+          <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
+          <p className="text-xs leading-relaxed text-amber-950">
+            Đây là các gợi ý trong kế hoạch. Lịch, giá, tình trạng mở cửa và sự kiện chỉ được cập nhật sau khi địa điểm xác nhận.
+          </p>
         </div>
-
-        <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
-          <div>
-            <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
-              Chủ đề & trải nghiệm đặc trưng
-            </span>
-            <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 mt-1">
-              {monthData.title}
-            </h3>
-            <p className="text-zinc-600 text-sm mt-3 leading-relaxed">
-              {monthData.highlight}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-            <div className="bg-forest-50/70 p-3 rounded-xl border border-forest-100">
-              <div className="flex items-center gap-1.5 text-forest-800 font-semibold text-xs">
-                <Sun className="w-4 h-4 text-amber-500" />
-                Thời tiết lý tưởng
-              </div>
-              <p className="text-xs text-zinc-600 mt-1">Nắng sớm mát lành, gió sông Sài Gòn lộng mát.</p>
-            </div>
-
-            <div className="bg-emerald-50/70 p-3 rounded-xl border border-emerald-100">
-              <div className="flex items-center gap-1.5 text-emerald-800 font-semibold text-xs">
-                <Leaf className="w-4 h-4 text-emerald-600" />
-                Nông sản thu hoạch
-              </div>
-              <p className="text-xs text-zinc-600 mt-1">Rau củ hữu cơ, hoa sen, quả ngọt miệt vườn.</p>
-            </div>
-
-            <div className="bg-river-50/70 p-3 rounded-xl border border-river-100">
-              <div className="flex items-center gap-1.5 text-river-800 font-semibold text-xs">
-                <Droplets className="w-4 h-4 text-river-600" />
-                Không gian sinh thái
-              </div>
-              <p className="text-xs text-zinc-600 mt-1">Bến sông, rạch dừa và vườn cây rợp bóng.</p>
-            </div>
-          </div>
-
-          <div className="pt-2">
-            <a
-              href={`#service-${monthData.activeServiceId}`}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-forest-700 text-white font-semibold text-sm hover:bg-forest-800 transition-colors shadow-sm"
-            >
-              <span>Xem trải nghiệm gợi ý tháng này</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
+        <div className="flex shrink-0 flex-wrap gap-2">
+          <Link
+            href="#experiences-grid"
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-forest-700 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-forest-800"
+          >
+            Xem trải nghiệm <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+          <Link
+            href="/itinerary"
+            className="inline-flex items-center justify-center rounded-xl border border-forest-200 bg-white px-4 py-2.5 text-xs font-bold text-forest-800 transition-colors hover:bg-forest-50"
+          >
+            Lập hành trình
+          </Link>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

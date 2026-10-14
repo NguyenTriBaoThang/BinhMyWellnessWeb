@@ -94,6 +94,9 @@ export default function AdminDashboardPage() {
   };
 
   const pendingModeration = services.filter((s) => s.status === 'REVIEW' || s.status === 'REVISION');
+  const sourceEntries = Object.entries(summary?.sourceBreakdown || {}) as [string, number][];
+  const totalViews = sourceEntries.reduce((sum, [, count]) => sum + count, 0);
+  const sourceColors = ['bg-emerald-500', 'bg-river-500', 'bg-amber-500', 'bg-purple-500'];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
@@ -158,8 +161,8 @@ export default function AdminDashboardPage() {
               <div className="text-3xl font-black text-zinc-900 font-mono">
                 {summary.views}
               </div>
-              <span className="text-[11px] text-emerald-600 font-semibold block">
-                Tăng trưởng 18% so với tuần trước
+              <span className="text-[11px] text-zinc-500 block">
+                Lượt xem đã ghi nhận trên website
               </span>
             </div>
 
@@ -185,7 +188,7 @@ export default function AdminDashboardPage() {
                 {summary.conversion}%
               </div>
               <span className="text-[11px] text-emerald-600 font-semibold block">
-                Hiệu quả kết nối cao
+                Tỷ lệ yêu cầu trên lượt xem
               </span>
             </div>
 
@@ -210,25 +213,24 @@ export default function AdminDashboardPage() {
                 Phân Bố Nguồn Khách Truy Cập
               </h3>
               <div className="space-y-3">
-                {[
-                  { source: 'Trực tiếp (Website)', percent: 52, color: 'bg-emerald-500' },
-                  { source: 'Mã QR tại quầy đón khách', percent: 28, color: 'bg-river-500' },
-                  { source: 'Mạng xã hội & Zalo miệt vườn', percent: 14, color: 'bg-amber-500' },
-                  { source: 'Cổng thông tin du lịch Huyện', percent: 6, color: 'bg-purple-500' },
-                ].map((item) => (
-                  <div key={item.source} className="space-y-1">
+                {sourceEntries.length > 0 ? sourceEntries.map(([source, count], index) => {
+                  const percent = totalViews > 0 ? Math.round((count / totalViews) * 100) : 0;
+                  const color = sourceColors[index % sourceColors.length];
+                  return (
+                  <div key={source} className="space-y-1">
                     <div className="flex justify-between text-xs font-semibold text-zinc-700">
-                      <span>{item.source}</span>
-                      <span>{item.percent}%</span>
+                      <span>{source}</span>
+                      <span>{percent}% · {count}</span>
                     </div>
                     <div className="w-full h-2 rounded-full bg-zinc-100 overflow-hidden">
                       <div
-                        className={`h-full rounded-full ${item.color}`}
-                        style={{ width: `${item.percent}%` }}
+                        className={`h-full rounded-full ${color}`}
+                        style={{ width: `${percent}%` }}
                       />
                     </div>
                   </div>
-                ))}
+                  );
+                }) : <p className="text-xs text-zinc-500">Chưa có lượt truy cập được ghi nhận.</p>}
               </div>
             </div>
 

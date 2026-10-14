@@ -43,7 +43,10 @@ export default function ExperienceCard({
 
             {onToggleFavorite && (
               <button
+                type="button"
                 onClick={() => onToggleFavorite(service.id)}
+                aria-label={isFavorite ? `Bỏ lưu ${service.name}` : `Lưu ${service.name} vào yêu thích`}
+                aria-pressed={isFavorite}
                 className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
                   isFavorite
                     ? 'bg-rose-500 text-white shadow-md'

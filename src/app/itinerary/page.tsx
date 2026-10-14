@@ -15,12 +15,13 @@ import {
   Sparkles,
   Car,
 } from 'lucide-react';
-import { Service } from '@/types';
+import { Service, User } from '@/types';
 import { formatVND } from '@/lib/utils';
 import BookingModal from '@/components/BookingModal';
 
 export default function ItineraryPage() {
   const [services, setServices] = useState<Service[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>(['s1', 's2', 's7']);
   const [startTime, setStartTime] = useState<string>('08:30');
   const [bookingService, setBookingService] = useState<Service | null>(null);
@@ -29,8 +30,16 @@ export default function ItineraryPage() {
     fetch('/api/services')
       .then((r) => r.json())
       .then((d) => {
-        if (d.services) setServices(d.services);
+        if (d.services) {
+          setServices(d.services);
+          const requestedServiceId = new URLSearchParams(window.location.search).get('book');
+          const requestedService = d.services.find((service: Service) => service.id === requestedServiceId);
+          if (requestedService) setBookingService(requestedService);
+        }
       });
+    fetch('/api/auth/me')
+      .then((r) => r.json())
+      .then((d) => setCurrentUser(d.user || null));
   }, []);
 
   const addStop = (id: string) => {
@@ -46,10 +55,15 @@ export default function ItineraryPage() {
   // Calculate timeline
   let currentMinutes =
     Number(startTime.split(':')[0]) * 60 + Number(startTime.split(':')[1]);
+  let scheduleComplete = true;
 
   const itinerarySteps = selectedIds.map((id, index) => {
     const s = services.find((serv) => serv.id === id);
     if (!s) return null;
+
+    if (!scheduleComplete) {
+      return { service: s, start: null, end: null, isAutoSlot: false, transitNote: '' };
+    }
 
     // Pick slot that fits after currentMinutes
     const suitableSlot = s.slots.find((slotStr) => {
@@ -58,11 +72,12 @@ export default function ItineraryPage() {
       return slotMins >= currentMinutes;
     });
 
-    const stepStart =
-      suitableSlot ||
-      `${String(Math.floor(currentMinutes / 60)).padStart(2, '0')}:${String(
-        currentMinutes % 60
-      ).padStart(2, '0')}`;
+    if (!suitableSlot) {
+      scheduleComplete = false;
+      return { service: s, start: null, end: null, isAutoSlot: false, transitNote: '' };
+    }
+
+    const stepStart = suitableSlot;
 
     const stepStartMins =
       Number(stepStart.split(':')[0]) * 60 + Number(stepStart.split(':')[1]);
@@ -137,6 +152,11 @@ export default function ItineraryPage() {
           </div>
 
           <div className="space-y-4">
+            {itinerarySteps.some((step: any) => !step.start) && (
+              <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-900">
+                Một số điểm dừng không còn khung giờ nhận khách sau các hoạt động trước đó. Hãy xóa bớt điểm hoặc chọn giờ bắt đầu sớm hơn.
+              </p>
+            )}
             {itinerarySteps.map((step: any, idx: number) => (
               <div key={step.service.id} className="relative">
                 {idx > 0 && (
@@ -169,9 +189,11 @@ export default function ItineraryPage() {
                         {step.service.name}
                       </h3>
                       <div className="flex items-center gap-3 text-xs text-zinc-500 font-mono">
-                        <span className="font-bold text-emerald-800">
-                          {step.start} - {step.end}
-                        </span>
+                        {step.start && step.end ? (
+                          <span className="font-bold text-emerald-800">{step.start} - {step.end}</span>
+                        ) : (
+                          <span className="font-semibold text-amber-700">Không còn ca phù hợp trong ngày</span>
+                        )}
                         <span>({step.service.duration} phút)</span>
                       </div>
                     </div>
@@ -247,8 +269,9 @@ export default function ItineraryPage() {
       {bookingService && (
         <BookingModal
           service={bookingService}
-          currentUser={null}
+          currentUser={currentUser}
           onClose={() => setBookingService(null)}
+          returnPath="/itinerary"
         />
       )}
     </div>

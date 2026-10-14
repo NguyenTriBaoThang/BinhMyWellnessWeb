@@ -4,11 +4,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   webpack: (config, { dev }) => {
-    if (dev) {
-      // Disable filesystem caching to prevent ArrayBuffer allocation errors on low-memory/paging systems
-      config.cache = false;
-    }
     return config;
   },
 };

@@ -25,11 +25,14 @@ export async function POST(req: Request) {
 
     const { bookingId, rating, text } = await req.json();
 
-    if (!bookingId || !rating || !text) {
+    if (typeof bookingId !== 'string' || !bookingId || !Number.isInteger(Number(rating)) || typeof text !== 'string' || !text.trim()) {
       return NextResponse.json(
         { error: 'Vui lòng chọn số sao và nhập nội dung đánh giá.' },
         { status: 400 }
       );
+    }
+    if (Number(rating) < 1 || Number(rating) > 5 || text.trim().length > 2000) {
+      return NextResponse.json({ error: 'Số sao phải từ 1 đến 5; đánh giá tối đa 2.000 ký tự.' }, { status: 400 });
     }
 
     const review = await db.createReview({
@@ -37,7 +40,7 @@ export async function POST(req: Request) {
       userId: user.id,
       userName: user.name,
       rating: Number(rating),
-      text,
+      text: text.trim(),
     });
 
     return NextResponse.json({
@@ -61,18 +64,30 @@ export async function PUT(req: Request) {
     }
 
     const { reviewId, replyText } = await req.json();
-    if (!reviewId || !replyText) {
+    if (typeof reviewId !== 'string' || !reviewId || typeof replyText !== 'string' || !replyText.trim()) {
       return NextResponse.json(
         { error: 'Vui lòng nhập nội dung phản hồi.' },
         { status: 400 }
       );
     }
+    if (replyText.trim().length > 2000) {
+      return NextResponse.json({ error: 'Phản hồi tối đa 2.000 ký tự.' }, { status: 400 });
+    }
 
-    const review = await db.replyReview(reviewId, replyText, user.name);
+    const review = (await db.getReviews()).find((item) => item.id === reviewId);
+    if (!review) return NextResponse.json({ error: 'Không tìm thấy đánh giá.' }, { status: 404 });
+    if (user.role === 'PROVIDER') {
+      const provider = await db.getProviderByUserId(user.id);
+      if (!provider || provider.id !== review.providerId) {
+        return NextResponse.json({ error: 'Đánh giá này không thuộc nhà vườn của bạn.' }, { status: 403 });
+      }
+    }
+
+    const updatedReview = await db.replyReview(reviewId, replyText.trim(), user.name);
 
     return NextResponse.json({
       success: true,
-      review,
+      review: updatedReview,
       message: 'Đã gửi phản hồi cho khách hàng thành công!',
     });
   } catch (error: any) {

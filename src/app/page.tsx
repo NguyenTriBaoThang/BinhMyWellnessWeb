@@ -39,6 +39,7 @@ export default function HomePage() {
   // Modals & Active items
   const [bookingService, setBookingService] = useState<Service | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [favoriteNotice, setFavoriteNotice] = useState('');
 
   useEffect(() => {
     async function loadData() {
@@ -49,11 +50,22 @@ export default function HomePage() {
         const meData = await meRes.json();
         setCurrentUser(meData.user);
 
+        if (meData.user?.role === 'CUSTOMER') {
+          const favoritesRes = await fetch('/api/favorites');
+          if (favoritesRes.ok) {
+            const favoritesData = await favoritesRes.json();
+            setFavorites(favoritesData.favorites || []);
+          }
+        }
+
         // Load services
         const servRes = await fetch('/api/services');
         const servData = await servRes.json();
         if (servData.services) {
           setServices(servData.services);
+          const requestedServiceId = new URLSearchParams(window.location.search).get('book');
+          const requestedService = servData.services.find((service: Service) => service.id === requestedServiceId);
+          if (requestedService) setBookingService(requestedService);
         }
       } catch (err) {
         console.error(err);
@@ -65,10 +77,27 @@ export default function HomePage() {
     loadData();
   }, []);
 
-  const toggleFavorite = (id: string) => {
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+  const toggleFavorite = async (id: string) => {
+    if (currentUser?.role !== 'CUSTOMER') {
+      setFavoriteNotice(currentUser
+        ? 'Tính năng yêu thích dành cho tài khoản khách hàng.'
+        : 'Đăng nhập bằng tài khoản khách hàng để lưu trải nghiệm yêu thích.');
+      return;
+    }
+
+    setFavoriteNotice('');
+    try {
+      const response = await fetch('/api/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serviceId: id, favorited: !favorites.includes(id) }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Không lưu được trải nghiệm.');
+      setFavorites(data.favorites || []);
+    } catch (error) {
+      setFavoriteNotice(error instanceof Error ? error.message : 'Không lưu được trải nghiệm.');
+    }
   };
 
   // Filtered services
@@ -174,13 +203,18 @@ export default function HomePage() {
       {/* Main Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16">
         {/* Realtime Capacity Widget */}
-        <RealtimeCapacityWidget services={services} />
+        <RealtimeCapacityWidget />
 
         {/* 365 Days Seasonal Timeline */}
         <BinhMy365Timeline
+          services={services}
           onSelectService={(serviceId) => {
             const found = services.find((s) => s.id === serviceId);
             if (found) setBookingService(found);
+          }}
+          onExploreCategory={(category) => {
+            setSelectedCategory(category);
+            document.getElementById('experiences-grid')?.scrollIntoView({ behavior: 'smooth' });
           }}
         />
 
@@ -270,6 +304,13 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+
+          {favoriteNotice && (
+            <div role="status" className="flex flex-wrap items-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
+              <span>{favoriteNotice}</span>
+              {!currentUser && <Link href="/login" className="font-bold underline">Đăng nhập</Link>}
+            </div>
+          )}
 
           {/* Experiences Grid */}
           {filteredServices.length > 0 ? (

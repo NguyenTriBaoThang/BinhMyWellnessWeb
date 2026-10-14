@@ -1,17 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { X, Calendar, Clock, Users, ShieldCheck, Check, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { X, Users, Check, AlertCircle } from 'lucide-react';
 import { Service, User } from '@/types';
-import { formatVND } from '@/lib/utils';
+import { formatVND, getTodayInVietnam, getTomorrowInVietnam } from '@/lib/utils';
 
 interface BookingModalProps {
   service: Service | null;
   currentUser: User | null;
   onClose: () => void;
   onSuccess?: () => void;
+  returnPath?: string;
 }
 
 export default function BookingModal({
@@ -19,24 +20,93 @@ export default function BookingModal({
   currentUser,
   onClose,
   onSuccess,
+  returnPath = '/',
 }: BookingModalProps) {
   const router = useRouter();
 
-  // Tomorrow by default
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-  const [date, setDate] = useState(tomorrow);
+  const [date, setDate] = useState(getTomorrowInVietnam());
   const [slot, setSlot] = useState(service?.slots[0] || '08:30');
   const [people, setPeople] = useState(2);
-  const [name, setName] = useState(currentUser?.name || 'Bảo Thắng');
-  const [phone, setPhone] = useState(currentUser?.phone || '0901234567');
+  const [name, setName] = useState(currentUser?.name || '');
+  const [phone, setPhone] = useState(currentUser?.phone || '');
   const [notes, setNotes] = useState('');
-  const [accepted, setAccepted] = useState(true);
+  const [accepted, setAccepted] = useState(false);
+  const [availablePlaces, setAvailablePlaces] = useState<number | null>(null);
+  const [checkingCapacity, setCheckingCapacity] = useState(false);
+  const [capacityMessage, setCapacityMessage] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  useEffect(() => {
+    if (currentUser?.name) setName((value) => value || currentUser.name);
+    if (currentUser?.phone) setPhone((value) => value || currentUser.phone || '');
+  }, [currentUser?.id, currentUser?.name, currentUser?.phone]);
+
+  useEffect(() => {
+    if (!service || !date || !slot || currentUser?.role !== 'CUSTOMER') return;
+
+    let active = true;
+    setCheckingCapacity(true);
+    setAvailablePlaces(null);
+    setCapacityMessage(null);
+
+    fetch(`/api/capacity?date=${encodeURIComponent(date)}&serviceId=${encodeURIComponent(service.id)}&slot=${encodeURIComponent(slot)}`, { cache: 'no-store' })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Không tải được chỗ trống.');
+        return data;
+      })
+      .then((data) => {
+        if (active) {
+          setAvailablePlaces(data.availablePlaces);
+          if (data.availablePlaces > 0) {
+            setPeople((count) => Math.min(count, data.availablePlaces));
+          }
+        }
+      })
+      .catch((error: unknown) => {
+        if (active) {
+          setAvailablePlaces(null);
+          setCapacityMessage(error instanceof Error ? error.message : 'Chưa lấy được tình trạng chỗ.');
+        }
+      })
+      .finally(() => {
+        if (active) setCheckingCapacity(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [currentUser?.role, date, service?.id, slot]);
+
   if (!service) return null;
+
+  if (currentUser?.role !== 'CUSTOMER') {
+    const returnTo = encodeURIComponent(`${returnPath}?book=${service.id}`);
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+        <div role="dialog" aria-modal="true" aria-labelledby="booking-login-title" className="w-full max-w-md space-y-5 rounded-3xl border border-emerald-100 bg-white p-6 shadow-2xl">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Đặt lịch trải nghiệm</p>
+              <h2 id="booking-login-title" className="mt-1 text-lg font-bold text-zinc-900">Đăng nhập để tiếp tục</h2>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-600">Đăng nhập bằng tài khoản khách hàng để gửi yêu cầu và theo dõi phản hồi từ nhà vườn.</p>
+            </div>
+            <button type="button" onClick={onClose} aria-label="Đóng" className="rounded-full p-1.5 text-zinc-500 hover:bg-zinc-100">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="rounded-xl bg-forest-50 p-3 text-sm font-semibold text-forest-900">{service.name}</div>
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={onClose} className="rounded-xl border border-zinc-300 px-4 py-2.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50">Để sau</button>
+            <Link href={`/login?returnTo=${returnTo}`} className="rounded-xl bg-forest-700 px-4 py-2.5 text-xs font-bold text-white hover:bg-forest-800">Đăng nhập</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const total = service.price * people;
 
@@ -141,7 +211,7 @@ export default function BookingModal({
             <div className="relative">
               <input
                 type="date"
-                min={new Date().toISOString().split('T')[0]}
+                min={getTodayInVietnam()}
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 required
@@ -171,6 +241,17 @@ export default function BookingModal({
                 </button>
               ))}
             </div>
+            <p role="status" className="mt-2 text-xs text-zinc-500">
+              {checkingCapacity
+                ? 'Đang kiểm tra chỗ trống…'
+                : capacityMessage
+                ? capacityMessage
+                : availablePlaces === null
+                ? 'Chưa lấy được tình trạng chỗ. Máy chủ sẽ kiểm tra lại khi gửi yêu cầu.'
+                : availablePlaces > 0
+                ? `Còn ${availablePlaces} chỗ trong ca này.`
+                : 'Ca này đã hết chỗ. Hãy chọn khung giờ hoặc ngày khác.'}
+            </p>
           </div>
 
           {/* People Count */}
@@ -191,13 +272,14 @@ export default function BookingModal({
               </span>
               <button
                 type="button"
-                onClick={() => setPeople(Math.min(service.capacity, people + 1))}
-                className="w-9 h-9 rounded-xl border border-zinc-300 flex items-center justify-center font-bold text-lg hover:bg-zinc-100"
+                disabled={people >= Math.min(service.capacity, availablePlaces ?? service.capacity)}
+                onClick={() => setPeople(Math.min(service.capacity, availablePlaces ?? service.capacity, people + 1))}
+                className="w-9 h-9 rounded-xl border border-zinc-300 flex items-center justify-center font-bold text-lg hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 +
               </button>
               <span className="text-xs text-zinc-500">
-                (Tối đa {service.capacity} khách trong ca này)
+                (Tối đa {Math.min(service.capacity, availablePlaces ?? service.capacity)} khách trong ca này)
               </span>
             </div>
           </div>
@@ -284,7 +366,7 @@ export default function BookingModal({
             </button>
             <button
               type="submit"
-              disabled={loading || success}
+              disabled={loading || success || checkingCapacity || availablePlaces === 0 || !!capacityMessage}
               className="px-6 py-2.5 rounded-xl bg-forest-700 hover:bg-forest-800 text-white text-xs sm:text-sm font-bold shadow-md shadow-forest-700/20 disabled:opacity-60 transition-all"
             >
               {loading ? 'Đang gửi...' : 'Xác nhận đặt lịch'}

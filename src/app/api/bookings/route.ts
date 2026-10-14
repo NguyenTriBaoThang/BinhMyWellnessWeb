@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+import { getTodayInVietnam, isBookableSlotInVietnam } from '@/lib/utils';
 
 export async function GET(req: Request) {
   try {
@@ -30,17 +31,48 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const user = await getCurrentUser();
+    if (!user || user.role !== 'CUSTOMER') {
+      return NextResponse.json(
+        { error: 'Vui lòng đăng nhập bằng tài khoản khách hàng để đặt trải nghiệm.' },
+        { status: 401 }
+      );
+    }
     const body = await req.json();
 
-    const customerId = user?.id || 'guest-' + Date.now().toString(36);
-    const customerName = body.name || user?.name || 'Khách trải nghiệm';
-    const customerPhone = body.phone || user?.phone || '0901234567';
+    const customerId = user.id;
+    const customerName = String(body.name ?? user.name ?? '').trim();
+    const customerPhone = String(body.phone ?? user.phone ?? '').trim();
+    const date = String(body.date ?? '');
+    const people = Number(body.people);
 
-    if (!body.serviceId || !body.date || !body.slot || !body.people) {
+    if (typeof body.serviceId !== 'string' || !body.serviceId || !date || typeof body.slot !== 'string' || !body.slot || !Number.isInteger(people)) {
       return NextResponse.json(
         { error: 'Vui lòng chọn dịch vụ, ngày, khung giờ và số người tham gia.' },
         { status: 400 }
       );
+    }
+
+    const parsedDate = new Date(`${date}T00:00:00.000Z`);
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
+      Number.isNaN(parsedDate.getTime()) ||
+      parsedDate.toISOString().slice(0, 10) !== date ||
+      date < getTodayInVietnam()
+    ) {
+      return NextResponse.json({ error: 'Ngày trải nghiệm không hợp lệ hoặc đã qua.' }, { status: 400 });
+    }
+    if (!isBookableSlotInVietnam(date, body.slot)) {
+      return NextResponse.json({ error: 'Vui lòng đặt trước giờ trải nghiệm ít nhất 30 phút.' }, { status: 400 });
+    }
+    if (customerName.length < 2 || customerName.length > 100) {
+      return NextResponse.json({ error: 'Tên người liên hệ phải từ 2 đến 100 ký tự.' }, { status: 400 });
+    }
+    const phoneDigits = customerPhone.replace(/\D/g, '');
+    if (phoneDigits.length < 9 || phoneDigits.length > 12) {
+      return NextResponse.json({ error: 'Vui lòng nhập số điện thoại hợp lệ.' }, { status: 400 });
+    }
+    if (typeof body.notes === 'string' && body.notes.length > 500) {
+      return NextResponse.json({ error: 'Ghi chú không được vượt quá 500 ký tự.' }, { status: 400 });
     }
 
     const booking = await db.createBooking({
@@ -48,10 +80,10 @@ export async function POST(req: Request) {
       customerId,
       customerName,
       customerPhone,
-      notes: body.notes,
-      date: body.date,
+      notes: typeof body.notes === 'string' ? body.notes.trim() : undefined,
+      date,
       slot: body.slot,
-      people: Number(body.people),
+      people,
       source: body.source || 'Trực tiếp',
     });
 
