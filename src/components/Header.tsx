@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -44,23 +45,18 @@ export default function Header({ currentUser }: HeaderProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-forest-600 to-river-600 flex items-center justify-center text-white shadow-md shadow-forest-500/20 group-hover:scale-105 transition-transform">
-              <Trees className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-lg sm:text-xl text-forest-950 tracking-tight">
-                  Bình Mỹ Wellness
-                </span>
-                <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full uppercase tracking-wider">
-                  365
-                </span>
-              </div>
-              <p className="text-xs text-zinc-500 hidden sm:block">
-                Du lịch sinh thái & miệt vườn Củ Chi ven sông Sài Gòn
-              </p>
-            </div>
+          <Link href="/" aria-label="Bình Mỹ Wellness Web - Trang chủ" className="group flex items-center gap-2 sm:gap-3">
+            <Image
+              src="/assets/logo-binh-my-wellness.png"
+              alt="Bình Mỹ Wellness Web"
+              width={434}
+              height={145}
+              priority
+              className="h-10 w-auto object-contain transition-transform group-hover:scale-[1.02] sm:h-14"
+            />
+            <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-800">
+              365
+            </span>
           </Link>
 
           {/* Desktop Nav */}
