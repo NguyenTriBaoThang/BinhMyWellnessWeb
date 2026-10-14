@@ -10,6 +10,7 @@ import {
   Navigation,
   Phone,
 } from 'lucide-react';
+import { ACTIVE_CAMPAIGN_MONTHS } from '@/lib/campaigns';
 
 type MapLocation = {
   id: string;
@@ -19,8 +20,6 @@ type MapLocation = {
   hours?: string;
   phone?: string;
 };
-
-const ACTIVE_MONTHS = [1, 2, 3, 7, 8, 9] as const;
 
 const LOCATIONS: Record<string, MapLocation> = {
   'kdl-binh-my': {
@@ -85,8 +84,12 @@ const MONTH_PLANS: Record<number, { title: string; focus: string; locationIds: s
   },
 };
 
-export default function MonthlyDestinationMap() {
-  const [activeMonth, setActiveMonth] = useState<number>(1);
+interface MonthlyDestinationMapProps {
+  activeMonth: number;
+  onMonthChange: (month: number) => void;
+}
+
+export default function MonthlyDestinationMap({ activeMonth, onMonthChange }: MonthlyDestinationMapProps) {
   const [selectedLocationId, setSelectedLocationId] = useState('kdl-binh-my');
   const monthPlan = MONTH_PLANS[activeMonth];
   const monthLocations = useMemo(
@@ -96,11 +99,6 @@ export default function MonthlyDestinationMap() {
   const selectedLocation = monthLocations.find((location) => location.id === selectedLocationId) ?? monthLocations[0];
   const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(selectedLocation.address)}&output=embed`;
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(selectedLocation.address)}`;
-
-  const selectMonth = (month: number) => {
-    setActiveMonth(month);
-    setSelectedLocationId(MONTH_PLANS[month].locationIds[0]);
-  };
 
   return (
     <section id="map-section" className="scroll-mt-24 space-y-5">
@@ -118,12 +116,12 @@ export default function MonthlyDestinationMap() {
       </div>
 
       <nav aria-label="Chọn tháng hoạt động" className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-        {ACTIVE_MONTHS.map((month) => (
+        {ACTIVE_CAMPAIGN_MONTHS.map((month) => (
           <button
             key={month}
             type="button"
             aria-pressed={activeMonth === month}
-            onClick={() => selectMonth(month)}
+            onClick={() => onMonthChange(month)}
             className={`shrink-0 rounded-xl border px-4 py-2 text-sm font-bold transition-colors ${
               activeMonth === month
                 ? 'border-forest-800 bg-forest-800 text-white shadow-sm'

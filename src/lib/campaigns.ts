@@ -58,6 +58,8 @@ export interface CampaignDetails {
   operationNotes?: string[];
 }
 
+export const ACTIVE_CAMPAIGN_MONTHS = [1, 2, 3, 7, 8, 9] as const;
+
 export const CAMPAIGNS_365: MonthlyCampaign[] = [
   {
     month: 1,

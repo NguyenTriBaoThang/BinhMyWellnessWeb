@@ -29,11 +29,13 @@ import RealtimeCapacityWidget from '@/components/RealtimeCapacityWidget';
 import BinhMy365Timeline from '@/components/BinhMy365Timeline';
 import MonthlyDestinationMap from '@/components/MonthlyDestinationMap';
 import BookingModal from '@/components/BookingModal';
+import { ACTIVE_CAMPAIGN_MONTHS } from '@/lib/campaigns';
 
 export default function HomePage() {
   const [services, setServices] = useState<Service[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedCampaignMonth, setSelectedCampaignMonth] = useState<number>(ACTIVE_CAMPAIGN_MONTHS[0]);
 
   // Filters
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
@@ -245,6 +247,8 @@ export default function HomePage() {
         {/* 365 Days Seasonal Timeline */}
         <BinhMy365Timeline
           services={services}
+          selectedMonth={selectedCampaignMonth}
+          onMonthChange={setSelectedCampaignMonth}
           onSelectService={(serviceId) => {
             const found = services.find((s) => s.id === serviceId);
             if (found) setBookingService(found);
@@ -256,7 +260,7 @@ export default function HomePage() {
         />
 
         {/* Monthly destination map */}
-        <MonthlyDestinationMap />
+        <MonthlyDestinationMap activeMonth={selectedCampaignMonth} onMonthChange={setSelectedCampaignMonth} />
 
         {/* Experiences Showcase Section */}
         <section id="experiences-grid" className="space-y-8 scroll-mt-24">

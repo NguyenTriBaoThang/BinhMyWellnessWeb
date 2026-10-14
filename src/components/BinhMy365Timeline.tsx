@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -18,11 +17,13 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { formatVND } from '@/lib/utils';
-import { CAMPAIGNS_365, CAMPAIGN_DETAILS, type CampaignSpotKind } from '@/lib/campaigns';
+import { ACTIVE_CAMPAIGN_MONTHS, CAMPAIGNS_365, CAMPAIGN_DETAILS, type CampaignSpotKind } from '@/lib/campaigns';
 import type { Service } from '@/types';
 
 interface BinhMy365TimelineProps {
   services: Service[];
+  selectedMonth: number;
+  onMonthChange: (month: number) => void;
   onSelectService?: (serviceId: string) => void;
   onExploreCategory?: (category: string) => void;
 }
@@ -49,14 +50,11 @@ const KIND_TO_CATEGORY: Record<CampaignSpotKind, string> = {
 
 export default function BinhMy365Timeline({
   services,
+  selectedMonth,
+  onMonthChange,
   onSelectService,
   onExploreCategory,
 }: BinhMy365TimelineProps) {
-  const currentMonth = Number(new Intl.DateTimeFormat('en-US', {
-    timeZone: 'Asia/Ho_Chi_Minh',
-    month: 'numeric',
-  }).format(new Date()));
-  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const campaign = CAMPAIGNS_365.find((item) => item.month === selectedMonth) ?? CAMPAIGNS_365[0];
   const details = CAMPAIGN_DETAILS[campaign.month];
 
@@ -70,33 +68,32 @@ export default function BinhMy365Timeline({
         <div className="max-w-3xl">
           <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-forest-100 px-3 py-1 text-xs font-semibold text-forest-800">
             <CalendarDays className="h-3.5 w-3.5" />
-            BÌNH MỸ 365 · 12 THÁNG
+            BÌNH MỸ 365 · THÁNG CÓ THÔNG TIN
           </div>
           <h2 id="binhmy-365-title" className="text-2xl font-extrabold tracking-tight text-forest-950 sm:text-3xl">
-            Khám phá Bình Mỹ theo 12 tháng
+            Khám phá Bình Mỹ theo tháng hoạt động
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-zinc-600">
-            Mỗi tháng một lý do để đến Bình Mỹ. Chọn chủ đề phù hợp và xem các điểm đến được gợi ý.
+            Chọn tháng có trong kế hoạch để xem ảnh, trải nghiệm và địa điểm tương ứng.
           </p>
         </div>
 
         <div className="inline-flex items-center gap-2 self-start rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-xs font-semibold text-emerald-800 md:self-auto">
           <Sparkles className="h-4 w-4 text-emerald-600" />
-          <span>Tháng hiện tại: {currentMonth}</span>
+          <span>Đang xem tháng {selectedMonth}</span>
         </div>
       </div>
 
       <nav aria-label="Chọn tháng" className="-mx-1 flex gap-2 overflow-x-auto border-b border-zinc-100 px-1 pb-4 no-scrollbar">
-        {CAMPAIGNS_365.map((item) => {
+        {CAMPAIGNS_365.filter((item) => ACTIVE_CAMPAIGN_MONTHS.includes(item.month as (typeof ACTIVE_CAMPAIGN_MONTHS)[number])).map((item) => {
           const isActive = item.month === selectedMonth;
-          const isCurrent = item.month === currentMonth;
 
           return (
             <button
               key={item.month}
               type="button"
               aria-pressed={isActive}
-              onClick={() => setSelectedMonth(item.month)}
+              onClick={() => onMonthChange(item.month)}
               className={`flex min-w-[5.25rem] shrink-0 flex-col items-center gap-1 rounded-2xl px-3 py-2.5 text-xs font-bold transition-all ${
                 isActive
                   ? 'bg-forest-700 text-white shadow-md shadow-forest-700/20'
@@ -104,11 +101,6 @@ export default function BinhMy365Timeline({
               }`}
             >
               <span>Tháng {item.month}</span>
-              {isCurrent && (
-                <span className={`rounded-full px-1.5 py-0.5 text-[9px] ${isActive ? 'bg-emerald-300 text-forest-950' : 'bg-emerald-100 text-emerald-800'}`}>
-                  Hiện tại
-                </span>
-              )}
             </button>
           );
         })}
