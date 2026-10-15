@@ -51,6 +51,28 @@ const config: Config = {
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
       },
+      boxShadow: {
+        'glass': '0 8px 32px 0 rgba(16, 185, 129, 0.12)',
+        '3d': '0 20px 40px -15px rgba(5, 46, 22, 0.2), 0 0 15px rgba(34, 197, 94, 0.1)',
+        '3d-hover': '0 30px 60px -12px rgba(5, 46, 22, 0.35), 0 0 25px rgba(34, 197, 94, 0.25)',
+        'glow-emerald': '0 0 30px -5px rgba(16, 185, 129, 0.4)',
+        'glow-amber': '0 0 30px -5px rgba(245, 158, 11, 0.4)',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+          '50%': { transform: 'translateY(-12px) rotate(1deg)' },
+        },
+        floatReverse: {
+          '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+          '50%': { transform: 'translateY(12px) rotate(-1deg)' },
+        },
+      },
+      animation: {
+        'float': 'float 6s ease-in-out infinite',
+        'float-reverse': 'floatReverse 7s ease-in-out infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
     },
   },
   plugins: [],
