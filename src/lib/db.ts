@@ -252,8 +252,10 @@ const persistentDb = {
 
   async getServiceById(id: string): Promise<Service | null> {
     const row = await prisma.service.findFirst({ where: { OR: [{ id }, { code: id }] }, include: { provider: true } });
-    if (!row || (process.env.NODE_ENV === 'production' && row.testOnly && !isTestBookingModeEnabled())) return null;
-    return mapService(row);
+    if (!row) return null;
+    const service = mapService(row);
+    if (process.env.NODE_ENV === 'production' && service.testOnly && !isTestBookingModeEnabled()) return null;
+    return service;
   },
 
   async createService(data: Omit<Service, 'id' | 'code' | 'updatedAt'>, actorName = 'Chủ nhà vườn'): Promise<Service> {
