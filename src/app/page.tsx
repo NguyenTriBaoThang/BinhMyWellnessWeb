@@ -49,6 +49,8 @@ export default function HomePage() {
   const [services, setServices] = useState<Service[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [servicesError, setServicesError] = useState<string | null>(null);
+  const [reloadCount, setReloadCount] = useState(0);
   const [selectedCampaignMonth, setSelectedCampaignMonth] = useState<number>(getCurrentCampaignMonth);
 
   // Filters
@@ -81,22 +83,28 @@ export default function HomePage() {
 
         // Load services
         const servRes = await fetch('/api/services');
-        const servData = await servRes.json();
-        if (servData.services) {
-          setServices(servData.services);
-          const requestedServiceId = new URLSearchParams(window.location.search).get('book');
-          const requestedService = servData.services.find((service: Service) => service.id === requestedServiceId);
-          if (requestedService) setBookingService(requestedService);
+        const servData = await servRes.json().catch(() => ({}));
+        if (!servRes.ok) {
+          throw new Error(servData.error || 'Chưa tải được danh sách địa điểm và hoạt động.');
         }
+        if (!Array.isArray(servData.services)) {
+          throw new Error('Dữ liệu địa điểm và hoạt động chưa đúng định dạng.');
+        }
+        setServices(servData.services);
+        setServicesError(null);
+        const requestedServiceId = new URLSearchParams(window.location.search).get('book');
+        const requestedService = servData.services.find((service: Service) => service.id === requestedServiceId);
+        if (requestedService) setBookingService(requestedService);
       } catch (err) {
         console.error(err);
+        setServicesError(err instanceof Error ? err.message : 'Chưa tải được danh sách địa điểm và hoạt động.');
       } finally {
         setLoading(false);
       }
     }
 
     loadData();
-  }, []);
+  }, [reloadCount]);
 
   const toggleFavorite = async (id: string) => {
     if (currentUser?.role !== 'CUSTOMER') {
@@ -524,7 +532,27 @@ export default function HomePage() {
           )}
 
           {/* Experiences 3D Grid */}
-          {filteredServices.length > 0 ? (
+          {loading ? (
+            <div role="status" className="rounded-3xl border border-zinc-200 bg-white p-6 text-sm text-zinc-600 shadow-sm">
+              Đang tải địa điểm và hoạt động…
+            </div>
+          ) : servicesError ? (
+            <div role="alert" className="rounded-3xl border border-amber-200 bg-amber-50 p-6 text-amber-950 shadow-sm">
+              <p className="font-bold">Chưa tải được địa điểm và hoạt động.</p>
+              <p className="mt-1 text-sm">{servicesError}</p>
+              <p className="mt-1 text-sm">Hệ thống cần kết nối cơ sở dữ liệu để hiển thị dịch vụ và nhận đặt chỗ.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setLoading(true);
+                  setReloadCount((count) => count + 1);
+                }}
+                className="mt-4 rounded-xl bg-forest-800 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-forest-900"
+              >
+                Thử tải lại
+              </button>
+            </div>
+          ) : filteredServices.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredServices.map((service) => (
                 <ExperienceCard
