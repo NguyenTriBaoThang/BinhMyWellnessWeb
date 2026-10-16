@@ -11,7 +11,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('password@123');
+  const [password, setPassword] = useState('');
   const [role, setRole] = useState<Role>('CUSTOMER');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +68,7 @@ export default function RegisterPage() {
             </label>
             <input
               type="text"
+              autoComplete="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -82,6 +83,7 @@ export default function RegisterPage() {
             </label>
             <input
               type="email"
+              autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -96,6 +98,7 @@ export default function RegisterPage() {
             </label>
             <input
               type="tel"
+              autoComplete="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
@@ -110,6 +113,7 @@ export default function RegisterPage() {
             </label>
             <input
               type="password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

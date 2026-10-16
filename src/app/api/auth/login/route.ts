@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db, isPersistentDatabaseConfigured, isTestBookingModeEnabled } from '@/lib/db';
 import { verifyPassword, encodeSession, isSessionSecretConfigured } from '@/lib/auth';
 import { DEFAULT_ACCOUNTS } from '@/lib/constants';
+import { isDatabaseConnectionError } from '@/lib/db-errors';
 
 export async function POST(req: Request) {
   try {
@@ -68,6 +69,13 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error: any) {
+    if (isDatabaseConnectionError(error)) {
+      console.error('Login database connection failed.', { code: error?.code });
+      return NextResponse.json(
+        { error: 'Hệ thống tạm thời không kết nối được cơ sở dữ liệu. Vui lòng thử lại sau.' },
+        { status: 503 }
+      );
+    }
     return NextResponse.json(
       { error: error?.message || 'Lỗi xử lý đăng nhập' },
       { status: 500 }

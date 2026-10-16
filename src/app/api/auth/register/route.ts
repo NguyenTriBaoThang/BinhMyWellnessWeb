@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db, isPersistentDatabaseConfigured } from '@/lib/db';
+import { isDatabaseConnectionError } from '@/lib/db-errors';
 
 export async function POST(req: Request) {
   try {
@@ -29,6 +30,16 @@ export async function POST(req: Request) {
       message: 'Đăng ký tài khoản thành công! Vui lòng đăng nhập.',
     });
   } catch (error: any) {
+    if (error?.code === 'P2002') {
+      return NextResponse.json({ error: 'Email này đã được đăng ký.' }, { status: 409 });
+    }
+    if (isDatabaseConnectionError(error)) {
+      console.error('Account registration database connection failed.', { code: error?.code });
+      return NextResponse.json(
+        { error: 'Hệ thống tạm thời không kết nối được cơ sở dữ liệu. Vui lòng thử lại sau.' },
+        { status: 503 }
+      );
+    }
     return NextResponse.json(
       { error: error?.message || 'Lỗi khi đăng ký' },
       { status: 400 }
