@@ -44,16 +44,24 @@ async function main() {
 
   prisma = new PrismaClient();
   const { DEFAULT_ACCOUNTS, DEFAULT_PASSWORD, SEED_PROVIDERS, SEED_SERVICES } = await loadSeedData();
+  const adminPassword = process.env.BM_ADMIN_PASSWORD?.trim();
+  if (adminPassword && (adminPassword.length < 12 || adminPassword === DEFAULT_PASSWORD)) {
+    throw new Error('BM_ADMIN_PASSWORD phải có ít nhất 12 ký tự và khác mật khẩu mẫu.');
+  }
   const passwordHash = bcrypt.hashSync(DEFAULT_PASSWORD, 10);
+  const adminPasswordHash = adminPassword ? bcrypt.hashSync(adminPassword, 10) : null;
 
   for (const account of DEFAULT_ACCOUNTS) {
+    const accountPasswordHash = account.role === 'ADMIN' && adminPasswordHash
+      ? adminPasswordHash
+      : passwordHash;
     await prisma.user.upsert({
       where: { email: account.email.toLowerCase() },
       update: {
         name: account.name,
         phone: account.phone ?? null,
         role: account.role,
-        password: passwordHash,
+        password: accountPasswordHash,
       },
       create: {
         id: account.id,
@@ -61,7 +69,7 @@ async function main() {
         name: account.name,
         phone: account.phone ?? null,
         role: account.role,
-        password: passwordHash,
+        password: accountPasswordHash,
       },
     });
   }
@@ -113,7 +121,9 @@ async function main() {
   }
 
   console.log(`Đã nạp ${DEFAULT_ACCOUNTS.length} tài khoản thử nghiệm, ${SEED_PROVIDERS.length} cơ sở và ${SEED_SERVICES.length} dịch vụ.`);
-  console.log(`Mật khẩu tài khoản thử nghiệm: ${DEFAULT_PASSWORD}`);
+  console.log(adminPasswordHash
+    ? 'Tài khoản quản trị được đặt mật khẩu riêng từ BM_ADMIN_PASSWORD.'
+    : 'Tài khoản quản trị vẫn dùng mật khẩu mẫu; chỉ đăng nhập được ở môi trường phát triển.');
 }
 
 main()

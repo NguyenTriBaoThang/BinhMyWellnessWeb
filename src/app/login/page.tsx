@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const demoProviders = DEFAULT_ACCOUNTS.filter((account) =>
     account.role === 'PROVIDER' &&
-    (process.env.NODE_ENV !== 'production' || account.email.endsWith('@binhmy.test'))
+    (process.env.NODE_ENV !== 'production' || account.email.endsWith('@binhmy.test') || account.email === 'nhavuona@gmail.com')
   );
 
   const getRedirectPath = (role: Role) => {

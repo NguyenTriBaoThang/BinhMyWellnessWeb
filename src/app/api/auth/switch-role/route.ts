@@ -24,7 +24,9 @@ export async function POST(req: Request) {
     const targetEmail = role === 'PROVIDER' && typeof providerEmail === 'string'
       ? providerEmail
       : emailMap[role as Role];
-    if (productionTestMode && role === 'PROVIDER' && !/^provider\.p(?:[2-9]|10)@binhmy\.test$/i.test(targetEmail)) {
+    const isAllowedTestProvider = targetEmail.toLowerCase() === 'nhavuona@gmail.com'
+      || /^provider\.p(?:[2-9]|10)@binhmy\.test$/i.test(targetEmail);
+    if (productionTestMode && role === 'PROVIDER' && !isAllowedTestProvider) {
       return NextResponse.json({ error: 'Chỉ tài khoản nhà vườn thử nghiệm được dùng ở chế độ này.' }, { status: 403 });
     }
     const user = await db.findUserByEmail(targetEmail);

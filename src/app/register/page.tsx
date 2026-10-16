@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { UserPlus, AlertCircle } from 'lucide-react';
-import { Role } from '@/types';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -12,7 +11,6 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<Role>('CUSTOMER');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,7 +23,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone, password, role }),
+        body: JSON.stringify({ name, email, phone, password }),
       });
 
       const data = await res.json();
@@ -51,6 +49,9 @@ export default function RegisterPage() {
           </h1>
           <p className="text-xs text-zinc-500">
             Trải nghiệm dịch vụ du lịch sinh thái nông nghiệp Bình Mỹ
+          </p>
+          <p className="text-xs text-zinc-500">
+            Form này tạo tài khoản khách hàng. Tài khoản nhà vườn và quản trị được cấp riêng.
           </p>
         </div>
 
@@ -119,36 +120,6 @@ export default function RegisterPage() {
               required
               className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-forest-500 font-mono"
             />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-zinc-700 mb-1">
-              Vai trò tài khoản
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setRole('CUSTOMER')}
-                className={`py-2 rounded-xl text-xs font-bold border transition-all ${
-                  role === 'CUSTOMER'
-                    ? 'bg-emerald-600 text-white border-emerald-600'
-                    : 'bg-zinc-50 text-zinc-700 border-zinc-200'
-                }`}
-              >
-                Khách trải nghiệm
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole('PROVIDER')}
-                className={`py-2 rounded-xl text-xs font-bold border transition-all ${
-                  role === 'PROVIDER'
-                    ? 'bg-amber-600 text-white border-amber-600'
-                    : 'bg-zinc-50 text-zinc-700 border-zinc-200'
-                }`}
-              >
-                Chủ nhà vườn
-              </button>
-            </div>
           </div>
 
           <button

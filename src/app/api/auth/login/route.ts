@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db, isPersistentDatabaseConfigured, isTestBookingModeEnabled } from '@/lib/db';
 import { verifyPassword, encodeSession, isSessionSecretConfigured } from '@/lib/auth';
-import { DEFAULT_ACCOUNTS } from '@/lib/constants';
+import { DEFAULT_ACCOUNTS, DEFAULT_PASSWORD } from '@/lib/constants';
 import { isDatabaseConnectionError } from '@/lib/db-errors';
 
 export async function POST(req: Request) {
@@ -25,14 +25,11 @@ export async function POST(req: Request) {
     const demoAccount = DEFAULT_ACCOUNTS.find((account) => account.email.toLowerCase() === normalizedEmail);
     const approvedTestLogin = isTestBookingModeEnabled() && (
       (demoAccount?.role === 'CUSTOMER' && demoAccount.id === 'user-customer-1') ||
-      (demoAccount?.role === 'PROVIDER' && /^provider\.p(?:[2-9]|10)@binhmy\.test$/.test(normalizedEmail))
+      (demoAccount?.role === 'PROVIDER' && (
+        normalizedEmail === 'nhavuona@gmail.com' ||
+        /^provider\.p(?:[2-9]|10)@binhmy\.test$/.test(normalizedEmail)
+      ))
     );
-    if (process.env.NODE_ENV === 'production' && demoAccount && !approvedTestLogin) {
-      return NextResponse.json(
-        { error: 'Tài khoản mẫu chỉ dùng trong môi trường thử nghiệm.' },
-        { status: 401 }
-      );
-    }
 
     const user = await db.findUserByEmail(email);
     if (!user) {
@@ -46,6 +43,20 @@ export async function POST(req: Request) {
     if (!valid) {
       return NextResponse.json(
         { error: 'Email hoặc mật khẩu không chính xác.' },
+        { status: 401 }
+      );
+    }
+
+    // Never accept the publicly documented demo password for sample accounts in production.
+    // A provisioned admin can still sign in with a private password stored as a hash in the DB.
+    if (
+      process.env.NODE_ENV === 'production' &&
+      demoAccount &&
+      password === DEFAULT_PASSWORD &&
+      !approvedTestLogin
+    ) {
+      return NextResponse.json(
+        { error: 'Tài khoản mẫu chỉ dùng trong môi trường thử nghiệm.' },
         { status: 401 }
       );
     }
