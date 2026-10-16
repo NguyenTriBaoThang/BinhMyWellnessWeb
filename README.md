@@ -165,7 +165,9 @@ Hệ thống cung cấp sẵn 3 tài khoản mẫu ứng với 3 nhóm người 
 | :--- | :--- | :--- | :--- | :--- |
 | 🧑‍🌾 **Khách Hàng**<br>`CUSTOMER` | `baothang@gmail.com` | `password@123` | `/customer` | • Khám phá danh mục nhà vườn & đặt chỗ theo ca.<br>• Quản lý lịch trình, chấp nhận/từ chối đề xuất đổi giờ.<br>• Viết đánh giá 5 sao & nhận xét sau khi hoàn thành. |
 | 🏡 **Chủ Nhà Vườn**<br>`PROVIDER` | `nhavuona@gmail.com` | `password@123` | `/provider` | • Tiếp nhận đơn đặt chỗ thời gian thực.<br>• Xác nhận (`confirm`) hoặc Đề xuất đổi lịch (`propose`).<br>• Đánh dấu Hoàn thành dịch vụ (`complete`).<br>• Trực tiếp phản hồi lời cảm ơn cho khách đánh giá. |
-| 🏛️ **Ban Quản Trị**<br>`ADMIN` | `binhmy@admin.com` | `password@123` | `/admin` | • Kiểm duyệt dịch vụ (`review -> published/revision`).<br>• Kích hoạt / Tạm ngưng hoạt động nhà vườn.<br>• Giám sát bảng **Audit Logs** toàn hệ thống.<br>• Thống kê nguồn truy cập (Web, QR Code, Zalo, Facebook). |
+| 🏛️ **Ban Quản Trị**<br>`ADMIN` | `binhmy@admin.com` | Mật khẩu riêng trong biến `BM_ADMIN_PASSWORD` lúc chạy seed | `/admin` | • Kiểm duyệt dịch vụ (`review -> published/revision`).<br>• Kích hoạt / Tạm ngưng hoạt động nhà vườn.<br>• Giám sát bảng **Audit Logs** toàn hệ thống.<br>• Thống kê nguồn truy cập (Web, QR Code, Zalo, Facebook). |
+
+> Tài khoản ADMIN không dùng mật khẩu mẫu công khai `password@123`. Khách hàng và chủ vườn dùng mật khẩu mẫu ở trên trong môi trường thử nghiệm; muốn đăng nhập các tài khoản mẫu trên production thì bật `BM_ENABLE_TEST_BOOKINGS=true`.
 
 > ⚡ **Thanh công cụ chuyển vai trò 1-chạm (Role Switcher Bar)**: Ở góc trên cùng của giao diện web luôn có sẵn 3 nút chuyển nhanh. Chỉ cần nhấp chuột vào vai trò mong muốn, hệ thống sẽ tự động đăng nhập và cập nhật trạng thái session ngay lập tức mà không cần gõ form đăng nhập.
 
