@@ -17,9 +17,15 @@ export async function GET(req: Request) {
 
     const currentUser = await getCurrentUser();
 
-    // If admin or provider asking for all
+    // Providers only see their own unpublished services; admins can review all.
     if (all && (currentUser?.role === 'ADMIN' || currentUser?.role === 'PROVIDER')) {
-      const services = await db.getAllServices({ category, budget, duration, group, indoor });
+      const allServices = await db.getAllServices({ category, budget, duration, group, indoor });
+      if (currentUser.role === 'PROVIDER') {
+        const provider = await db.getProviderByUserId(currentUser.id);
+        if (!provider) return NextResponse.json({ error: 'Tài khoản chưa có hồ sơ nhà vườn.' }, { status: 409 });
+        return NextResponse.json({ services: allServices.filter((service) => service.providerId === provider.id) });
+      }
+      const services = allServices;
       return NextResponse.json({ services });
     }
 
@@ -41,18 +47,29 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+    let providerId = typeof body.providerId === 'string' ? body.providerId : '';
+    if (user.role === 'PROVIDER') {
+      const provider = await db.getProviderByUserId(user.id);
+      if (!provider) return NextResponse.json({ error: 'Tạo dịch vụ cần hoàn tất hồ sơ nhà vườn trước.' }, { status: 409 });
+      providerId = provider.id;
+    } else if (!providerId) {
+      providerId = 'p1';
+    }
+    const owner = await db.getProviderById(providerId);
+    if (!owner) return NextResponse.json({ error: 'Không tìm thấy hồ sơ nhà vườn của dịch vụ.' }, { status: 400 });
+
     const service = await db.createService(
       {
-        providerId: user.providerProfileId || 'p1',
-        providerName: user.name,
+        providerId,
+        providerName: owner.name,
         name: body.name,
         category: body.category || 'Nông nghiệp',
         price: Number(body.price) || 100000,
         duration: Number(body.duration) || 60,
         capacity: Number(body.capacity) || 16,
         image: body.image || '/assets/nong_trai_binh_my.jpg',
-        latitude: body.latitude || 10.96,
-        longitude: body.longitude || 106.64,
+        latitude: Number.isFinite(body.latitude) ? body.latitude : 10.98,
+        longitude: Number.isFinite(body.longitude) ? body.longitude : 106.6,
         groups: body.groups || ['family', 'friends'],
         indoor: !!body.indoor,
         description: body.description || '',

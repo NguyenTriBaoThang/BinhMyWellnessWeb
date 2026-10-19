@@ -20,7 +20,8 @@ export async function GET(req: Request) {
     if (user.role === 'ADMIN') {
       bookings = await db.getBookings();
     } else if (user.role === 'PROVIDER') {
-      bookings = await db.getBookings({ providerId: user.providerProfileId || 'p1' });
+      const provider = await db.getProviderByUserId(user.id);
+      bookings = provider ? await db.getBookings({ providerId: provider.id }) : [];
     } else {
       bookings = await db.getBookings({ customerId: user.id });
     }
@@ -61,6 +62,10 @@ export async function POST(req: Request) {
     const requestedService = await db.getServiceById(body.serviceId);
     if (!requestedService || (requestedService.testOnly && process.env.NODE_ENV === 'production' && !isTestBookingModeEnabled())) {
       return NextResponse.json({ error: 'Hoạt động thử nghiệm hiện không nhận đặt chỗ thực tế.' }, { status: 404 });
+    }
+    const requestedProvider = requestedService ? await db.getProviderById(requestedService.providerId) : null;
+    if (requestedService.status !== 'PUBLISHED' || !requestedProvider?.active || !requestedService.slots.includes(body.slot)) {
+      return NextResponse.json({ error: 'Dịch vụ chưa mở nhận yêu cầu hoặc khung giờ không hợp lệ.' }, { status: 409 });
     }
 
     const parsedDate = new Date(`${date}T00:00:00.000Z`);

@@ -16,6 +16,13 @@ export async function GET(
     }
 
     const provider = await db.getProviderById(service.providerId);
+    if (service.status !== 'PUBLISHED' || !provider?.active) {
+      const user = await getCurrentUser();
+      const owner = user?.role === 'PROVIDER' ? await db.getProviderByUserId(user.id) : null;
+      if (user?.role !== 'ADMIN' && (!owner || owner.id !== service.providerId)) {
+        return NextResponse.json({ error: 'Không tìm thấy dịch vụ.' }, { status: 404 });
+      }
+    }
     const reviews = await db.getReviews(service.id);
 
     return NextResponse.json({ service, provider, reviews });
@@ -38,6 +45,14 @@ export async function PUT(
     }
 
     const body = await req.json();
+    const existing = await db.getServiceById(params.id);
+    if (!existing) return NextResponse.json({ error: 'Không tìm thấy dịch vụ.' }, { status: 404 });
+    if (user.role === 'PROVIDER') {
+      const provider = await db.getProviderByUserId(user.id);
+      if (!provider || existing.providerId !== provider.id) {
+        return NextResponse.json({ error: 'Dịch vụ này không thuộc hồ sơ nhà vườn của bạn.' }, { status: 403 });
+      }
+    }
     const service = await db.updateService(params.id, body, user.name);
 
     return NextResponse.json({ success: true, service });

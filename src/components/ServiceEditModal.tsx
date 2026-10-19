@@ -21,6 +21,8 @@ export default function ServiceEditModal({
   const [price, setPrice] = useState(service?.price || 120000);
   const [duration, setDuration] = useState(service?.duration || 90);
   const [capacity, setCapacity] = useState(service?.capacity || 16);
+  const [latitude, setLatitude] = useState(String(service?.latitude ?? 10.98));
+  const [longitude, setLongitude] = useState(String(service?.longitude ?? 106.6));
   const [slotsStr, setSlotsStr] = useState(service?.slots?.join(', ') || '08:30, 10:30, 14:00, 16:00');
   const [description, setDescription] = useState(service?.description || '');
   const [indoor, setIndoor] = useState(service?.indoor || false);
@@ -45,6 +47,13 @@ export default function ServiceEditModal({
       setError('Vui lòng nhập ít nhất một khung giờ đón khách.');
       return;
     }
+    const latitudeValue = Number(latitude);
+    const longitudeValue = Number(longitude);
+    if (!Number.isFinite(latitudeValue) || latitudeValue < 10.7 || latitudeValue > 11.3
+      || !Number.isFinite(longitudeValue) || longitudeValue < 106.3 || longitudeValue > 106.9) {
+      setError('Tọa độ cần nằm trong khu vực Bình Mỹ và lân cận.');
+      return;
+    }
 
     try {
       setLoading(true);
@@ -60,6 +69,8 @@ export default function ServiceEditModal({
           price: Number(price),
           duration: Number(duration),
           capacity: Number(capacity),
+          latitude: latitudeValue,
+          longitude: longitudeValue,
           slots,
           description,
           indoor,
@@ -148,6 +159,15 @@ export default function ServiceEditModal({
                 className="w-full px-3 py-2 rounded-xl border border-zinc-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <label className="text-xs font-semibold text-zinc-700">Vĩ độ (Bình Mỹ)
+              <input type="number" min="10.7" max="11.3" step="any" value={latitude} onChange={(e) => setLatitude(e.target.value)} required className="mt-1 w-full rounded-xl border border-zinc-300 px-3 py-2 text-sm font-mono" />
+            </label>
+            <label className="text-xs font-semibold text-zinc-700">Kinh độ (Bình Mỹ)
+              <input type="number" min="106.3" max="106.9" step="any" value={longitude} onChange={(e) => setLongitude(e.target.value)} required className="mt-1 w-full rounded-xl border border-zinc-300 px-3 py-2 text-sm font-mono" />
+            </label>
           </div>
 
           <div className="grid grid-cols-2 gap-3">

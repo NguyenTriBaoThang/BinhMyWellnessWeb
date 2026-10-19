@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   Trees,
   Calendar,
@@ -23,6 +24,7 @@ import { formatVND, formatDateVN, getStatusBadge } from '@/lib/utils';
 import ServiceEditModal from '@/components/ServiceEditModal';
 import ProviderAvailabilityEditor from '@/components/ProviderAvailabilityEditor';
 import BookingReconciliationForm from '@/components/BookingReconciliationForm';
+import ProviderProfileEditor from '@/components/ProviderProfileEditor';
 
 export default function ProviderDashboardPage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -30,10 +32,12 @@ export default function ProviderDashboardPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [availabilityCount, setAvailabilityCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [pageError, setPageError] = useState('');
 
   // Tab: 'orders' | 'services' | 'reviews'
-  const [activeTab, setActiveTab] = useState<'orders' | 'services' | 'reviews'>('orders');
+  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'services' | 'reviews'>('orders');
   const [orderFilter, setOrderFilter] = useState<string>('PENDING');
 
   // Modal
@@ -63,17 +67,17 @@ export default function ProviderDashboardPage() {
       ]);
 
       setCurrentUser(meRes.user);
+      setProvider(meRes.provider || null);
+      setAvailabilityCount(Number(meRes.availabilityCount) || 0);
+      if (meRes.user?.role === 'PROVIDER' && !meRes.provider) setActiveTab('profile');
       if (bRes.bookings) setBookings(bRes.bookings);
       if (sRes.services) {
-        // Filter services belonging to this provider profile (or p1 default)
-        const myServices = sRes.services.filter(
-          (s: Service) => s.providerId === (meRes.user?.providerProfileId || 'p1')
-        );
-        setServices(myServices);
+        setServices(sRes.services);
       }
       if (rRes.reviews) setReviews(rRes.reviews);
+      setPageError('');
     } catch (err) {
-      console.error(err);
+      setPageError(err instanceof Error ? err.message : 'Không tải được dữ liệu nhà vườn.');
     } finally {
       setLoading(false);
     }
@@ -95,6 +99,9 @@ export default function ProviderDashboardPage() {
       if (res.ok) {
         setProposeBookingId(null);
         await loadData();
+      } else {
+        const result = await res.json();
+        setPageError(result.error || 'Không cập nhật được yêu cầu.');
       }
     } finally {
       setActionLoading(null);
@@ -133,6 +140,41 @@ export default function ProviderDashboardPage() {
     return b.status === orderFilter;
   });
 
+  const completedBookings = bookings.filter((booking) => booking.status === 'COMPLETED');
+  const steps = [
+    { label: 'Tạo hồ sơ', done: Boolean(provider), tab: 'profile' as const, detail: provider ? 'Hồ sơ đã lưu' : 'Bổ sung thông tin cơ sở' },
+    { label: 'Đăng dịch vụ', done: services.length > 0, tab: 'services' as const, detail: services.length ? `${services.length} dịch vụ` : 'Tạo trải nghiệm đầu tiên' },
+    { label: 'Cập nhật lịch', done: availabilityCount > 0, tab: 'services' as const, detail: availabilityCount ? `${availabilityCount} ca đã nhập` : 'Chọn ngày và ca phục vụ' },
+    { label: 'Nhận yêu cầu', done: bookings.length > 0, tab: 'orders' as const, detail: bookings.length ? `${bookings.length} yêu cầu` : 'Đơn của khách sẽ hiện ở đây' },
+    { label: 'Xác nhận', done: bookings.some((booking) => ['CONFIRMED', 'COMPLETED'].includes(booking.status)), tab: 'orders' as const, detail: 'Xác nhận hoặc đề xuất đổi lịch' },
+    { label: 'Phục vụ', done: completedBookings.length > 0, tab: 'orders' as const, detail: 'Đánh dấu hoàn tất sau trải nghiệm' },
+    { label: 'Đối soát', done: completedBookings.length > 0 && completedBookings.every((booking) => booking.feeRecordedAt), tab: 'orders' as const, detail: 'Ghi khoản thu ròng và phí 8%' },
+  ];
+  const activeStep = steps.findIndex((step) => !step.done);
+  const openStep = (label: string, tab: typeof activeTab) => {
+    setActiveTab(tab);
+    if (label === 'Đăng dịch vụ' && services.length === 0) setEditServiceModal('NEW');
+    if (label === 'Nhận yêu cầu') setOrderFilter('PENDING');
+    if (label === 'Phục vụ') setOrderFilter('CONFIRMED');
+    if (label === 'Đối soát') setOrderFilter('COMPLETED');
+  };
+
+  if (!loading && currentUser?.role !== 'PROVIDER') {
+    return (
+      <div className="mx-auto my-16 max-w-xl rounded-3xl border border-amber-200 bg-white p-8 text-center shadow-sm">
+        <Trees className="mx-auto h-10 w-10 text-amber-700" />
+        <h1 className="mt-4 text-2xl font-black text-zinc-900">Khu vực nhà vườn</h1>
+        <p className="mt-2 text-sm text-zinc-600">Đăng nhập tài khoản nhà vườn hoặc gửi hồ sơ tham gia Bình Mỹ.</p>
+        <div className="mt-5 flex flex-wrap justify-center gap-2">
+          <Link href="/login" className="rounded-xl bg-forest-800 px-4 py-2.5 text-sm font-bold text-white">Đăng nhập</Link>
+          <Link href="/register" className="rounded-xl border border-amber-300 px-4 py-2.5 text-sm font-bold text-amber-900">Tạo hồ sơ nhà vườn</Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) return <div role="status" className="mx-auto max-w-7xl px-4 py-16 text-center text-sm text-zinc-600">Đang tải quy trình nhà vườn…</div>;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
       {/* Provider Header Banner */}
@@ -143,10 +185,10 @@ export default function ProviderDashboardPage() {
             CỔNG QUẢN LÝ NHÀ VƯỜN ĐỐI TÁC
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-white">
-            Vườn Xanh Bình Mỹ (Chủ Vườn A)
+            {provider?.name || 'Hoàn thiện hồ sơ nhà vườn'}
           </h1>
           <p className="text-xs sm:text-sm text-zinc-300">
-            Tài khoản: <code className="font-mono text-amber-300">{currentUser?.email || 'nhavuona@gmail.com'}</code> • Ấp 6, Xã Bình Mỹ, Củ Chi
+            Tài khoản: <code className="font-mono text-amber-300">{currentUser?.email}</code>{provider?.address ? ` · ${provider.address}` : ''}
           </p>
         </div>
 
@@ -175,8 +217,31 @@ export default function ProviderDashboardPage() {
         </div>
       </div>
 
+      {pageError && <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900"><span>{pageError}</span><button onClick={() => void loadData()} className="rounded-lg bg-rose-700 px-3 py-2 text-xs font-bold text-white">Tải lại</button></div>}
+
+      <section aria-labelledby="provider-flow-heading" className="space-y-3">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div><p className="text-xs font-bold uppercase tracking-wide text-amber-800">Quy trình phục vụ</p><h2 id="provider-flow-heading" className="mt-1 text-lg font-black text-zinc-900">Từ hồ sơ đến đối soát</h2></div>
+          <div className="flex items-center gap-3"><p className="text-xs text-zinc-500">{steps.filter((step) => step.done).length} / {steps.length} bước đã hoàn tất</p><button type="button" onClick={() => void loadData()} className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-bold text-zinc-700 hover:bg-zinc-50">Làm mới yêu cầu</button></div>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+          {steps.map((step, index) => (
+            <button key={step.label} type="button" onClick={() => openStep(step.label, step.tab)} aria-current={index === activeStep ? 'step' : undefined} className={`min-w-0 rounded-2xl border p-3 text-left transition ${step.done ? 'border-emerald-200 bg-emerald-50' : index === activeStep ? 'border-amber-400 bg-amber-50 ring-2 ring-amber-100' : 'border-zinc-200 bg-white hover:border-amber-300'}`}>
+              <span className="flex items-center gap-2"><span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[10px] font-black ${step.done ? 'bg-emerald-700 text-white' : 'bg-zinc-200 text-zinc-700'}`}>{step.done ? '✓' : index + 1}</span><span className="text-xs font-bold text-zinc-900">{step.label}</span></span>
+              <span className="mt-2 block text-[10px] leading-relaxed text-zinc-600">{step.detail}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
       {/* Main Section Navigation */}
-      <div className="flex items-center gap-2 border-b border-zinc-200 pb-2 text-xs sm:text-sm font-bold">
+      <div className="flex items-center gap-2 overflow-x-auto border-b border-zinc-200 pb-2 text-xs sm:text-sm font-bold">
+        <button
+          onClick={() => setActiveTab('profile')}
+          className={`shrink-0 px-4 py-2.5 rounded-xl transition-all ${activeTab === 'profile' ? 'bg-amber-600 text-white shadow-sm' : 'text-zinc-600 hover:bg-zinc-100'}`}
+        >
+          Hồ sơ nhà vườn {provider ? '✓' : '•'}
+        </button>
         <button
           onClick={() => setActiveTab('orders')}
           className={`px-4 py-2.5 rounded-xl transition-all ${
@@ -210,6 +275,8 @@ export default function ProviderDashboardPage() {
           Đánh Giá & Phản Hồi ({reviews.length})
         </button>
       </div>
+
+      {activeTab === 'profile' && <ProviderProfileEditor profile={provider} onSaved={() => void loadData()} />}
 
       {/* TAB 1: ORDERS */}
       {activeTab === 'orders' && (
@@ -355,7 +422,7 @@ export default function ProviderDashboardPage() {
                       </div>
                     </div>
 
-                    {b.status === 'COMPLETED' && <BookingReconciliationForm booking={b} />}
+                    {b.status === 'COMPLETED' && <BookingReconciliationForm booking={b} onSaved={() => void loadData()} />}
 
                     {/* Propose reschedule inline popup */}
                     {proposeBookingId === b.id && (
@@ -467,7 +534,7 @@ export default function ProviderDashboardPage() {
                           : 'bg-amber-500 text-white'
                       }`}
                     >
-                      {s.status === 'PUBLISHED' ? 'Đã công bố' : 'Chờ kiểm duyệt'}
+                      {s.status === 'PUBLISHED' ? 'Đã công bố' : s.status === 'REVISION' ? 'Cần chỉnh sửa' : s.status === 'PAUSED' ? 'Đang tạm dừng' : 'Chờ kiểm duyệt'}
                     </span>
                   </div>
 
@@ -496,7 +563,7 @@ export default function ProviderDashboardPage() {
                       ))}
                     </div>
                   </div>
-                  {s.status === 'PUBLISHED' && <ProviderAvailabilityEditor service={s} />}
+                  {['PUBLISHED', 'REVIEW'].includes(s.status) && <ProviderAvailabilityEditor service={s} onSaved={() => void loadData()} />}
                 </div>
 
                 <div className="pt-3 border-t border-zinc-100 flex items-center justify-between">
@@ -514,6 +581,7 @@ export default function ProviderDashboardPage() {
               </div>
             ))}
           </div>
+          {services.length === 0 && <div className="rounded-2xl border border-dashed border-amber-300 bg-amber-50 p-8 text-center text-sm text-amber-950">Chưa có dịch vụ. Tạo hồ sơ nhà vườn trước, sau đó đăng trải nghiệm đầu tiên để bắt đầu nhận yêu cầu.</div>}
         </div>
       )}
 

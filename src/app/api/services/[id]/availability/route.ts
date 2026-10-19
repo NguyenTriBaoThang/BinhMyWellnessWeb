@@ -67,7 +67,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     if (!service || service.providerId !== user.providerProfileId || service.provider.userId !== user.id) {
       return NextResponse.json({ error: 'Không tìm thấy dịch vụ thuộc nhà vườn của bạn.' }, { status: 404 });
     }
-    if (service.status !== 'PUBLISHED' || selectedSlots.some((slot) => !service.slots.includes(slot))) {
+    if (!['REVIEW', 'PUBLISHED'].includes(service.status) || selectedSlots.some((slot) => !service.slots.includes(slot))) {
       return NextResponse.json({ error: 'Dịch vụ chưa công bố hoặc có khung giờ ngoài lịch dịch vụ.' }, { status: 400 });
     }
     if (capacity !== undefined && capacity > service.capacity) {

@@ -417,22 +417,26 @@ export default function HomePage() {
         <RealtimeCapacityWidget />
 
         {/* 365 Days Seasonal Timeline */}
-        <BinhMy365Timeline
-          services={services}
-          selectedMonth={selectedCampaignMonth}
-          onMonthChange={setSelectedCampaignMonth}
-          onSelectService={(serviceId) => {
-            const found = services.find((s) => s.id === serviceId);
-            if (found) setBookingService(found);
-          }}
-          onExploreCategory={(category) => {
-            setSelectedCategory(category);
-            document.getElementById('experiences-grid')?.scrollIntoView({ behavior: 'smooth' });
-          }}
-        />
+        <section id="binhmy-365" className="scroll-mt-24">
+          <BinhMy365Timeline
+            services={services}
+            selectedMonth={selectedCampaignMonth}
+            onMonthChange={setSelectedCampaignMonth}
+            onSelectService={(serviceId) => {
+              const found = services.find((s) => s.id === serviceId);
+              if (found) setBookingService(found);
+            }}
+            onExploreCategory={(category) => {
+              setSelectedCategory(category);
+              document.getElementById('experiences-grid')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          />
+        </section>
 
         {/* Monthly destination map */}
-        <MonthlyDestinationMap activeMonth={selectedCampaignMonth} onMonthChange={setSelectedCampaignMonth} />
+        <section id="map-section" className="scroll-mt-24">
+          <MonthlyDestinationMap activeMonth={selectedCampaignMonth} onMonthChange={setSelectedCampaignMonth} />
+        </section>
 
         {/* Experiences Showcase Section */}
         <section id="experiences-grid" className="space-y-8 scroll-mt-24">

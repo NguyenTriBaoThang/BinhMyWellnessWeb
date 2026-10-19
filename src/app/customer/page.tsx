@@ -24,6 +24,7 @@ export default function CustomerDashboardPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [savedItineraryCount, setSavedItineraryCount] = useState(0);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
 
@@ -34,9 +35,10 @@ export default function CustomerDashboardPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [meResponse, bookingsResponse] = await Promise.all([
+      const [meResponse, bookingsResponse, itinerariesResponse] = await Promise.all([
         fetch('/api/auth/me', { cache: 'no-store' }),
         fetch('/api/bookings', { cache: 'no-store' }),
+        fetch('/api/itineraries', { cache: 'no-store' }).catch(() => null),
       ]);
       const [meData, bookingsData] = await Promise.all([
         meResponse.json(),
@@ -50,8 +52,11 @@ export default function CustomerDashboardPage() {
         throw new Error(bookingsData.error || 'Không tải được danh sách đặt chỗ.');
       }
 
+      const itinerariesData = itinerariesResponse?.ok ? await itinerariesResponse.json().catch(() => null) : null;
+
       setCurrentUser(meData.user);
       setBookings(Array.isArray(bookingsData.bookings) ? bookingsData.bookings : []);
+      setSavedItineraryCount(Array.isArray(itinerariesData?.itineraries) ? itinerariesData.itineraries.length : 0);
       setLoadError(null);
     } catch (err) {
       setLoadError(err instanceof Error ? err.message : 'Không tải được danh sách đặt chỗ.');
@@ -75,6 +80,9 @@ export default function CustomerDashboardPage() {
 
       if (res.ok) {
         await loadData();
+      } else {
+        const result = await res.json();
+        setLoadError(result.error || 'Không cập nhật được yêu cầu.');
       }
     } finally {
       setActionLoading(null);
@@ -86,6 +94,36 @@ export default function CustomerDashboardPage() {
     return b.status === filterStatus;
   });
 
+  const completedBookings = bookings.filter((booking) => booking.status === 'COMPLETED');
+  const hasChosenPlan = savedItineraryCount > 0 || bookings.length > 0;
+  const hasConfirmation = bookings.some((booking) => ['PROPOSED', 'CONFIRMED', 'COMPLETED'].includes(booking.status));
+  const customerSteps = [
+    { label: 'Khám phá', done: hasChosenPlan, href: '/#experiences-grid', detail: 'Tìm nhà vườn và trải nghiệm' },
+    { label: 'Nhập nhu cầu', done: hasChosenPlan, href: '/itinerary', detail: 'Ngày đi, nhóm khách, sở thích' },
+    { label: 'Chọn hành trình', done: hasChosenPlan, href: '/itinerary', detail: savedItineraryCount ? `${savedItineraryCount} hành trình đã lưu` : 'Xem các điểm dừng phù hợp' },
+    { label: 'Gửi yêu cầu', done: bookings.length > 0, href: '/itinerary', detail: bookings.length ? `${bookings.length} yêu cầu đã gửi` : 'Gửi yêu cầu tới nhà vườn' },
+    { label: 'Nhận xác nhận', done: hasConfirmation, href: '/customer#my-bookings', detail: 'Theo dõi trạng thái và lịch hẹn' },
+    { label: 'Trải nghiệm', done: completedBookings.length > 0, href: '/customer#my-bookings', detail: 'Nhà vườn cập nhật sau khi phục vụ' },
+    { label: 'Đánh giá', done: completedBookings.length > 0 && completedBookings.every((booking) => Boolean(booking.review)), href: '/customer#my-bookings', detail: 'Chia sẻ nhận xét sau chuyến đi' },
+  ];
+  const activeCustomerStep = customerSteps.findIndex((step) => !step.done);
+
+  if (loading) return <div role="status" className="mx-auto max-w-7xl px-4 py-16 text-center text-sm text-zinc-600">Đang tải hành trình khách hàng…</div>;
+  if (!currentUser) {
+    return (
+      <div className="mx-auto my-16 max-w-xl space-y-4 rounded-3xl border border-emerald-100 bg-white p-8 text-center shadow-sm">
+        <h1 className="text-2xl font-black text-zinc-900">Đăng nhập để theo dõi hành trình</h1>
+        <p className="text-sm text-zinc-600">Bạn có thể khám phá trải nghiệm trước, sau đó đăng nhập để lưu lịch, gửi yêu cầu và đánh giá.</p>
+        {loadError && <p role="alert" className="rounded-xl bg-amber-50 p-3 text-xs text-amber-950">{loadError}</p>}
+        <div className="flex flex-wrap justify-center gap-2">
+          <Link href="/login" className="rounded-xl bg-forest-800 px-4 py-2.5 text-sm font-bold text-white">Đăng nhập</Link>
+          <Link href="/register" className="rounded-xl border border-emerald-300 px-4 py-2.5 text-sm font-bold text-emerald-900">Tạo tài khoản</Link>
+          <Link href="/#experiences-grid" className="rounded-xl border border-zinc-300 px-4 py-2.5 text-sm font-bold text-zinc-800">Khám phá nhà vườn</Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
       {/* Header Profile Banner */}
@@ -95,22 +133,41 @@ export default function CustomerDashboardPage() {
             Khu Vực Khách Hàng
           </span>
           <h1 className="text-2xl sm:text-3xl font-black text-white">
-            Chào mừng, {currentUser?.name || 'Bảo Thắng'}
+            Chào mừng, {currentUser.name}
           </h1>
           <p className="text-xs sm:text-sm text-zinc-300">
-            Email: <code className="font-mono text-emerald-300">{currentUser?.email || 'baothang@gmail.com'}</code> • Điện thoại: {currentUser?.phone || '0901234567'}
+            Email: <code className="font-mono text-emerald-300">{currentUser.email}</code>{currentUser.phone ? ` · Điện thoại: ${currentUser.phone}` : ''}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <Link
             href="/#experiences-grid"
-            className="px-5 py-2.5 rounded-2xl bg-white text-forest-900 font-bold text-xs sm:text-sm hover:bg-emerald-50 transition-all shadow-md"
+            className="px-4 py-2.5 rounded-2xl bg-white text-forest-900 font-bold text-xs sm:text-sm hover:bg-emerald-50 transition-all shadow-md"
           >
-            + Đặt thêm trải nghiệm mới
+            Khám phá trải nghiệm
+          </Link>
+          <Link href="/itinerary" className="rounded-2xl border border-white/30 bg-white/10 px-4 py-2.5 text-xs font-bold text-white hover:bg-white/20 sm:text-sm">
+            Lập hành trình
           </Link>
         </div>
       </div>
+
+      <section aria-labelledby="customer-flow-heading" className="space-y-3 rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div><p className="text-xs font-bold uppercase tracking-wide text-emerald-800">Hành trình của bạn</p><h2 id="customer-flow-heading" className="mt-1 text-lg font-black text-zinc-900">Từ khám phá đến đánh giá</h2></div>
+          <div className="flex items-center gap-3"><p className="text-xs text-zinc-500">{customerSteps.filter((step) => step.done).length} / {customerSteps.length} bước đã hoàn tất</p><button type="button" onClick={() => void loadData()} className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-bold text-zinc-700 hover:bg-zinc-50">Làm mới trạng thái</button></div>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+          {customerSteps.map((step, index) => (
+            <Link key={step.label} href={step.href} aria-current={index === activeCustomerStep ? 'step' : undefined} className={`min-w-0 rounded-2xl border p-3 transition ${step.done ? 'border-emerald-200 bg-emerald-50' : index === activeCustomerStep ? 'border-amber-400 bg-amber-50 ring-2 ring-amber-100' : 'border-zinc-200 bg-zinc-50 hover:border-emerald-300'}`}>
+              <span className="flex items-center gap-2"><span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[10px] font-black ${step.done ? 'bg-emerald-700 text-white' : 'bg-zinc-200 text-zinc-700'}`}>{step.done ? '✓' : index + 1}</span><span className="text-xs font-bold text-zinc-900">{step.label}</span></span>
+              <span className="mt-2 block text-[10px] leading-relaxed text-zinc-600">{step.detail}</span>
+            </Link>
+          ))}
+        </div>
+        <p className="text-[11px] leading-relaxed text-zinc-500">Lưu hành trình tại trang lập lịch để quay lại chỉnh sửa; yêu cầu đặt chỗ chỉ được gửi sau khi bạn xác nhận.</p>
+      </section>
 
       {/* Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-zinc-200 text-xs font-bold no-scrollbar">
@@ -146,7 +203,7 @@ export default function CustomerDashboardPage() {
       </div>
 
       {/* Bookings List */}
-      <div className="space-y-4">
+      <div id="my-bookings" className="scroll-mt-24 space-y-4">
         {loadError && (
           <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">
             <span>{loadError}</span>

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { formatVND } from '@/lib/utils';
 import type { Booking } from '@/types';
 
-export default function BookingReconciliationForm({ booking }: { booking: Booking }) {
+export default function BookingReconciliationForm({ booking, onSaved }: { booking: Booking; onSaved?: () => void }) {
   const [net, setNet] = useState(String(booking.netReceivedVnd ?? ''));
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
@@ -21,6 +21,7 @@ export default function BookingReconciliationForm({ booking }: { booking: Bookin
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Không lưu được đối soát.');
       setMessage(`Đã ghi nhận phí nền tảng 8%: ${formatVND(result.reconciliation.platformFeeVnd)}. Quản trị viên xác nhận khoản phí sau khi thu.`);
+      onSaved?.();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Không lưu được đối soát.');
     } finally {

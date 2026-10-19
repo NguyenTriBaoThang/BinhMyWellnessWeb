@@ -6,7 +6,12 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const serviceId = searchParams.get('serviceId') || undefined;
-    const reviews = await db.getReviews(serviceId);
+    let reviews = await db.getReviews(serviceId);
+    const user = await getCurrentUser();
+    if (user?.role === 'PROVIDER') {
+      const provider = await db.getProviderByUserId(user.id);
+      reviews = provider ? reviews.filter((review) => review.providerId === provider.id) : [];
+    }
     return NextResponse.json({ reviews });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

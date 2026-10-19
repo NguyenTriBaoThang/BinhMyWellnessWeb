@@ -384,8 +384,8 @@ export default function ItineraryAssistant() {
 
       {notice && <p role="status" className="mb-3 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">{notice}</p>}
 
-      <div className="grid gap-3 lg:relative lg:h-[calc(100svh-150px)] lg:min-h-[650px]">
-        <div className="relative h-[42svh] min-h-[320px] overflow-hidden rounded-3xl border border-emerald-900/10 bg-emerald-50 shadow-inner lg:absolute lg:inset-0 lg:h-full">
+      <div className="grid gap-3 lg:relative lg:isolate lg:h-[calc(100svh-150px)] lg:min-h-[650px]">
+        <div className="relative h-[42svh] min-h-[320px] overflow-hidden rounded-3xl border border-emerald-900/10 bg-emerald-50 shadow-inner lg:absolute lg:inset-0 lg:z-0 lg:h-full">
           <PlanMap plan={plan} selectedStopId={selectedStopId} onSelectStop={selectStop} />
         </div>
 

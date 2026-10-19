@@ -10,7 +10,7 @@ function localDateAfter(days: number): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
-export default function ProviderAvailabilityEditor({ service }: { service: Service }) {
+export default function ProviderAvailabilityEditor({ service, onSaved }: { service: Service; onSaved?: () => void }) {
   const [date, setDate] = useState(localDateAfter(2));
   const [slots, setSlots] = useState<string[]>([]);
   const [capacity, setCapacity] = useState(service.capacity);
@@ -48,6 +48,7 @@ export default function ProviderAvailabilityEditor({ service }: { service: Servi
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Không thể cập nhật lịch.');
       setMessage(`Đã lưu ${slots.length} khung giờ. Quản trị viên cần xác minh trước khi khách thấy lịch.`);
+      onSaved?.();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Không thể cập nhật lịch.');
     } finally {
@@ -60,6 +61,7 @@ export default function ProviderAvailabilityEditor({ service }: { service: Servi
       <div className="flex items-center gap-2 text-sm font-bold text-river-950">
         <CalendarCheck className="h-4 w-4" /> Cập nhật lịch trống
       </div>
+      <p className="text-[11px] leading-relaxed text-zinc-600">Lịch có thể chuẩn bị khi dịch vụ đang chờ duyệt. Khách chỉ thấy ca sau khi quản trị viên xác minh.</p>
       <label className="block text-xs font-semibold text-zinc-700">
         Ngày
         <input type="date" value={date} min={localDateAfter(0)} onChange={(event) => setDate(event.target.value)} className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-2.5 py-2" required />
@@ -79,7 +81,7 @@ export default function ProviderAvailabilityEditor({ service }: { service: Servi
         <input type="number" min={1} max={service.capacity} value={capacity} onChange={(event) => setCapacity(Number(event.target.value))} className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-2.5 py-2" />
       </label>
       <input value={note} onChange={(event) => setNote(event.target.value)} maxLength={200} placeholder="Ghi chú nguồn lịch (tùy chọn)" className="w-full rounded-lg border border-zinc-300 bg-white px-2.5 py-2 text-xs" />
-      <button disabled={busy || loadingDate || service.status !== 'PUBLISHED'} className="rounded-lg bg-river-800 px-3 py-2 text-xs font-bold text-white disabled:opacity-50">
+      <button disabled={busy || loadingDate || !['PUBLISHED', 'REVIEW'].includes(service.status)} className="rounded-lg bg-river-800 px-3 py-2 text-xs font-bold text-white disabled:opacity-50">
         {busy ? 'Đang lưu…' : 'Lưu lịch ngày này'}
       </button>
       {message && <p role="status" className="text-xs leading-relaxed text-zinc-700">{message}</p>}
