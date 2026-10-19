@@ -67,7 +67,7 @@ export interface ItineraryStop {
   slot: string;
   costVnd: number | null;
   knownCostVnd: number;
-  availablePlaces: number;
+  availablePlaces: number | null;
   latitude: number;
   longitude: number;
   routeFromPrevious: RouteEstimate | null;

@@ -1,5 +1,37 @@
 @import 'leaflet/dist/leaflet.css';
 
+.bm-itinerary-marker-icon.leaflet-div-icon {
+  border: 0;
+  background: transparent;
+}
+
+.bm-itinerary-marker {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 2px solid white;
+  border-radius: 9999px;
+  background: #14532d;
+  color: white;
+  box-shadow: 0 4px 14px rgb(15 23 42 / 28%);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  transition: transform 160ms ease, background-color 160ms ease;
+}
+
+.bm-itinerary-marker.is-selected {
+  transform: scale(1.16);
+  background: #d97706;
+}
+
+.bm-itinerary-marker:focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 2px;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

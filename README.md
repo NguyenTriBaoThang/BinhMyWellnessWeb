@@ -167,7 +167,7 @@ Hệ thống cung cấp sẵn 3 tài khoản mẫu ứng với 3 nhóm người 
 | 🏡 **Chủ Nhà Vườn**<br>`PROVIDER` | `nhavuona@gmail.com` | `password@123` | `/provider` | • Tiếp nhận đơn đặt chỗ thời gian thực.<br>• Xác nhận (`confirm`) hoặc Đề xuất đổi lịch (`propose`).<br>• Đánh dấu Hoàn thành dịch vụ (`complete`).<br>• Trực tiếp phản hồi lời cảm ơn cho khách đánh giá. |
 | 🏛️ **Ban Quản Trị**<br>`ADMIN` | `binhmy@admin.com` | Mật khẩu riêng trong biến `BM_ADMIN_PASSWORD` lúc chạy seed | `/admin` | • Kiểm duyệt dịch vụ (`review -> published/revision`).<br>• Kích hoạt / Tạm ngưng hoạt động nhà vườn.<br>• Giám sát bảng **Audit Logs** toàn hệ thống.<br>• Thống kê nguồn truy cập (Web, QR Code, Zalo, Facebook). |
 
-> Tài khoản ADMIN không dùng mật khẩu mẫu công khai `password@123`. Khách hàng và chủ vườn dùng mật khẩu mẫu ở trên trong môi trường thử nghiệm; muốn đăng nhập các tài khoản mẫu trên production thì bật `BM_ENABLE_TEST_BOOKINGS=true`.
+> Demo accounts and the quick role switcher are only for an isolated Vercel Preview deployment connected to a disposable demo database. Set both test flags in Preview only; keep them `false` in Production. The quick role switcher never grants the admin role.
 
 > ⚡ **Thanh công cụ chuyển vai trò 1-chạm (Role Switcher Bar)**: Ở góc trên cùng của giao diện web luôn có sẵn 3 nút chuyển nhanh. Chỉ cần nhấp chuột vào vai trò mong muốn, hệ thống sẽ tự động đăng nhập và cập nhật trạng thái session ngay lập tức mà không cần gõ form đăng nhập.
 
@@ -462,7 +462,7 @@ npm run dev
 ---
 
 ### 4. Cấu Hình PostgreSQL / Supabase
-Sao chép `.env.example` thành `.env`, sau đó điền connection string trong Supabase. Website dùng URL pooler; Prisma dùng direct URL để cập nhật schema và nạp dữ liệu. Không commit `.env`.
+Sao chép `.env.example` thành `.env`, sau đó điền connection string trong Supabase. Website dùng URL pooler; Prisma dùng direct URL cho migrations. Chỉ seed trên database demo riêng. Không commit `.env`. Với Vercel Preview, xem thêm `docs/VERCEL_DEMO.md`.
 
 ```env
 DATABASE_URL="<Supabase pooled connection string>"
