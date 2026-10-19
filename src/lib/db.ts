@@ -61,11 +61,16 @@ function mapService(row: any): Service {
     name: row.name,
     category: row.category,
     price: row.price,
+    priceBasis: row.priceBasis ?? 'PER_PERSON',
+    childPrice: row.childPrice ?? undefined,
     duration: row.duration,
     capacity: row.capacity,
     image: row.image,
     latitude: row.latitude ?? undefined,
     longitude: row.longitude ?? undefined,
+    areaCode: row.areaCode ?? undefined,
+    serviceVerifiedAt: row.serviceVerifiedAt?.toISOString(),
+    locationVerifiedAt: row.locationVerifiedAt?.toISOString(),
     groups: row.groups,
     indoor: row.indoor,
     description: row.description,
@@ -118,6 +123,10 @@ function mapBooking(row: any): Booking {
     people: row.people,
     price: row.price,
     total: row.total,
+    netReceivedVnd: row.netReceivedVnd ?? undefined,
+    platformFeeVnd: row.platformFeeVnd ?? undefined,
+    feeRecordedAt: row.feeRecordedAt?.toISOString(),
+    feePaidAt: row.feePaidAt?.toISOString(),
     duration: row.duration,
     status: row.status,
     proposal: row.proposalDate && row.proposalSlot
@@ -265,6 +274,8 @@ const persistentDb = {
       name: data.name,
       category: data.category,
       price: data.price,
+      priceBasis: data.priceBasis ?? 'PER_PERSON',
+      childPrice: data.childPrice ?? null,
       duration: data.duration,
       capacity: data.capacity,
       image: data.image,
@@ -294,6 +305,8 @@ const persistentDb = {
       name: data.name,
       category: data.category,
       price: data.price,
+      priceBasis: data.priceBasis,
+      childPrice: data.childPrice,
       duration: data.duration,
       capacity: data.capacity,
       image: data.image,
@@ -308,6 +321,8 @@ const persistentDb = {
       excluded: data.excluded,
       conditions: data.conditions,
       bookingUnit: data.bookingUnit,
+      serviceVerifiedAt: null,
+      locationVerifiedAt: data.latitude !== undefined || data.longitude !== undefined ? null : undefined,
     }, include: { provider: true } });
     await this.addLog(actorName, 'Cập nhật dịch vụ', row.name, 'Chỉnh sửa thông tin trải nghiệm.');
     return mapService(row);
@@ -556,7 +571,7 @@ const persistentDb = {
   },
 
   async getAnalyticsSummary() {
-    const [views, requests, confirmed, completed, providersCount, activeProvidersCount, servicesCount, publishedServicesCount, pendingModerationCount, viewEvents] = await Promise.all([
+    const [views, requests, confirmed, completed, providersCount, activeProvidersCount, servicesCount, publishedServicesCount, pendingModerationCount, viewEvents, feeTotals, unpaidFees] = await Promise.all([
       prisma.analyticsEvent.count({ where: { type: 'view' } }),
       prisma.analyticsEvent.count({ where: { type: 'request' } }),
       prisma.booking.count({ where: { status: { in: ['CONFIRMED', 'COMPLETED'] } } }),
@@ -567,12 +582,17 @@ const persistentDb = {
       prisma.service.count({ where: { status: 'PUBLISHED' } }),
       prisma.service.count({ where: { status: 'REVIEW' } }),
       prisma.analyticsEvent.findMany({ where: { type: 'view' }, select: { source: true } }),
+      prisma.booking.aggregate({ where: { status: 'COMPLETED', feeRecordedAt: { not: null } }, _sum: { netReceivedVnd: true, platformFeeVnd: true } }),
+      prisma.booking.aggregate({ where: { status: 'COMPLETED', feeRecordedAt: { not: null }, feePaidAt: null }, _sum: { platformFeeVnd: true } }),
     ]);
     const sourceBreakdown: Record<string, number> = {};
     for (const event of viewEvents) sourceBreakdown[event.source] = (sourceBreakdown[event.source] || 0) + 1;
     return {
       views, requests, confirmed, completed,
       conversion: views > 0 ? ((requests / views) * 100).toFixed(1) : '0',
+      netReceivedVnd: feeTotals._sum.netReceivedVnd ?? 0,
+      platformFeeRecordedVnd: feeTotals._sum.platformFeeVnd ?? 0,
+      platformFeeUnpaidVnd: unpaidFees._sum.platformFeeVnd ?? 0,
       sourceBreakdown, providersCount, activeProvidersCount, servicesCount, publishedServicesCount, pendingModerationCount,
     };
   },

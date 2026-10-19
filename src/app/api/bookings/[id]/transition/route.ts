@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+import { isPersistentDatabaseConfigured } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(
   req: Request,
@@ -52,6 +54,25 @@ export async function POST(
       user.name,
       extra
     );
+
+    if (isPersistentDatabaseConfigured()) {
+      const bookingLink = await prisma.booking.findUnique({ where: { id: booking.id }, select: { itineraryStopId: true } });
+      const stop = bookingLink?.itineraryStopId
+        ? await prisma.itineraryStop.findUnique({ where: { id: bookingLink.itineraryStopId }, select: { itineraryId: true } })
+        : null;
+      if (stop) {
+        const itinerary = await prisma.itinerary.findUnique({ where: { id: stop.itineraryId }, include: { stops: { include: { booking: { select: { status: true } } } } } });
+        if (itinerary) {
+          const statuses = itinerary.stops.map((item) => item.booking?.status ?? 'UNBOOKED');
+          const allCompleted = statuses.length > 0 && statuses.every((status) => status === 'COMPLETED');
+          const allConfirmed = statuses.length > 0 && statuses.every((status) => status === 'CONFIRMED' || status === 'COMPLETED');
+          const anyResponded = statuses.some((status) => ['CONFIRMED', 'COMPLETED', 'REJECTED', 'CANCELLED'].includes(status));
+          const allTerminal = statuses.every((status) => ['CANCELLED', 'REJECTED'].includes(status));
+          const status = allCompleted ? 'COMPLETED' : allConfirmed ? 'CONFIRMED' : allTerminal ? 'CANCELLED' : anyResponded ? 'PARTIALLY_CONFIRMED' : 'BOOKING_REQUESTED';
+          await prisma.itinerary.update({ where: { id: itinerary.id }, data: { status } });
+        }
+      }
+    }
 
     return NextResponse.json({
       success: true,

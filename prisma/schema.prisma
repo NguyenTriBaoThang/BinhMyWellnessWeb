@@ -31,6 +31,26 @@ enum ServiceStatus {
   PAUSED
 }
 
+enum AvailabilityStatus {
+  AVAILABLE
+  CLOSED
+}
+
+enum ServicePriceBasis {
+  PER_PERSON
+  PER_GROUP
+  CONTACT
+}
+
+enum ItineraryStatus {
+  SAVED
+  BOOKING_REQUESTED
+  PARTIALLY_CONFIRMED
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
 model User {
   id              String           @id @default(cuid())
   email           String           @unique
@@ -47,6 +67,8 @@ model User {
   reviews         Review[]
   favorites       Favorite[]
   auditLogs       AuditLog[]
+  itineraries     Itinerary[]
+  aiUsageLogs     AiUsageLog[]
 
   @@map("users")
 }
@@ -78,11 +100,16 @@ model Service {
   name           String
   category       String
   price          Int
+  priceBasis     ServicePriceBasis @default(PER_PERSON)
+  childPrice     Int?
   duration       Int
   capacity       Int             @default(16)
   image          String
   latitude       Float?
   longitude      Float?
+  areaCode       String?
+  serviceVerifiedAt  DateTime?
+  locationVerifiedAt DateTime?
   testOnly       Boolean         @default(false)
   bookingUnit    String?
   groups         String[]        @default(["family", "friends"])
@@ -100,8 +127,95 @@ model Service {
 
   bookings       Booking[]
   reviews        Review[]
+  availabilities ServiceAvailability[]
+  itineraryStops ItineraryStop[]
 
   @@map("services")
+}
+
+model ServiceAvailability {
+  id         String             @id @default(cuid())
+  serviceId  String
+  service    Service            @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  date       DateTime           @db.Date
+  slot       String
+  capacity   Int?
+  status     AvailabilityStatus @default(AVAILABLE)
+  verifiedAt DateTime?
+  sourceNote String?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  @@unique([serviceId, date, slot])
+  @@index([date, status])
+  @@map("service_availability")
+}
+
+model Itinerary {
+  id                String          @id @default(cuid())
+  code              String          @unique
+  customerId        String
+  customer          User            @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  date              String
+  adults            Int
+  children          Int             @default(0)
+  budgetVnd         Int?
+  budgetBasis       String
+  startTime         String
+  endTime           String
+  transportMode     String
+  originLatitude    Float?
+  originLongitude   Float?
+  originLabel       String?
+  returnLatitude    Float?
+  returnLongitude   Float?
+  returnLabel       String?
+  returnTravelMinutes Int?
+  returnDistanceM     Int?
+  returnRouteProvider String?
+  returnRouteGeometry String?
+  totalCostVnd      Int?
+  knownCostVnd      Int
+  hasUnknownCosts   Boolean         @default(false)
+  fallbackMode      String
+  status            ItineraryStatus @default(SAVED)
+  explanation       String?
+  warnings          Json            @default("[]")
+  constraints       Json
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  stops ItineraryStop[]
+
+  @@index([customerId, createdAt])
+  @@map("itineraries")
+}
+
+model ItineraryStop {
+  id                       String    @id @default(cuid())
+  itineraryId              String
+  itinerary                Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  serviceId                String
+  service                  Service   @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  position                 Int
+  date                     String
+  slot                     String
+  arrivalTime              String
+  departureTime            String
+  travelFromPreviousMin    Int?
+  distanceFromPreviousM    Int?
+  routeProvider            String?
+  routeGeometry            String?
+  estimatedCostVnd         Int?
+  costKnown                Boolean   @default(true)
+  availabilityCheckedAt   DateTime?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  booking                  Booking?
+
+  @@unique([itineraryId, position])
+  @@index([serviceId, date, slot])
+  @@map("itinerary_stops")
 }
 
 model Booking {
@@ -121,6 +235,10 @@ model Booking {
   people         Int
   price          Int
   total          Int
+  netReceivedVnd Int?
+  platformFeeVnd Int?
+  feeRecordedAt  DateTime?
+  feePaidAt      DateTime?
   duration       Int
   status         BookingStatus   @default(PENDING)
   proposalDate   String?
@@ -128,11 +246,14 @@ model Booking {
   proposalReason String?
   cancelReason   String?
   source         String          @default("Trực tiếp")
+  itineraryStopId String?        @unique
+  idempotencyKey  String?        @unique
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
   history        BookingHistory[]
   review         Review?
+  itineraryStop  ItineraryStop?  @relation(fields: [itineraryStopId], references: [id], onDelete: SetNull)
 
   @@map("bookings")
 }
@@ -199,4 +320,32 @@ model AnalyticsEvent {
   createdAt DateTime @default(now())
 
   @@map("analytics_events")
+}
+
+model AiRateLimit {
+  key             String   @id
+  count           Int      @default(0)
+  windowStartedAt DateTime
+  expiresAt       DateTime
+  updatedAt       DateTime @updatedAt
+
+  @@index([expiresAt])
+  @@map("ai_rate_limits")
+}
+
+model AiUsageLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  model        String
+  mode         String
+  outcome      String
+  inputTokens  Int?
+  outputTokens Int?
+  requestId    String
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId, createdAt])
+  @@map("ai_usage_logs")
 }

@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { Service, ProviderProfile, User, AuditLog } from '@/types';
 import { formatVND } from '@/lib/utils';
+import AdminVerificationPanel from '@/components/AdminVerificationPanel';
+import ReconciliationDashboard from '@/components/ReconciliationDashboard';
 
 export default function AdminDashboardPage() {
   const [summary, setSummary] = useState<any>(null);
@@ -30,7 +32,7 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   // Tab: 'overview' | 'moderation' | 'providers' | 'users' | 'logs'
-  const [activeTab, setActiveTab] = useState<'overview' | 'moderation' | 'providers' | 'users' | 'logs'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'moderation' | 'providers' | 'users' | 'logs' | 'reconciliation'>('overview');
 
   const [revisionNote, setRevisionNote] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -130,6 +132,7 @@ export default function AdminDashboardPage() {
           { id: 'providers', label: `Nhà Vườn Đối Tác (${providers.length})`, icon: Trees },
           { id: 'users', label: `Người Dùng (${users.length})`, icon: Users },
           { id: 'logs', label: `Nhật Ký Kiểm Toán (${logs.length})`, icon: FileText },
+          { id: 'reconciliation', label: 'Đối soát phí 8%', icon: Activity },
         ].map((tab) => {
           const Icon = tab.icon;
           return (
@@ -348,6 +351,7 @@ export default function AdminDashboardPage() {
                     Yêu cầu bổ sung
                   </button>
                 </div>
+                {s.status === 'PUBLISHED' && <AdminVerificationPanel service={s} onSaved={loadData} />}
               </div>
             ))}
           </div>
@@ -478,6 +482,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       )}
+      {activeTab === 'reconciliation' && <ReconciliationDashboard />}
     </div>
   );
 }

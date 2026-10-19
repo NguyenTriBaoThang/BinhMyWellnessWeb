@@ -441,7 +441,7 @@ Mở trình duyệt truy cập: **`http://localhost:3000`**
 
 ---
 
-### 3. Cài Đặt Trọn Vẹn Với PostgreSQL 16 & Docker Compose (Khuyến nghị cho Production)
+### 3. Local PostgreSQL (development only)
 
 Nếu muốn trải nghiệm cơ sở dữ liệu quan hệ bền vững, hãy khởi chạy container PostgreSQL có sẵn:
 
@@ -452,13 +452,10 @@ docker compose up -d
 # 2. Kiểm tra container đã hoạt động
 docker ps
 
-# 3. Đẩy cấu trúc lược đồ Prisma vào cơ sở dữ liệu PostgreSQL
-npm run prisma:push
+# 3. Apply the checked-in migrations
+npx prisma migrate deploy
 
-# 4. Nạp tài khoản thử nghiệm, nhà vườn và dịch vụ từ constants.ts
-npm run prisma:seed
-
-# 5. Khởi chạy ứng dụng
+# 4. Start the application
 npm run dev
 ```
 
@@ -475,7 +472,7 @@ BM_ENABLE_TEST_BOOKINGS="false"
 NEXT_PUBLIC_BM_ENABLE_TEST_BOOKINGS="false"
 ```
 
-Sau khi điền biến môi trường, chạy `npm run prisma:generate`, `npm run prisma:push`, rồi `npm run prisma:seed`. Trong môi trường đã đăng, thêm các biến này vào cấu hình của dịch vụ hosting. Tạo SESSION_SECRET riêng, tối thiểu 32 ký tự; cookie đăng nhập được ký bằng khóa này. Mặc định các tài khoản và dịch vụ thử nghiệm không hoạt động ở production. Chỉ bật đồng thời `BM_ENABLE_TEST_BOOKINGS` và `NEXT_PUBLIC_BM_ENABLE_TEST_BOOKINGS` thành `true` khi cần thử đặt chỗ trên website; chế độ này cho phép đăng nhập nhanh khách/nhà vườn thử nghiệm, không mở tài khoản quản trị và không thu tiền.
+Database setup: follow docs/DATABASE_MIGRATIONS.md. Never run db push or seed production. Configure DATABASE_URL, DIRECT_URL, SESSION_SECRET, GEMINI_API_KEY, GEMINI_MODEL, and GOONG_API_KEY in the hosting server environment; keep integration keys out of NEXT_PUBLIC variables. Set a unique SESSION_SECRET of at least 32 characters. Demo booking flags remain false unless a controlled demo is intended.
 
 ---
 

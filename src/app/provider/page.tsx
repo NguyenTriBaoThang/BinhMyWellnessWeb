@@ -21,6 +21,8 @@ import {
 import { Booking, Service, Review, ProviderProfile, User } from '@/types';
 import { formatVND, formatDateVN, getStatusBadge } from '@/lib/utils';
 import ServiceEditModal from '@/components/ServiceEditModal';
+import ProviderAvailabilityEditor from '@/components/ProviderAvailabilityEditor';
+import BookingReconciliationForm from '@/components/BookingReconciliationForm';
 
 export default function ProviderDashboardPage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -67,7 +69,7 @@ export default function ProviderDashboardPage() {
         const myServices = sRes.services.filter(
           (s: Service) => s.providerId === (meRes.user?.providerProfileId || 'p1')
         );
-        setServices(myServices.length ? myServices : sRes.services.slice(0, 2));
+        setServices(myServices);
       }
       if (rRes.reviews) setReviews(rRes.reviews);
     } catch (err) {
@@ -353,6 +355,8 @@ export default function ProviderDashboardPage() {
                       </div>
                     </div>
 
+                    {b.status === 'COMPLETED' && <BookingReconciliationForm booking={b} />}
+
                     {/* Propose reschedule inline popup */}
                     {proposeBookingId === b.id && (
                       <div className="mt-4 p-4 rounded-2xl bg-purple-50 border border-purple-200 space-y-3 text-xs">
@@ -492,6 +496,7 @@ export default function ProviderDashboardPage() {
                       ))}
                     </div>
                   </div>
+                  {s.status === 'PUBLISHED' && <ProviderAvailabilityEditor service={s} />}
                 </div>
 
                 <div className="pt-3 border-t border-zinc-100 flex items-center justify-between">

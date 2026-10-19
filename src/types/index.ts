@@ -45,11 +45,16 @@ export interface Service {
   name: string;
   category: 'Nông nghiệp' | 'Ẩm thực' | 'Thiên nhiên' | 'Văn hóa' | 'Nghỉ ngơi' | string;
   price: number;
+  priceBasis?: 'PER_PERSON' | 'PER_GROUP' | 'CONTACT';
+  childPrice?: number;
   duration: number; // in minutes
   capacity: number;
   image: string;
   latitude?: number;
   longitude?: number;
+  areaCode?: string;
+  serviceVerifiedAt?: string;
+  locationVerifiedAt?: string;
   groups: string[];
   indoor: boolean;
   description: string;
@@ -90,6 +95,10 @@ export interface Booking {
   people: number;
   price: number;
   total: number;
+  netReceivedVnd?: number;
+  platformFeeVnd?: number;
+  feeRecordedAt?: string;
+  feePaidAt?: string;
   duration: number;
   status: BookingStatus;
   proposal?: {
