@@ -10,7 +10,8 @@
     "lint": "next lint",
     "test:planner": "tsc src/lib/itinerary/engine.ts --outDir .test-build --module commonjs --target ES2019 --strict --skipLibCheck --esModuleInterop && node --test scripts/itinerary-engine.test.cjs",
     "prisma:generate": "prisma generate",
-    "prisma:seed": "node scripts/seed.mjs"
+    "prisma:seed": "node scripts/seed.mjs",
+    "seed:workflow:local": "node scripts/seed-local-workflow.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.30.0",
