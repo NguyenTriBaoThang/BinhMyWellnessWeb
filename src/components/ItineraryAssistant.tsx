@@ -67,17 +67,32 @@ function PlanMap({ plan, selectedStopId, onSelectStop }: {
       const points = (plan?.stops ?? []).filter((stop) => Number.isFinite(stop.latitude) && Number.isFinite(stop.longitude)).map((stop) => [stop.latitude, stop.longitude] as [number, number]);
       map = L.map(element.current, { scrollWheelZoom: false, zoomControl: true }).setView(points[0] ?? BINH_MY_MAP_CENTER, points.length ? 13 : 12);
       mapRef.current = map;
+      // OpenStreetMap keeps the demo usable when a configured MapTiler key is
+      // invalid or restricted. MapTiler is opt-in so a rejected key cannot
+      // cover the map with its "Invalid key" tiles.
       const mapTilerKey = process.env.NEXT_PUBLIC_MAPTILER_KEY?.trim();
-      const tileLayer = mapTilerKey
-        ? L.tileLayer(`https://api.maptiler.com/maps/streets-v4/256/{z}/{x}/{y}.png?key=${encodeURIComponent(mapTilerKey)}`, {
+      const useMapTiler = process.env.NEXT_PUBLIC_MAPTILER_ENABLED === 'true' && Boolean(mapTilerKey);
+      const osmLayer = () => L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19,
+      });
+      let tileLayer: import('leaflet').TileLayer;
+      if (useMapTiler && mapTilerKey) {
+        tileLayer = L.tileLayer(`https://api.maptiler.com/maps/streets-v4/256/{z}/{x}/{y}.png?key=${encodeURIComponent(mapTilerKey)}`, {
           attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">&copy; OpenStreetMap contributors</a>',
           maxZoom: 19,
           crossOrigin: true,
-        })
-        : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; OpenStreetMap contributors',
-          maxZoom: 19,
         });
+        let fellBackToOsm = false;
+        tileLayer.on('tileerror', () => {
+          if (fellBackToOsm || !map) return;
+          fellBackToOsm = true;
+          map.removeLayer(tileLayer);
+          tileLayer = osmLayer().addTo(map);
+        });
+      } else {
+        tileLayer = osmLayer();
+      }
       tileLayer.addTo(map);
       const bounds: Array<[number, number]> = [...points];
       const markers: typeof markerRefs.current = [];

@@ -20,7 +20,7 @@ This guide prepares a demo deployment without changing Production.
    - `SESSION_SECRET`: unique random value of at least 32 characters.
    - `BM_ENABLE_TEST_BOOKINGS=true` and `NEXT_PUBLIC_BM_ENABLE_TEST_BOOKINGS=true` only if the demo needs the public sample customer/provider accounts and test-only catalogue entries. Keep both `false` in Production. The quick role switch never grants admin access.
    - `GEMINI_API_KEY`, `GEMINI_MODEL`, `GOONG_API_KEY`, `GOONG_DIRECTIONS_URL`, and `ROUTING_TIMEOUT_MS` only when those integrations are intended for this Preview deployment. Keep Gemini and Goong keys server-side.
-   - `NEXT_PUBLIC_MAPTILER_KEY` to use MapTiler map tiles. This key is sent to the browser, so restrict its allowed origins in MapTiler. Without it, the map uses OpenStreetMap tiles.
+   - The map uses OpenStreetMap tiles by default. To opt into MapTiler after verifying its public key, set `NEXT_PUBLIC_MAPTILER_KEY` and `NEXT_PUBLIC_MAPTILER_ENABLED=true`. Restrict the key to the Preview site's allowed origins. MapTiler tile errors fall back to OpenStreetMap.
 
    Preview sample logins are public test identities. Use this mode only with disposable data. Do not create a real customer/provider account in the demo database.
 
