@@ -472,7 +472,7 @@ BM_ENABLE_TEST_BOOKINGS="false"
 NEXT_PUBLIC_BM_ENABLE_TEST_BOOKINGS="false"
 ```
 
-Database setup: follow docs/DATABASE_MIGRATIONS.md. Never run db push or seed production. Configure DATABASE_URL, DIRECT_URL, SESSION_SECRET, GEMINI_API_KEY, GEMINI_MODEL, and GOONG_API_KEY in the hosting server environment; keep integration keys out of NEXT_PUBLIC variables. Set a unique SESSION_SECRET of at least 32 characters. Demo booking flags remain false unless a controlled demo is intended.
+Database setup: follow docs/DATABASE_MIGRATIONS.md. Never run db push or seed production. Configure DATABASE_URL, DIRECT_URL, SESSION_SECRET, GEMINI_API_KEY, GEMINI_MODEL, and GOONG_API_KEY in the hosting server environment; keep Gemini and Goong keys out of NEXT_PUBLIC variables. Set NEXT_PUBLIC_MAPTILER_KEY for MapTiler tiles and restrict its allowed origins in MapTiler. Set a unique SESSION_SECRET of at least 32 characters. Demo booking flags remain false unless a controlled demo is intended.
 
 ---
 
