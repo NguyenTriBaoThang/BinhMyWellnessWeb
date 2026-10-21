@@ -27,11 +27,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate Prisma Client
-        run: npx prisma generate
+      - name: Run planner tests
+        run: npm run test:planner
 
       - name: Lint and typecheck
-        run: npm run lint
+        run: |
+          npm run lint
+          npm run typecheck
 
       - name: Build Next.js production bundle
         run: npm run build
@@ -52,8 +54,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate Prisma Client
-        run: npx prisma generate
+      - name: Run planner, lint and type checks
+        run: |
+          npm run test:planner
+          npm run lint
+          npm run typecheck
 
       - name: Build Next.js production bundle
         run: npm run build

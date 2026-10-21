@@ -2,44 +2,21 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import AnalyticsTracker from '@/components/AnalyticsTracker';
-import { getCurrentUser } from '@/lib/auth';
+import { siteData } from '@/lib/data/repository';
 
 export const metadata: Metadata = {
-  title: 'Bình Mỹ Wellness Web | Khám Phá Nông Nghiệp & Miệt Vườn Củ Chi 365',
-  icons: {
-    icon: '/favicon.png',
-    shortcut: '/favicon.png',
-    apple: '/favicon.png',
-  },
-  description:
-    'Nền tảng kết nối du lịch nông nghiệp, sinh thái miệt vườn, chèo SUP hoàng hôn ven sông Sài Gòn và ẩm thực đồng quê tại Xã Bình Mỹ, Huyện Củ Chi, TP.HCM.',
-  keywords: [
-    'Bình Mỹ',
-    'Củ Chi',
-    'Du lịch sinh thái',
-    'Nhà vườn',
-    'Chèo SUP',
-    'Rạch Dứa',
-    'Vườn xanh',
-    'Đầm sen',
-    'Sông Sài Gòn',
-  ],
+  title: `${siteData.name} | Khám phá Bình Mỹ`,
+  description: siteData.introduction,
+  keywords: ['Bình Mỹ', 'khám phá Bình Mỹ', 'vườn trái cây', 'trải nghiệm làm nghề', 'sông nước'],
+  icons: { icon: '/favicon.svg' },
 };
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const currentUser = await getCurrentUser();
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" className="scroll-smooth">
-      <body className="min-h-screen flex flex-col antialiased selection:bg-emerald-200 selection:text-emerald-950 font-sans">
-        <AnalyticsTracker />
-        <Header currentUser={currentUser} />
-        <main className="flex-1">{children}</main>
+    <html lang="vi">
+      <body className="min-h-screen bg-[#F8FAF9] font-sans text-zinc-900 antialiased selection:bg-emerald-200 selection:text-emerald-950">
+        <Header />
+        <main className="min-h-[60vh]">{children}</main>
         <Footer />
       </body>
     </html>

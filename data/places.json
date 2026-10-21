@@ -1,0 +1,335 @@
+[
+  {
+    "id": "wetro-moon-river",
+    "slug": "ben-wetro-line-moon-river",
+    "name": "Bến Wetro Line – Moon River",
+    "aliases": [
+      "Bến tàu Wetro Line - Moon River"
+    ],
+    "primaryCategory": "song-nuoc-ky-uc",
+    "secondaryCategories": [],
+    "shortDescription": "Bài viết ghi nhận bến là điểm đến của một chuyến đi bằng ca nô tới Bình Mỹ. Lịch khai thác, dịch vụ và vị trí cổng hiện cần xác nhận.",
+    "locality": "Bình Mỹ, Thành phố Hồ Chí Minh",
+    "areaCode": "BINH_MY",
+    "address": null,
+    "coordinates": null,
+    "coordinateStatus": "unverified",
+    "contacts": null,
+    "imageIds": [
+      "cano-den-binh-my"
+    ],
+    "sourceIds": [
+      "vntravel-binh-my-2025",
+      "xudua-water-route-2026"
+    ],
+    "updatedAt": "2026-10-21",
+    "verification": {
+      "identity": {
+        "status": "reported",
+        "sourceIds": [
+          "vntravel-binh-my-2025",
+          "xudua-water-route-2026"
+        ],
+        "checkedAt": "2026-10-21"
+      },
+      "address": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "coordinates": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "hours": {
+        "status": "unknown",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "pricing": {
+        "status": "unknown",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "operations": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "area": {
+        "status": "reported",
+        "sourceIds": [
+          "vntravel-binh-my-2025",
+          "xudua-water-route-2026"
+        ],
+        "checkedAt": "2026-10-21"
+      }
+    }
+  },
+  {
+    "id": "vuon-ky-uc",
+    "slug": "vuon-ky-uc-tu-huynh",
+    "name": "Vườn Ký Ức – Vườn trái cây Tư Huỳnh",
+    "aliases": [
+      "Vườn Ký Ức",
+      "Vườn trái cây Tư Huỳnh",
+      "Vườn Ký Ức – Tư Huỳnh"
+    ],
+    "primaryCategory": "vuon-trai-cay",
+    "secondaryCategories": [
+      "song-nuoc-ky-uc"
+    ],
+    "shortDescription": "Tài liệu nghiên cứu mô tả khu vườn và không gian Thủy Đạo gắn với Rạch Đáy. Địa chỉ tiếp cận, mùa trái và lịch đón khách chưa được xác minh.",
+    "locality": "Bình Mỹ, Thành phố Hồ Chí Minh",
+    "areaCode": "BINH_MY",
+    "address": null,
+    "coordinates": null,
+    "coordinateStatus": "unverified",
+    "contacts": null,
+    "imageIds": [
+      "thuy-dao",
+      "vuon-tu-huynh"
+    ],
+    "sourceIds": [
+      "xudua-vuon-binh-my-2026"
+    ],
+    "updatedAt": "2026-10-21",
+    "verification": {
+      "identity": {
+        "status": "reported",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
+      },
+      "address": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "coordinates": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "hours": {
+        "status": "unknown",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "pricing": {
+        "status": "unknown",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "operations": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "area": {
+        "status": "reported",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
+      }
+    }
+  },
+  {
+    "id": "vuon-lang-nghe-sang-tao",
+    "slug": "vuon-lang-nghe-sang-tao-binh-my",
+    "name": "Vườn Làng nghề sáng tạo Bình Mỹ",
+    "aliases": [],
+    "primaryCategory": "vuon-trai-cay",
+    "secondaryCategories": [],
+    "shortDescription": "Tên điểm có trong tài liệu nghiên cứu du lịch vườn Bình Mỹ. Địa chỉ, hoạt động đang mở và khả năng đón khách cần được xác nhận riêng.",
+    "locality": "Bình Mỹ, Thành phố Hồ Chí Minh",
+    "areaCode": "BINH_MY",
+    "address": null,
+    "coordinates": null,
+    "coordinateStatus": "unverified",
+    "contacts": null,
+    "imageIds": [
+      "chom-rong",
+      "canh-quan"
+    ],
+    "sourceIds": [
+      "xudua-vuon-binh-my-2026"
+    ],
+    "updatedAt": "2026-10-21",
+    "verification": {
+      "identity": {
+        "status": "reported",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
+      },
+      "address": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "coordinates": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "hours": {
+        "status": "unknown",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "pricing": {
+        "status": "unknown",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "operations": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "area": {
+        "status": "reported",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
+      }
+    }
+  },
+  {
+    "id": "gom-hai-tu",
+    "slug": "lang-gom-hai-tu",
+    "name": "Làng gốm Hai Tú",
+    "aliases": [
+      "Hai Tú"
+    ],
+    "primaryCategory": "trai-nghiem-lam-nghe",
+    "secondaryCategories": [],
+    "shortDescription": "Bài báo mô tả hoạt động tìm hiểu và thực hành làm gốm tại Hai Tú. Lịch workshop, mức phí và tình trạng đón khách hiện chưa xác minh.",
+    "locality": "Bình Mỹ, Thành phố Hồ Chí Minh",
+    "areaCode": "BINH_MY",
+    "address": null,
+    "coordinates": null,
+    "coordinateStatus": "unverified",
+    "contacts": null,
+    "imageIds": [
+      "khong-gian-lang-gom"
+    ],
+    "sourceIds": [
+      "vntravel-binh-my-2025"
+    ],
+    "updatedAt": "2026-10-21",
+    "verification": {
+      "identity": {
+        "status": "reported",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
+      },
+      "address": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "coordinates": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "hours": {
+        "status": "unknown",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "pricing": {
+        "status": "unknown",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "operations": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "area": {
+        "status": "reported",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
+      }
+    }
+  },
+  {
+    "id": "bo-sua-ba-thang",
+    "slug": "trang-trai-bo-sua-ba-thang",
+    "name": "Trang trại bò sữa Ba Thẳng",
+    "aliases": [
+      "Ba Thẳng"
+    ],
+    "primaryCategory": "trang-trai",
+    "secondaryCategories": [],
+    "shortDescription": "Bài báo giới thiệu một số hoạt động nông nghiệp tại trang trại. Việc tiếp khách, hoạt động hiện có, giá và lịch cần được xác nhận trực tiếp.",
+    "locality": "Bình Mỹ, Thành phố Hồ Chí Minh",
+    "areaCode": "BINH_MY",
+    "address": null,
+    "coordinates": null,
+    "coordinateStatus": "unverified",
+    "contacts": null,
+    "imageIds": [
+      "trai-bo-sua",
+      "hoat-dong-trang-trai"
+    ],
+    "sourceIds": [
+      "vntravel-binh-my-2025"
+    ],
+    "updatedAt": "2026-10-21",
+    "verification": {
+      "identity": {
+        "status": "reported",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
+      },
+      "address": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "coordinates": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "hours": {
+        "status": "unknown",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "pricing": {
+        "status": "unknown",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "operations": {
+        "status": "needs_confirmation",
+        "sourceIds": [],
+        "checkedAt": null
+      },
+      "area": {
+        "status": "reported",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
+      }
+    }
+  }
+]

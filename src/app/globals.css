@@ -198,3 +198,24 @@
   animation: spinSlow 12s linear infinite;
 }
 
+ :focus-visible {
+  outline: 3px solid #e76f51;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  header, footer, button, .leaflet-container { display: none !important; }
+  body { background: white !important; color: black !important; }
+  main { min-height: 0 !important; }
+  article, section, aside { break-inside: avoid; box-shadow: none !important; }
+}
+

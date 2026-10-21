@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://binhmyduky.local/schema/place.json",
+  "title": "Binh My place record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "slug", "name", "aliases", "primaryCategory", "secondaryCategories", "shortDescription", "locality", "areaCode", "address", "coordinates", "coordinateStatus", "contacts", "imageIds", "sourceIds", "updatedAt", "verification"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "name": { "type": "string", "minLength": 1 },
+    "aliases": { "type": "array", "items": { "type": "string" } },
+    "primaryCategory": { "type": "string" },
+    "secondaryCategories": { "type": "array", "items": { "type": "string" } },
+    "shortDescription": { "type": "string" },
+    "locality": { "type": "string", "minLength": 1 },
+    "areaCode": { "type": ["string", "null"] },
+    "address": { "type": ["string", "null"] },
+    "coordinates": { "type": ["object", "null"], "required": ["latitude", "longitude"], "properties": { "latitude": { "type": "number", "minimum": -90, "maximum": 90 }, "longitude": { "type": "number", "minimum": -180, "maximum": 180 } }, "additionalProperties": false },
+    "coordinateStatus": { "$ref": "#/$defs/status" },
+    "contacts": { "type": ["object", "null"], "properties": { "phone": { "type": "string" }, "email": { "type": "string" }, "website": { "type": "string", "format": "uri" } }, "additionalProperties": false },
+    "imageIds": { "type": "array", "items": { "type": "string" } },
+    "sourceIds": { "type": "array", "items": { "type": "string" } },
+    "updatedAt": { "type": "string", "format": "date" },
+    "verification": { "type": "object", "required": ["identity", "area", "address", "coordinates", "hours", "pricing", "operations"], "properties": { "identity": { "$ref": "#/$defs/fact" }, "area": { "$ref": "#/$defs/fact" }, "address": { "$ref": "#/$defs/fact" }, "coordinates": { "$ref": "#/$defs/fact" }, "hours": { "$ref": "#/$defs/fact" }, "pricing": { "$ref": "#/$defs/fact" }, "operations": { "$ref": "#/$defs/fact" } }, "additionalProperties": false }
+  },
+  "$defs": {
+    "status": { "enum": ["verified", "reported", "needs_confirmation", "unknown", "unverified"] },
+    "fact": { "type": "object", "required": ["status", "sourceIds", "checkedAt"], "properties": { "status": { "$ref": "#/$defs/status" }, "sourceIds": { "type": "array", "items": { "type": "string" } }, "checkedAt": { "type": ["string", "null"], "format": "date" } }, "additionalProperties": false }
+  }
+}

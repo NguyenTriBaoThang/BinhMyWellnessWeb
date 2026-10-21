@@ -1,0 +1,110 @@
+[
+  {
+    "id": "cano-den-binh-my",
+    "placeId": "wetro-moon-river",
+    "categoryId": "song-nuoc-ky-uc",
+    "researchPath": "research-assets/unverified/assets/song-nuoc-ky-uc/cano-den-binh-my.jpg",
+    "sourceUrl": "https://vntravel.org.vn/xa-binh-my-tphcm-he-sinh-thai-ven-song-mo-ra-nhieu-khong-gian-trai-nghiem-cho-du-khach-quoc-te-va-hoc-sinh-a7755.html",
+    "credit": "Ngân Trần / Vietnam Travel",
+    "rightsStatus": "permission_not_verified",
+    "publishAllowed": false,
+    "alt": "Cano từ Tân Cảng đến bến Wetro Line – Moon River",
+    "publishedPath": null
+  },
+  {
+    "id": "thuy-dao",
+    "placeId": "vuon-ky-uc",
+    "categoryId": "song-nuoc-ky-uc",
+    "researchPath": "research-assets/unverified/assets/song-nuoc-ky-uc/thuy-dao.png",
+    "sourceUrl": "https://xudua.com/tiep-can-phat-trien-du-lich-vuon-trai-cay-binh-my-tu-toa-dam-du-lich-suc-khoe-va-kinh-te-bac/",
+    "credit": "Nhóm nghiên cứu du lịch vườn Bình Mỹ / xudua.com",
+    "rightsStatus": "permission_not_verified",
+    "publishAllowed": false,
+    "alt": "Không gian tái hiện Thủy Đạo tại Vườn Ký Ức",
+    "publishedPath": null
+  },
+  {
+    "id": "vuon-tu-huynh",
+    "placeId": "vuon-ky-uc",
+    "categoryId": "vuon-trai-cay",
+    "researchPath": "research-assets/unverified/assets/vuon-trai-cay/vuon-tu-huynh.png",
+    "sourceUrl": "https://xudua.com/tiep-can-phat-trien-du-lich-vuon-trai-cay-binh-my-tu-toa-dam-du-lich-suc-khoe-va-kinh-te-bac/",
+    "credit": "Nhóm nghiên cứu du lịch vườn Bình Mỹ / xudua.com",
+    "rightsStatus": "permission_not_verified",
+    "publishAllowed": false,
+    "alt": "Vườn cây chưa vào mùa tại Vườn Ký Ức – Tư Huỳnh",
+    "publishedPath": null
+  },
+  {
+    "id": "chom-rong",
+    "placeId": "vuon-lang-nghe-sang-tao",
+    "categoryId": "vuon-trai-cay",
+    "researchPath": "research-assets/unverified/assets/vuon-trai-cay/chom-chom.png",
+    "sourceUrl": "https://xudua.com/tiep-can-phat-trien-du-lich-vuon-trai-cay-binh-my-tu-toa-dam-du-lich-suc-khoe-va-kinh-te-bac/",
+    "credit": "Phạm Thị Mỹ Quyên / xudua.com",
+    "rightsStatus": "permission_not_verified",
+    "publishAllowed": false,
+    "alt": "Ảnh tư liệu mùa chôm chôm, không phản ánh mùa hiện tại",
+    "publishedPath": null
+  },
+  {
+    "id": "canh-quan",
+    "placeId": "vuon-lang-nghe-sang-tao",
+    "categoryId": "vuon-trai-cay",
+    "researchPath": "research-assets/unverified/assets/vuon-trai-cay/canh-quan.png",
+    "sourceUrl": "https://xudua.com/tiep-can-phat-trien-du-lich-vuon-trai-cay-binh-my-tu-toa-dam-du-lich-suc-khoe-va-kinh-te-bac/",
+    "credit": "Nhóm nghiên cứu du lịch vườn Bình Mỹ / xudua.com",
+    "rightsStatus": "permission_not_verified",
+    "publishAllowed": false,
+    "alt": "Cảnh quan Vườn Làng nghề sáng tạo Bình Mỹ",
+    "publishedPath": null
+  },
+  {
+    "id": "khong-gian-lang-gom",
+    "placeId": "gom-hai-tu",
+    "categoryId": "trai-nghiem-lam-nghe",
+    "researchPath": "research-assets/unverified/assets/trai-nghiem-lam-nghe/khong-gian-lang-gom.jpg",
+    "sourceUrl": "https://vntravel.org.vn/xa-binh-my-tphcm-he-sinh-thai-ven-song-mo-ra-nhieu-khong-gian-trai-nghiem-cho-du-khach-quoc-te-va-hoc-sinh-a7755.html",
+    "credit": "Ngân Trần / Vietnam Travel",
+    "rightsStatus": "permission_not_verified",
+    "publishAllowed": false,
+    "alt": "Không gian được bài báo ghi nhận tại làng gốm Hai Tú",
+    "publishedPath": null
+  },
+  {
+    "id": "dan-luc-binh",
+    "placeId": null,
+    "categoryId": "trai-nghiem-lam-nghe",
+    "researchPath": "research-assets/unverified/assets/trai-nghiem-lam-nghe/dan-luc-binh.jpg",
+    "sourceUrl": "https://vntravel.org.vn/xa-binh-my-tphcm-he-sinh-thai-ven-song-mo-ra-nhieu-khong-gian-trai-nghiem-cho-du-khach-quoc-te-va-hoc-sinh-a7755.html",
+    "credit": "Ngân Trần / Vietnam Travel",
+    "rightsStatus": "permission_not_verified",
+    "publishAllowed": false,
+    "alt": "Ảnh hoạt động đan lục bình tại Bình Mỹ; bài báo chưa nêu hộ cụ thể",
+    "publishedPath": null
+  },
+  {
+    "id": "trai-bo-sua",
+    "placeId": "bo-sua-ba-thang",
+    "categoryId": "trang-trai",
+    "researchPath": "research-assets/unverified/assets/trang-trai/trai-bo-sua.jpg",
+    "sourceUrl": "https://vntravel.org.vn/xa-binh-my-tphcm-he-sinh-thai-ven-song-mo-ra-nhieu-khong-gian-trai-nghiem-cho-du-khach-quoc-te-va-hoc-sinh-a7755.html",
+    "credit": "Ngân Trần / Vietnam Travel",
+    "rightsStatus": "permission_not_verified",
+    "publishAllowed": false,
+    "alt": "Hoạt động tại trang trại bò sữa Ba Thẳng",
+    "publishedPath": null
+  },
+  {
+    "id": "hoat-dong-trang-trai",
+    "placeId": "bo-sua-ba-thang",
+    "categoryId": "trang-trai",
+    "researchPath": "research-assets/unverified/assets/trang-trai/hoat-dong-trang-trai.jpg",
+    "sourceUrl": "https://vntravel.org.vn/xa-binh-my-tphcm-he-sinh-thai-ven-song-mo-ra-nhieu-khong-gian-trai-nghiem-cho-du-khach-quoc-te-va-hoc-sinh-a7755.html",
+    "credit": "Ngân Trần / Vietnam Travel",
+    "rightsStatus": "permission_not_verified",
+    "publishAllowed": false,
+    "alt": "Các hoạt động tại trang trại bò sữa Ba Thẳng",
+    "publishedPath": null
+  }
+]

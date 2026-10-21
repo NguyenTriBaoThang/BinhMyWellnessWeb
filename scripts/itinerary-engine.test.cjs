@@ -1,145 +1,148 @@
 const assert = require('node:assert/strict');
+const os = require('node:os');
+const path = require('node:path');
 const test = require('node:test');
-const { buildItinerary } = require('../.test-build/engine.js');
+const { generateItineraryOptions, recalculateItinerary } = require(path.join(os.tmpdir(), 'binh-my-du-ky-test-build/engine.js'));
 
-const date = '2099-04-12';
-const route = async () => ({
-  provider: 'test-routing',
-  distanceMeters: 5_000,
-  durationMinutes: 20,
-  encodedPolyline: 'test-polyline',
-  isRealtime: false,
-});
+const DATE = '2099-04-12';
+const VERIFIED = { status: 'verified', sourceIds: ['source'], checkedAt: '2099-01-01' };
 
-function service(id, slot, overrides = {}) {
+function place(id, index = 0, overrides = {}) {
+  const fact = () => ({ ...VERIFIED, sourceIds: ['source'] });
   return {
-    id,
-    name: `Experience ${id}`,
-    category: 'Nature',
-    description: 'Outdoor garden activity',
-    price: 30_000,
-    priceBasis: 'PER_PERSON',
-    childPrice: 20_000,
-    duration: 60,
-    capacity: 10,
-    latitude: 10.96,
-    longitude: 106.64,
-    status: 'PUBLISHED',
-    testOnly: false,
-    areaCode: 'BINH_MY',
-    serviceVerifiedAt: '2099-01-01T00:00:00.000Z',
-    locationVerifiedAt: '2099-01-01T00:00:00.000Z',
-    provider: { id: `provider-${id}`, name: `Provider ${id}`, address: 'Verified address', active: true },
-    slots: [{ date, slot, verifiedAt: '2099-01-01T00:00:00.000Z', availablePlaces: 10 }],
+    id, slug: id, name: `Place ${id}`, aliases: [], primaryCategory: 'song-nuoc-ky-uc', secondaryCategories: [],
+    shortDescription: 'Test-only fixture', locality: 'Bình Mỹ', areaCode: 'BINH_MY',
+    address: `Test access ${id}`, coordinates: { latitude: 10.9 + index / 1000, longitude: 106.6 + index / 1000 },
+    coordinateStatus: 'verified', contacts: null, imageIds: [], sourceIds: ['source'], updatedAt: '2099-01-01',
+    verification: { identity: fact(), area: fact(), address: fact(), coordinates: fact(), hours: fact(), pricing: fact(), operations: fact() },
     ...overrides,
   };
+}
+
+function priceRule(basis, amount, overrides = {}) {
+  return { amountVnd: amount, basis, status: 'verified', sourceId: 'source', checkedAt: '2099-01-01', ageMinimum: null, ageMaximum: null, minGroup: null, capacity: 8, included: [], excluded: [], ...overrides };
+}
+
+function experience(id, placeId, overrides = {}) {
+  const week = Object.fromEntries(['0', '1', '2', '3', '4', '5', '6'].map((day) => [day, [{ start: '08:00', end: '18:00' }]]));
+  return {
+    id, placeId, categoryId: 'song-nuoc-ky-uc', name: `Experience ${id}`, activities: ['Guided activity'],
+    durationMinutes: 60, weeklyHours: week, dateExceptions: [], seasonAvailability: { status: 'verified', dates: [], yearRound: true, sourceIds: ['source'], checkedAt: '2099-01-01' },
+    bookingRequirement: 'Confirm directly before visiting', suitability: { status: 'verified', ageMinimum: 0, ageMaximum: 17, notes: null },
+    priceRules: [priceRule('per_adult', 10_000), priceRule('per_child', 5_000)],
+    evidence: { status: 'verified', sourceIds: ['source'], checkedAt: '2099-01-01' }, routeEligible: true, bookingAllowed: false,
+    ...overrides,
+  };
+}
+
+function edge(fromPlaceId, toPlaceId, overrides = {}) {
+  return { fromPlaceId, toPlaceId, mode: 'car', distanceMeters: 2_000, durationSeconds: 600, geometryRef: `${fromPlaceId}-${toPlaceId}`, sourceId: 'source', generatedAt: DATE, status: 'verified', ...overrides };
+}
+
+function catalog(options = {}) {
+  const places = [place('origin', 0), place('a', 1), place('b', 2), place('c', 3), place('destination', 4)];
+  const experiences = options.experiences ?? [experience('exp-a', 'a'), experience('exp-b', 'b'), experience('exp-c', 'c')];
+  const ids = places.map((item) => item.id);
+  const edges = options.edges ?? ids.flatMap((from) => ids.filter((to) => to !== from).map((to) => edge(from, to)));
+  return { places: options.places ?? places, experiences, sources: [], matrix: { version: 1, generatedAt: DATE, edges } };
 }
 
 function request(overrides = {}) {
   return {
-    date,
-    startTime: '08:00',
-    endTime: '17:00',
-    adults: 2,
-    children: 0,
-    budgetBasis: 'GROUP',
-    transportMode: 'car',
-    interests: [],
-    maxStops: 4,
+    date: DATE, startTime: '08:00', endTime: '17:00', adults: 2, children: 0, childAges: [],
+    budgetVnd: null, childBudgetVnd: null, budgetBasis: 'group', includeMealCost: false, mealCostVnd: null,
+    includeTransportCost: false, transportCostVnd: null, transportMode: 'car', originPlaceId: 'origin', destinationPlaceId: 'destination',
+    interestCategoryIds: [], requiredExperienceIds: [], pace: 'balanced', maxStops: 3, groupCostEstimatesVnd: {},
     ...overrides,
   };
 }
 
-test('uses verified availability, route ETA, and non-overlapping time slots', async () => {
-  const plan = await buildItinerary(request(), [
-    service('a', '08:00'),
-    service('b', '10:00', { latitude: 10.97 }),
-  ], route);
-
-  assert.equal(plan.stops.length, 2);
-  assert.equal(plan.stops[0].arrivalTime, '08:00');
-  assert.equal(plan.stops[0].departureTime, '09:00');
-  assert.equal(plan.stops[1].arrivalTime, '10:00');
-  assert.equal(plan.stops[1].routeFromPrevious.provider, 'test-routing');
-  assert.equal(plan.totalTravelMinutes, null, 'origin travel is unknown unless the traveler provides a consented origin');
+test('uses only verified Bình Mỹ places and experiences', () => {
+  const base = catalog();
+  const unverified = experience('not-verified', 'a', { evidence: { status: 'reported', sourceIds: ['source'], checkedAt: DATE } });
+  const wrongAreaPlaces = base.places.map((item) => item.id === 'b' ? { ...item, areaCode: 'OTHER' } : item);
+  const result = generateItineraryOptions(request(), { ...base, experiences: [unverified, experience('wrong-area', 'b')], places: wrongAreaPlaces });
+  assert.deepEqual(result.options, []);
+  assert.ok(result.blockingReasons.some((reason) => reason.includes('xác minh')));
 });
 
-test('excludes unverified, outside-area, test-only, inactive, and unverified-slot records', async () => {
-  const invalid = [
-    service('unverified-location', '08:00', { locationVerifiedAt: null }),
-    service('wrong-area', '08:00', { areaCode: 'OTHER' }),
-    service('test', '08:00', { testOnly: true }),
-    service('inactive-provider', '08:00', { provider: { id: 'p', name: 'P', address: 'A', active: false } }),
-    service('unverified-slot', '08:00', { slots: [{ date, slot: '08:00', verifiedAt: null, availablePlaces: 10 }] }),
-  ];
-  const plan = await buildItinerary(request(), invalid, route);
-  assert.equal(plan.feasibility, 'NO_FEASIBLE_PLAN');
-  assert.deepEqual(plan.stops, []);
-  assert.ok(plan.rejectedReasons.includes('NO_VERIFIED_AVAILABLE_SERVICES'));
+test('generates different options from verified directed edges and never duplicates a plan', () => {
+  const result = generateItineraryOptions(request(), catalog());
+  assert.ok(result.options.length > 0 && result.options.length <= 3);
+  assert.equal(new Set(result.options.map((option) => option.id)).size, result.options.length);
+  assert.ok(result.options.every((option) => option.stops.length >= 2));
+  assert.ok(result.options.every((option) => option.stops.every((stop) => stop.activities.length > 0 && stop.bookingRequirement.length > 0)));
 });
 
-test('does not exceed group or per-person budgets', async () => {
-  const plan = await buildItinerary(request({ budgetVnd: 25_000, budgetBasis: 'PER_PERSON' }), [
-    service('over-budget', '08:00'),
-  ], route);
-  assert.equal(plan.stops.length, 0);
-  assert.ok(plan.rejectedReasons.includes('OVER_BUDGET'));
+test('enforces the group budget at its exact boundary, including selected shared costs', () => {
+  const trip = catalog({ experiences: [experience('exp-a', 'a'), experience('exp-b', 'b')] });
+  const exact = generateItineraryOptions(request({ budgetVnd: 55_000, includeMealCost: true, mealCostVnd: 15_000 }), trip);
+  assert.ok(exact.options.length > 0);
+  assert.equal(exact.options[0].totalCostVnd, 55_000);
+  const over = generateItineraryOptions(request({ budgetVnd: 54_999, includeMealCost: true, mealCostVnd: 15_000 }), trip);
+  assert.deepEqual(over.options, []);
+  assert.ok(over.blockingReasons.some((reason) => reason.includes('vượt ngân sách')));
 });
 
-test('reports child price as unknown instead of assuming adult price', async () => {
-  const plan = await buildItinerary(request({ children: 1 }), [
-    service('child-price-missing', '08:00', { childPrice: null }),
-  ], route);
-  assert.equal(plan.stops[0].costVnd, null);
-  assert.equal(plan.totalCostVnd, null);
-  assert.ok(plan.warnings.includes('CHILD_PRICE_NOT_CONFIRMED'));
+test('requires each child price and does not substitute the adult price', () => {
+  const noChildPrice = (id, placeId) => experience(id, placeId, { priceRules: [priceRule('per_adult', 10_000)] });
+  const trip = catalog({ experiences: [noChildPrice('exp-a', 'a'), noChildPrice('exp-b', 'b')] });
+  const requestWithChild = request({ adults: 1, children: 1, childAges: [7] });
+  const uncapped = generateItineraryOptions(requestWithChild, trip);
+  assert.ok(uncapped.options.length > 0);
+  assert.equal(uncapped.options[0].totalCostVnd, null);
+  assert.ok(uncapped.options[0].stops.every((stop) => stop.costVnd === null));
+  const capped = generateItineraryOptions({ ...requestWithChild, budgetVnd: 100_000 }, trip);
+  assert.deepEqual(capped.options, []);
+  assert.ok(capped.blockingReasons.some((reason) => reason.includes('chưa biết')));
 });
 
-test('does not invent travel time or a multi-stop route when routing is unavailable', async () => {
-  const plan = await buildItinerary(request(), [service('a', '08:00'), service('b', '10:00')]);
-  assert.equal(plan.stops.length, 1);
-  assert.equal(plan.stops[0].routeFromPrevious, null);
-  assert.equal(plan.totalTravelMinutes, null);
-  assert.ok(plan.warnings.includes('ROUTING_NOT_CONFIGURED'));
+test('applies per-group fees once and rejects groups beyond recorded capacity', () => {
+  const groupPrices = [experience('exp-a', 'a', { priceRules: [priceRule('per_group', 30_000)] }), experience('exp-b', 'b', { priceRules: [priceRule('per_group', 30_000)] })];
+  const exactGroup = generateItineraryOptions(request({ budgetVnd: 60_000 }), catalog({ experiences: groupPrices }));
+  assert.equal(exactGroup.options[0]?.totalCostVnd, 60_000);
+  const limited = groupPrices.map((item) => ({ ...item, priceRules: [priceRule('per_group', 30_000, { capacity: 2 })] }));
+  const tooMany = generateItineraryOptions(request({ adults: 2, children: 1, childAges: [8] }), catalog({ experiences: limited }));
+  assert.deepEqual(tooMany.options, []);
+  assert.ok(tooMany.blockingReasons.some((reason) => reason.includes('sức chứa')));
 });
 
-test('caches repeated route lookups and caps external route requests', async () => {
-  let calls = 0;
-  const countedRoute = async () => { calls += 1; return route(); };
-  const sameServiceSlots = service('repeat', '08:00', {
-    slots: [
-      { date, slot: '08:00', verifiedAt: '2099-01-01T00:00:00.000Z', availablePlaces: 10 },
-      { date, slot: '08:30', verifiedAt: '2099-01-01T00:00:00.000Z', availablePlaces: 10 },
-    ],
-  });
-  await buildItinerary(request({ origin: { latitude: 10.95, longitude: 106.63 } }), [sameServiceSlots], countedRoute);
-  assert.equal(calls, 1, 'same coordinates and transport mode should be cached across time slots');
-
-  calls = 0;
-  const many = Array.from({ length: 40 }, (_, index) => service(`candidate-${index}`, '08:00', { longitude: 106.6 + index / 100_000 }));
-  const plan = await buildItinerary(request({ origin: { latitude: 10.95, longitude: 106.63 } }), many, countedRoute);
-  assert.equal(calls, 32, 'external routing calls must stay within the per-plan cap');
-  assert.ok(plan.warnings.includes('ROUTING_LOOKUP_LIMIT_REACHED'));
+test('respects weekly closing hours and keeps lunch as a real pause', () => {
+  const closed = catalog({ experiences: [experience('exp-a', 'a', { weeklyHours: { '0': [] } }), experience('exp-b', 'b')] });
+  const closedResult = generateItineraryOptions(request(), closed);
+  assert.ok(closedResult.blockingReasons.some((reason) => reason.includes('khung giờ')));
+  const lunch = generateItineraryOptions(request({ startTime: '12:30', endTime: '17:00', maxStops: 2 }), catalog({ experiences: [experience('exp-a', 'a'), experience('exp-b', 'b')] }));
+  assert.ok(lunch.options.length > 0);
+  assert.equal(lunch.options[0].stops[0].arrivalTime, '13:00');
 });
 
-test('requires return travel to fit before the requested end time', async () => {
-  const slowRoute = async () => ({
-    provider: 'test-routing', distanceMeters: 100_000, durationMinutes: 300,
-    encodedPolyline: 'test-polyline', isRealtime: false,
-  });
-  const plan = await buildItinerary(request({ endTime: '12:00', returnTo: { latitude: 10.9, longitude: 106.5 } }), [
-    service('late-return', '09:00'),
-  ], slowRoute);
-  assert.equal(plan.feasibility, 'NO_FEASIBLE_PLAN');
-  assert.deepEqual(plan.stops, []);
-  assert.ok(plan.rejectedReasons.includes('RETURN_TOO_LATE'));
+test('does not invent a route when directed edges are missing or reversed', () => {
+  const onlyForward = [edge('origin', 'a'), edge('a', 'b'), edge('b', 'destination')];
+  const trip = catalog({ experiences: [experience('exp-a', 'a'), experience('exp-b', 'b')], edges: onlyForward });
+  const result = generateItineraryOptions(request({ maxStops: 2 }), trip);
+  assert.ok(result.options.length > 0);
+  assert.equal(recalculateItinerary(request(), ['exp-b', 'exp-a'], trip), null);
+  const missing = generateItineraryOptions(request(), catalog({ experiences: [experience('exp-a', 'a'), experience('exp-b', 'b')], edges: [] }));
+  assert.deepEqual(missing.options, []);
+  assert.ok(missing.blockingReasons.some((reason) => reason.includes('có hướng')));
 });
 
-test('rejects impossible dates and malformed time windows', async () => {
-  const invalidDate = await buildItinerary(request({ date: '2099-02-30' }), [service('a', '08:00')], route);
-  const invalidTime = await buildItinerary(request({ startTime: '17:00', endTime: '08:00' }), [service('a', '08:00')], route);
-  assert.equal(invalidDate.feasibility, 'NO_FEASIBLE_PLAN');
-  assert.ok(invalidDate.rejectedReasons.includes('INVALID_OR_PAST_DATE'));
-  assert.equal(invalidTime.feasibility, 'NO_FEASIBLE_PLAN');
-  assert.ok(invalidTime.rejectedReasons.includes('INVALID_TIME_WINDOW'));
+test('requires selected mandatory points and rejects repeated/removed stops during edits', () => {
+  const trip = catalog({ experiences: [experience('exp-a', 'a'), experience('exp-b', 'b'), experience('exp-c', 'c')] });
+  const required = request({ requiredExperienceIds: ['exp-a'] });
+  const result = generateItineraryOptions(required, trip);
+  assert.ok(result.options.length > 0);
+  assert.ok(result.options.every((option) => option.stops.some((stop) => stop.experienceId === 'exp-a')));
+  assert.equal(recalculateItinerary(required, ['exp-b', 'exp-c'], trip), null);
+  assert.equal(recalculateItinerary(request(), ['exp-a', 'exp-a'], trip), null);
+});
+
+test('reports missing routing, unknown meal costs and malformed dates without claiming feasibility', () => {
+  const noRoute = generateItineraryOptions(request(), catalog({ experiences: [experience('exp-a', 'a'), experience('exp-b', 'b')], edges: [] }));
+  assert.deepEqual(noRoute.options, []);
+  const missingMeal = generateItineraryOptions(request({ budgetVnd: 50_000, includeMealCost: true }), catalog());
+  assert.deepEqual(missingMeal.options, []);
+  assert.ok(missingMeal.blockingReasons.some((reason) => reason.includes('nhập mức dự trù')));
+  const invalidDate = generateItineraryOptions(request({ date: '2099-02-30' }), catalog());
+  assert.deepEqual(invalidDate.options, []);
 });

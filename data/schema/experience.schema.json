@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://binhmyduky.local/schema/experience.json",
+  "title": "Binh My experience record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "placeId", "categoryId", "name", "activities", "durationMinutes", "weeklyHours", "dateExceptions", "seasonAvailability", "bookingRequirement", "suitability", "priceRules", "evidence", "routeEligible", "bookingAllowed"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "placeId": { "type": ["string", "null"] },
+    "categoryId": { "type": "string" },
+    "name": { "type": "string", "minLength": 1 },
+    "activities": { "type": "array", "items": { "type": "string" } },
+    "durationMinutes": { "type": ["integer", "null"], "minimum": 1 },
+    "weeklyHours": { "type": ["object", "null"], "propertyNames": { "pattern": "^[0-6]$" }, "additionalProperties": { "type": "array", "items": { "$ref": "#/$defs/window" } } },
+    "dateExceptions": { "type": "array", "items": { "type": "object", "required": ["date"], "properties": { "date": { "type": "string", "format": "date" }, "closed": { "type": "boolean" }, "windows": { "type": "array", "items": { "$ref": "#/$defs/window" } } }, "additionalProperties": false } },
+    "seasonAvailability": { "type": ["object", "null"], "required": ["status", "dates", "yearRound", "sourceIds", "checkedAt"], "properties": { "status": { "enum": ["verified", "needs_confirmation"] }, "dates": { "type": "array", "items": { "type": "string", "format": "date" } }, "yearRound": { "type": "boolean" }, "sourceIds": { "type": "array", "items": { "type": "string" } }, "checkedAt": { "type": ["string", "null"], "format": "date" } }, "additionalProperties": false },
+    "bookingRequirement": { "type": "string" },
+    "suitability": { "type": "object", "required": ["status", "ageMinimum", "ageMaximum", "notes"], "properties": { "status": { "enum": ["verified", "unknown"] }, "ageMinimum": { "type": ["integer", "null"], "minimum": 0, "maximum": 17 }, "ageMaximum": { "type": ["integer", "null"], "minimum": 0, "maximum": 17 }, "notes": { "type": ["string", "null"] } }, "additionalProperties": false },
+    "priceRules": { "type": ["array", "null"], "items": { "type": "object", "required": ["amountVnd", "basis", "status", "sourceId", "checkedAt", "ageMinimum", "ageMaximum", "minGroup", "capacity", "included", "excluded"], "properties": { "amountVnd": { "type": "integer", "minimum": 0 }, "basis": { "enum": ["per_adult", "per_child", "per_group"] }, "status": { "enum": ["verified", "user_estimate"] }, "sourceId": { "type": ["string", "null"] }, "checkedAt": { "type": ["string", "null"], "format": "date" }, "ageMinimum": { "type": ["integer", "null"], "minimum": 0, "maximum": 17 }, "ageMaximum": { "type": ["integer", "null"], "minimum": 0, "maximum": 17 }, "minGroup": { "type": ["integer", "null"], "minimum": 1 }, "capacity": { "type": ["integer", "null"], "minimum": 1 }, "included": { "type": "array", "items": { "type": "string" } }, "excluded": { "type": "array", "items": { "type": "string" } } }, "additionalProperties": false } },
+    "evidence": { "type": "object", "required": ["status", "sourceIds", "checkedAt"], "properties": { "status": { "enum": ["verified", "reported", "reported_without_provider", "needs_confirmation"] }, "sourceIds": { "type": "array", "items": { "type": "string" } }, "checkedAt": { "type": ["string", "null"], "format": "date" } }, "additionalProperties": false },
+    "routeEligible": { "type": "boolean" },
+    "bookingAllowed": { "type": "boolean" }
+  },
+  "$defs": { "window": { "type": "object", "required": ["start", "end"], "properties": { "start": { "type": "string", "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$" }, "end": { "type": "string", "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$" } }, "additionalProperties": false } }
+}

@@ -1,13 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  distDir: '.next-bm',
   images: {
     unoptimized: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  webpack: (config, { dev }) => {
+  webpack(config) {
+    config.module.rules.push({ test: /\.geojson$/, type: 'json' });
     return config;
   },
 };

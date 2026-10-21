@@ -17,6 +17,7 @@
 ## ✅ Danh sách kiểm tra (Checklist)
 - [ ] Mã nguồn đã được build thử thành công tại máy cục bộ (`npm run build`).
 - [ ] Đã kiểm tra kiểu dữ liệu và cú pháp lint (`npm run lint`).
-- [ ] Nếu có thay đổi Prisma Schema, đã chạy kiểm tra migration/generate (`npm run prisma:generate`).
+- [ ] Nếu có đổi dữ liệu, đã cập nhật nguồn, trạng thái xác minh, JSON validator và DATA_GAPS.md.
+- [ ] Nếu có thêm ảnh, đã ghi quyền sử dụng và chạy kiểm tra manifest.
 - [ ] Đã kiểm tra giao diện hiển thị tốt trên cả Desktop và Mobile (Responsive).
 - [ ] Tiêu đề PR và nội dung commit tuân thủ quy chuẩn **Conventional Commits**.
