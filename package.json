@@ -22,7 +22,7 @@
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.6.1",
+    "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^19.6.0",
     "@types/node": "^20.17.16",
     "@types/react": "^18.3.18",
