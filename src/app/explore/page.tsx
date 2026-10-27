@@ -1,14 +1,32 @@
 import type { Metadata } from 'next';
-import ExploreBrowser from '@/components/explore/ExploreBrowser';
+import SeasonExplorer from '@/components/explore/SeasonExplorer';
 import { categoriesData, experiencesData, placesData } from '@/lib/data/repository';
 
-export const metadata: Metadata = { title: 'Khám phá Bình Mỹ | Bình Mỹ Du Ký Website' };
+export const metadata: Metadata = {
+  title: 'Khám phá 4 mùa | Bình Mỹ Du Ký Website',
+  description: 'Khám phá bốn chủ đề sông nước, miệt vườn, nghề quê và nông trại tại Bình Mỹ.',
+};
 
 export default function ExplorePage() {
-  return <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-    <p className="text-xs font-bold uppercase tracking-[.18em] text-[#40916C]">Khám phá</p>
-    <h1 className="mt-2 text-3xl font-black tracking-tight text-[#1B4332] sm:text-4xl">Tìm điểm đến theo điều bạn thích</h1>
-    <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-600">Danh sách dựa trên tư liệu đã dẫn nguồn. Giá, thời lượng, tọa độ và tình trạng tiếp khách chỉ được lọc hoặc ghim khi có dữ liệu xác minh.</p>
-    <div className="mt-8"><ExploreBrowser places={placesData} categories={categoriesData} experiences={experiencesData} /></div>
-  </section>;
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-8 pb-28 sm:px-6 sm:py-12 sm:pb-28 md:pb-14 lg:px-8">
+      <header className="max-w-3xl">
+        <span className="text-sm font-bold text-[#A9761F]">Bốn mùa trải nghiệm</span>
+        <h1 className="mt-2 text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[#174C3C]">
+          Mỗi lần đến, thêm một khám phá.
+        </h1>
+        <p className="mt-3 text-base text-[#59675E] leading-7">
+          Chọn một chủ đề mùa, tìm hoạt động và địa điểm theo sở thích. Các mùa là cách khám phá; không đại diện cho lịch mùa vụ.
+        </p>
+      </header>
+
+      <div className="mt-8">
+        <SeasonExplorer
+          places={placesData}
+          categories={categoriesData}
+          experiences={experiencesData}
+        />
+      </div>
+    </div>
+  );
 }

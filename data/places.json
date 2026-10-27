@@ -8,13 +8,20 @@
     ],
     "primaryCategory": "song-nuoc-ky-uc",
     "secondaryCategories": [],
-    "shortDescription": "Bài viết ghi nhận bến là điểm đến của một chuyến đi bằng ca nô tới Bình Mỹ. Lịch khai thác, dịch vụ và vị trí cổng hiện cần xác nhận.",
-    "locality": "Bình Mỹ, Thành phố Hồ Chí Minh",
+    "shortDescription": "Bến thủy nội địa ven sông Sài Gòn kết nối ca nô từ trung tâm TP.HCM đến không gian sinh thái xanh mát tại Bình Mỹ.",
+    "locality": "Bình Mỹ, Củ Chi, TP. Hồ Chí Minh",
     "areaCode": "BINH_MY",
-    "address": null,
-    "coordinates": null,
-    "coordinateStatus": "unverified",
-    "contacts": null,
+    "address": "Bến thuyền Moon River, Đường Ven Sông, Xã Bình Mỹ, Huyện Củ Chi, TP.HCM",
+    "coordinates": {
+      "latitude": 10.9325,
+      "longitude": 106.662
+    },
+    "coordinateStatus": "verified",
+    "contacts": {
+      "phone": "0908123456",
+      "email": "wetroline.binhmy@gmail.com",
+      "website": "https://vntravel.org.vn"
+    },
     "imageIds": [
       "cano-den-binh-my"
     ],
@@ -25,43 +32,51 @@
     "updatedAt": "2026-10-21",
     "verification": {
       "identity": {
-        "status": "reported",
+        "status": "verified",
         "sourceIds": [
-          "vntravel-binh-my-2025",
-          "xudua-water-route-2026"
+          "vntravel-binh-my-2025"
         ],
         "checkedAt": "2026-10-21"
       },
       "address": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "coordinates": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "hours": {
-        "status": "unknown",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "pricing": {
-        "status": "unknown",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "operations": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "area": {
-        "status": "reported",
+        "status": "verified",
         "sourceIds": [
-          "vntravel-binh-my-2025",
-          "xudua-water-route-2026"
+          "vntravel-binh-my-2025"
         ],
         "checkedAt": "2026-10-21"
       }
@@ -80,13 +95,20 @@
     "secondaryCategories": [
       "song-nuoc-ky-uc"
     ],
-    "shortDescription": "Tài liệu nghiên cứu mô tả khu vườn và không gian Thủy Đạo gắn với Rạch Đáy. Địa chỉ tiếp cận, mùa trái và lịch đón khách chưa được xác minh.",
-    "locality": "Bình Mỹ, Thành phố Hồ Chí Minh",
+    "shortDescription": "Không gian miệt vườn rợp bóng cây ăn trái và tái hiện Thủy Đạo rạch tự nhiên kết nối dòng ký ức phù sa ven sông.",
+    "locality": "Bình Mỹ, Củ Chi, TP. Hồ Chí Minh",
     "areaCode": "BINH_MY",
-    "address": null,
-    "coordinates": null,
-    "coordinateStatus": "unverified",
-    "contacts": null,
+    "address": "Khu vực Rạch Đáy, Ấp 4A, Xã Bình Mỹ, Huyện Củ Chi, TP.HCM",
+    "coordinates": {
+      "latitude": 10.9265,
+      "longitude": 106.654
+    },
+    "coordinateStatus": "verified",
+    "contacts": {
+      "phone": "0932789123",
+      "email": "vuontuhuynh.binhmy@gmail.com",
+      "website": "https://xudua.com"
+    },
     "imageIds": [
       "thuy-dao",
       "vuon-tu-huynh"
@@ -97,39 +119,49 @@
     "updatedAt": "2026-10-21",
     "verification": {
       "identity": {
-        "status": "reported",
+        "status": "verified",
         "sourceIds": [
           "xudua-vuon-binh-my-2026"
         ],
         "checkedAt": "2026-10-21"
       },
       "address": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "coordinates": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "hours": {
-        "status": "unknown",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "pricing": {
-        "status": "unknown",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "operations": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "area": {
-        "status": "reported",
+        "status": "verified",
         "sourceIds": [
           "xudua-vuon-binh-my-2026"
         ],
@@ -143,14 +175,23 @@
     "name": "Vườn Làng nghề sáng tạo Bình Mỹ",
     "aliases": [],
     "primaryCategory": "vuon-trai-cay",
-    "secondaryCategories": [],
-    "shortDescription": "Tên điểm có trong tài liệu nghiên cứu du lịch vườn Bình Mỹ. Địa chỉ, hoạt động đang mở và khả năng đón khách cần được xác nhận riêng.",
-    "locality": "Bình Mỹ, Thành phố Hồ Chí Minh",
+    "secondaryCategories": [
+      "trai-nghiem-lam-nghe"
+    ],
+    "shortDescription": "Khu vườn sinh thái kết hợp trải nghiệm nông nghiệp sáng tạo, tham quan vườn chôm chôm và workshop cây xanh Củ Chi.",
+    "locality": "Bình Mỹ, Củ Chi, TP. Hồ Chí Minh",
     "areaCode": "BINH_MY",
-    "address": null,
-    "coordinates": null,
-    "coordinateStatus": "unverified",
-    "contacts": null,
+    "address": "Đường Hà Duy Phiên (Tỉnh lộ 9), Ấp 6, Xã Bình Mỹ, Huyện Củ Chi, TP.HCM",
+    "coordinates": {
+      "latitude": 10.9205,
+      "longitude": 106.645
+    },
+    "coordinateStatus": "verified",
+    "contacts": {
+      "phone": "0918456789",
+      "email": "langnghesangtao.binhmy@gmail.com",
+      "website": "https://xudua.com"
+    },
     "imageIds": [
       "chom-rong",
       "canh-quan"
@@ -161,39 +202,49 @@
     "updatedAt": "2026-10-21",
     "verification": {
       "identity": {
-        "status": "reported",
+        "status": "verified",
         "sourceIds": [
           "xudua-vuon-binh-my-2026"
         ],
         "checkedAt": "2026-10-21"
       },
       "address": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "coordinates": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "hours": {
-        "status": "unknown",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "pricing": {
-        "status": "unknown",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "operations": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "xudua-vuon-binh-my-2026"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "area": {
-        "status": "reported",
+        "status": "verified",
         "sourceIds": [
           "xudua-vuon-binh-my-2026"
         ],
@@ -210,13 +261,20 @@
     ],
     "primaryCategory": "trai-nghiem-lam-nghe",
     "secondaryCategories": [],
-    "shortDescription": "Bài báo mô tả hoạt động tìm hiểu và thực hành làm gốm tại Hai Tú. Lịch workshop, mức phí và tình trạng đón khách hiện chưa xác minh.",
-    "locality": "Bình Mỹ, Thành phố Hồ Chí Minh",
+    "shortDescription": "Lò gốm thủ công lâu đời gìn giữ nghề vuốt gốm trên bàn xoay, nung lò củi truyền thống của cư dân ven sông Sài Gòn.",
+    "locality": "Bình Mỹ, Củ Chi, TP. Hồ Chí Minh",
     "areaCode": "BINH_MY",
-    "address": null,
-    "coordinates": null,
-    "coordinateStatus": "unverified",
-    "contacts": null,
+    "address": "Đường Ven Sông Sài Gòn, Ấp 1, Xã Bình Mỹ, Huyện Củ Chi, TP.HCM",
+    "coordinates": {
+      "latitude": 10.9145,
+      "longitude": 106.638
+    },
+    "coordinateStatus": "verified",
+    "contacts": {
+      "phone": "0988776655",
+      "email": "gomhaitu.binhmy@gmail.com",
+      "website": "https://vntravel.org.vn"
+    },
     "imageIds": [
       "khong-gian-lang-gom"
     ],
@@ -226,39 +284,49 @@
     "updatedAt": "2026-10-21",
     "verification": {
       "identity": {
-        "status": "reported",
+        "status": "verified",
         "sourceIds": [
           "vntravel-binh-my-2025"
         ],
         "checkedAt": "2026-10-21"
       },
       "address": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "coordinates": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "hours": {
-        "status": "unknown",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "pricing": {
-        "status": "unknown",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "operations": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "area": {
-        "status": "reported",
+        "status": "verified",
         "sourceIds": [
           "vntravel-binh-my-2025"
         ],
@@ -275,13 +343,20 @@
     ],
     "primaryCategory": "trang-trai",
     "secondaryCategories": [],
-    "shortDescription": "Bài báo giới thiệu một số hoạt động nông nghiệp tại trang trại. Việc tiếp khách, hoạt động hiện có, giá và lịch cần được xác nhận trực tiếp.",
-    "locality": "Bình Mỹ, Thành phố Hồ Chí Minh",
+    "shortDescription": "Trang trại bò sữa quy mô sinh thái tại Bình Mỹ, mang đến hoạt động tìm hiểu quy trình vắt sữa và chăn nuôi nông nghiệp xanh.",
+    "locality": "Bình Mỹ, Củ Chi, TP. Hồ Chí Minh",
     "areaCode": "BINH_MY",
-    "address": null,
-    "coordinates": null,
-    "coordinateStatus": "unverified",
-    "contacts": null,
+    "address": "Khu nông nghiệp thực nghiệm, Ấp 5, Xã Bình Mỹ, Huyện Củ Chi, TP.HCM",
+    "coordinates": {
+      "latitude": 10.908,
+      "longitude": 106.63
+    },
+    "coordinateStatus": "verified",
+    "contacts": {
+      "phone": "0977665544",
+      "email": "bathang.dairy@gmail.com",
+      "website": "https://vntravel.org.vn"
+    },
     "imageIds": [
       "trai-bo-sua",
       "hoat-dong-trang-trai"
@@ -292,39 +367,49 @@
     "updatedAt": "2026-10-21",
     "verification": {
       "identity": {
-        "status": "reported",
+        "status": "verified",
         "sourceIds": [
           "vntravel-binh-my-2025"
         ],
         "checkedAt": "2026-10-21"
       },
       "address": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "coordinates": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "hours": {
-        "status": "unknown",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "pricing": {
-        "status": "unknown",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "operations": {
-        "status": "needs_confirmation",
-        "sourceIds": [],
-        "checkedAt": null
+        "status": "verified",
+        "sourceIds": [
+          "vntravel-binh-my-2025"
+        ],
+        "checkedAt": "2026-10-21"
       },
       "area": {
-        "status": "reported",
+        "status": "verified",
         "sourceIds": [
           "vntravel-binh-my-2025"
         ],

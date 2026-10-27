@@ -1,36 +1,5 @@
-import Link from 'next/link';
-import { ArrowRight, Compass, Map, Route, Search, Waves, Sprout, Shapes, Wheat } from 'lucide-react';
-import { categoriesData, placesData, getCategory } from '@/lib/data/repository';
-import PlaceCard from '@/components/PlaceCard';
-
-const categoryIcons = { waves: Waves, sprout: Sprout, shapes: Shapes, wheat: Wheat } as const;
+﻿import HomePageV2 from '@/components/HomePageV2';
 
 export default function HomePage() {
-  return (
-    <div>
-      <section className="relative overflow-hidden bg-[#1B4332] text-white">
-        <div className="pointer-events-none absolute -right-28 -top-36 h-[34rem] w-[34rem] rounded-full border border-white/10" />
-        <div className="pointer-events-none absolute -right-4 -top-12 h-[25rem] w-[25rem] rounded-full border border-white/10" />
-        <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-[1.1fr_.9fr] lg:items-center lg:px-8">
-          <div className="relative z-10">
-            <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-emerald-100"><span aria-hidden="true">⌖</span> Bình Mỹ, Thành phố Hồ Chí Minh</p>
-            <h1 className="mt-6 max-w-3xl text-4xl font-black leading-[1.08] tracking-tight sm:text-6xl">Một chuyến Bình Mỹ,<br /><span className="text-[#b7e4c7]">nhiều điều để khám phá.</span></h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-emerald-50/90 sm:text-lg">Tìm điểm đến thật, chọn trải nghiệm phù hợp và sắp xếp chuyến đi Bình Mỹ trên cùng một bản đồ.</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row"><Link href="/explore" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 font-bold text-[#1B4332] hover:bg-emerald-50">Khám phá 4 trải nghiệm <ArrowRight size={17} /></Link><Link href="/itinerary" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/30 px-5 py-3 font-bold text-white hover:bg-white/10"><Route size={17} /> Lên tuyến đi phù hợp</Link></div>
-            <p className="mt-5 max-w-xl text-xs leading-5 text-emerald-100/75">Thông tin giá, lịch và lối vào chưa xác minh được ghi rõ. Hành trình chỉ được tính khi có đủ dữ liệu đường đi.</p>
-          </div>
-          <div className="relative min-h-[330px] overflow-hidden rounded-[2rem] border border-white/15 bg-[#234d3d] p-6 sm:p-8">
-            <div className="absolute inset-0 opacity-30" aria-hidden="true"><div className="absolute left-[12%] top-[24%] h-36 w-36 rounded-full border border-emerald-100/40" /><div className="absolute right-[10%] top-[16%] h-52 w-52 rounded-full border border-emerald-100/30" /><div className="absolute bottom-[-55%] left-[20%] h-72 w-[130%] -rotate-12 rounded-[50%] border-t-2 border-emerald-200/50" /></div>
-            <div className="relative flex h-full min-h-[280px] flex-col justify-between"><div className="flex items-center justify-between"><span className="rounded-lg bg-white/10 px-3 py-2 text-xs font-semibold">BẢN ĐỒ DỮ LIỆU</span><Map size={20} className="text-emerald-200" /></div><div><p className="text-3xl font-black">Địa điểm có nguồn.<br />Tuyến có căn cứ.</p><p className="mt-3 max-w-sm text-sm leading-6 text-emerald-100/80">Vị trí nào chưa xác minh sẽ chưa được ghim hoặc đưa vào phép tính hành trình.</p><Link href="/explore" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-white underline-offset-4 hover:underline">Mở khám phá bản đồ <ArrowRight size={16} /></Link></div></div>
-          </div>
-        </div>
-      </section>
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[.18em] text-[#40916C]">Bốn cách nhìn về Bình Mỹ</p><h2 className="mt-2 text-3xl font-black tracking-tight text-[#1B4332]">Chọn điều bạn muốn khám phá</h2></div><Link href="/explore" className="inline-flex items-center gap-2 text-sm font-bold text-[#1B4332] hover:underline">Xem tất cả <ArrowRight size={16} /></Link></div>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{categoriesData.map((category, index) => { const Icon = categoryIcons[category.icon]; return <Link key={category.id} href={`/explore?category=${category.id}`} className="group rounded-2xl border border-zinc-200 bg-white p-5 transition hover:-translate-y-1 hover:border-emerald-300 hover:shadow-lg"><span className="grid h-12 w-12 place-items-center rounded-2xl text-white" style={{ backgroundColor: category.accent }}><Icon size={23} /></span><p className="mt-5 text-xs font-bold text-zinc-400">0{index + 1}</p><h3 className="mt-1 text-lg font-extrabold text-[#1B4332]">{category.name}</h3><p className="mt-2 text-sm leading-6 text-zinc-600">{category.description}</p><span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#40916C]">Khám phá nhóm này <ArrowRight size={15} className="transition group-hover:translate-x-1" /></span></Link>; })}</div>
-      </section>
-      <section className="bg-white py-16 sm:py-20"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[.18em] text-[#E76F51]">Từ tư liệu có nguồn</p><h2 className="mt-2 text-3xl font-black tracking-tight text-[#1B4332]">Những điểm đang được tìm hiểu</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">Các bài viết ghi nhận địa điểm và hoạt động, nhưng chưa xác minh được điều kiện hiện tại để lên tuyến hoặc đặt dịch vụ.</p></div><Link href="/explore" className="inline-flex items-center gap-2 text-sm font-bold text-[#1B4332] hover:underline">Tìm theo sở thích <Search size={16} /></Link></div><div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">{placesData.slice(0, 3).map((place) => <PlaceCard key={place.id} place={place} category={getCategory(place.primaryCategory)!} />)}</div></div></section>
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"><div className="grid gap-8 rounded-[2rem] bg-[#EAF4EE] p-6 sm:p-10 lg:grid-cols-[.8fr_1.2fr] lg:items-center"><div><p className="text-xs font-bold uppercase tracking-[.18em] text-[#40916C]">Lập chuyến đi</p><h2 className="mt-2 text-3xl font-black text-[#1B4332]">Từ sở thích đến hành trình dự kiến</h2><Link href="/itinerary" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#1B4332] px-4 py-3 text-sm font-bold text-white hover:bg-[#143627]">Thử lập hành trình <ArrowRight size={16} /></Link></div><ol className="grid gap-4 sm:grid-cols-3">{[['01', 'Nhập điều kiện', 'Ngày, thời gian, nhóm khách và mức dự trù.'], ['02', 'Xem dữ liệu phù hợp', 'Chỉ điểm đủ tọa độ, giờ và đường đi mới vào phép tính.'], ['03', 'Lưu trên thiết bị', 'Chỉnh sửa, xuất JSON hoặc in hành trình dự kiến.']].map(([number, title, body]) => <li key={number} className="rounded-2xl bg-white p-5"><span className="text-xs font-black text-[#E76F51]">{number}</span><h3 className="mt-2 font-extrabold text-[#1B4332]">{title}</h3><p className="mt-2 text-sm leading-6 text-zinc-600">{body}</p></li>)}</ol></div></section>
-    </div>
-  );
+  return <HomePageV2 />;
 }

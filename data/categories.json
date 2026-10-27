@@ -1,6 +1,30 @@
 [
-  { "id": "song-nuoc-ky-uc", "name": "Sông nước & Ký ức", "description": "Tìm hiểu những câu chuyện ven sông và thủy lộ Bình Mỹ được tư liệu nhắc đến.", "icon": "waves", "accent": "#1B4332" },
-  { "id": "vuon-trai-cay", "name": "Vườn trái cây", "description": "Khám phá các khu vườn có trong tài liệu nghiên cứu; mùa và lịch đón khách cần xác nhận.", "icon": "sprout", "accent": "#40916C" },
-  { "id": "trai-nghiem-lam-nghe", "name": "Trải nghiệm làm nghề", "description": "Tìm hiểu nghề thủ công được ghi nhận tại Bình Mỹ; hoạt động cụ thể cần hỏi đơn vị liên quan.", "icon": "shapes", "accent": "#E76F51" },
-  { "id": "trang-trai", "name": "Trang trại", "description": "Xem các mô hình nông nghiệp được bài viết giới thiệu; tình trạng tiếp khách hiện cần xác nhận.", "icon": "wheat", "accent": "#C07A24" }
+  {
+    "id": "song-nuoc-ky-uc",
+    "name": "Sông nước & Ký ức",
+    "description": "Thưởng ngoạn cảnh sắc ven sông Sài Gòn, bến tàu và những dấu ấn thủy lộ lịch sử.",
+    "icon": "waves",
+    "accent": "#174C3C"
+  },
+  {
+    "id": "vuon-trai-cay",
+    "name": "Vườn trái cây",
+    "description": "Tận hưởng không gian miệt vườn rợp bóng mát cùng mùa hoa trái Nam Bộ ngọt lành.",
+    "icon": "sprout",
+    "accent": "#46866E"
+  },
+  {
+    "id": "trai-nghiem-lam-nghe",
+    "name": "Trải nghiệm làm nghề",
+    "description": "Khám phá bàn tay khéo léo của thợ gốm, nghề đan lát lục bình truyền thống Củ Chi.",
+    "icon": "shapes",
+    "accent": "#D6A545"
+  },
+  {
+    "id": "trang-trai",
+    "name": "Trang trại",
+    "description": "Tìm hiểu mô hình nông nghiệp thực nghiệm, chăn nuôi bò sữa và đời sống nhà nông.",
+    "icon": "wheat",
+    "accent": "#BD892D"
+  }
 ]

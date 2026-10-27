@@ -1,26 +1,120 @@
 import Link from 'next/link';
-import { Compass, FileText, MapPin } from 'lucide-react';
-import { siteData } from '@/lib/data/repository';
+import { Compass, Camera, Sparkles, MapPin, Heart, Route } from 'lucide-react';
+import { categoriesData } from '@/lib/data/repository';
 
 export default function Footer() {
   return (
-    <footer className="mt-20 bg-[#1B4332] text-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.3fr_1fr_1fr] lg:px-8">
-        <div>
-          <div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-white/10"><Compass size={21} /></span><span className="font-bold">{siteData.name}</span></div>
-          <p className="mt-4 max-w-md text-sm leading-6 text-emerald-100">{siteData.tagline} Thông tin địa điểm, lịch và chi phí được ghi theo nguồn; nội dung chưa xác minh sẽ được đánh dấu.</p>
+    <footer className="mt-20 bg-[#174C3C] text-white">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+          {/* Brand block */}
+          <div className="lg:col-span-1">
+            <Link href="/" className="inline-flex items-center gap-2.5">
+              <span className="grid h-10 w-10 place-items-center rounded-2xl bg-white/10 text-[#D6A545]">
+                <Compass size={22} />
+              </span>
+              <span className="text-lg font-black tracking-tight text-white">
+                BÌNH MỸ DU KÝ
+              </span>
+            </Link>
+            <p className="mt-3 text-xs font-bold uppercase tracking-wider text-[#D6A545]">
+              “Bốn mùa trải nghiệm — Mỗi lần đến, thêm một khám phá.”
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-[#E7EFE4]/80">
+              Nền tảng du lịch sinh thái kết hợp miệt vườn, làng nghề truyền thống và sông nước Củ Chi.
+            </p>
+            <div className="mt-5 flex items-center gap-2 text-xs text-[#E7EFE4]/70">
+              <MapPin size={14} className="text-[#D6A545] shrink-0" />
+              <span>Bình Mỹ, Củ Chi, TP. Hồ Chí Minh</span>
+            </div>
+          </div>
+
+          {/* 4 Trải nghiệm */}
+          <div>
+            <h3 className="text-sm font-black uppercase tracking-wider text-[#D6A545]">
+              4 Nhóm trải nghiệm
+            </h3>
+            <ul className="mt-4 space-y-2.5 text-sm">
+              {categoriesData.map((cat) => (
+                <li key={cat.id}>
+                  <Link
+                    href={`/explore?category=${cat.id}`}
+                    className="text-[#E7EFE4]/80 hover:text-white transition flex items-center gap-2"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#D6A545]" />
+                    {cat.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Điều hướng nhanh */}
+          <div>
+            <h3 className="text-sm font-black uppercase tracking-wider text-[#D6A545]">
+              Tính năng chính
+            </h3>
+            <ul className="mt-4 space-y-2.5 text-sm">
+              <li>
+                <Link
+                  href="/explore"
+                  className="text-[#E7EFE4]/80 hover:text-white transition inline-flex items-center gap-2"
+                >
+                  <Compass size={14} /> Khám phá điểm đến
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/itinerary"
+                  className="text-[#E7EFE4]/80 hover:text-white transition inline-flex items-center gap-2"
+                >
+                  <Route size={14} /> Lập hành trình thông minh
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/my"
+                  className="text-[#E7EFE4]/80 hover:text-white transition inline-flex items-center gap-2"
+                >
+                  <Heart size={14} /> Điểm đến & Hành trình đã lưu
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/sources"
+                  className="text-[#E7EFE4]/80 hover:text-white transition inline-flex items-center gap-2"
+                >
+                  <Camera size={14} /> Nguồn ảnh & Tư liệu
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Minh bạch dữ liệu */}
+          <div>
+            <h3 className="text-sm font-black uppercase tracking-wider text-[#D6A545]">
+              Minh bạch dữ liệu
+            </h3>
+            <p className="mt-4 text-xs leading-relaxed text-[#E7EFE4]/80">
+              Dữ liệu được lưu trữ trực tiếp trên thiết bị qua localStorage. Website không thu thập thông tin cá nhân và không yêu cầu đăng nhập.
+            </p>
+            <div className="mt-4 pt-3 border-t border-white/10">
+              <Link
+                href="/editor"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#E7EFE4] hover:text-[#D6A545] transition"
+              >
+                <Sparkles size={13} /> Công cụ quản lý dữ liệu trên máy
+              </Link>
+            </div>
+          </div>
         </div>
-        <div>
-          <h2 className="text-sm font-bold">Khám phá</h2>
-          <div className="mt-3 grid gap-2 text-sm text-emerald-100"><Link href="/explore" className="hover:text-white">Các điểm đến</Link><Link href="/itinerary" className="hover:text-white">Lập hành trình</Link><Link href="/my" className="hover:text-white">Hành trình của tôi</Link></div>
-        </div>
-        <div>
-          <h2 className="inline-flex items-center gap-2 text-sm font-bold"><MapPin size={16} /> Dữ liệu minh bạch</h2>
-          <p className="mt-3 text-sm leading-6 text-emerald-100">{siteData.locality}. Giá và lịch đón khách cần được xác nhận trực tiếp với từng điểm đến.</p>
-          <Link href="/editor" className="mt-3 inline-flex items-center gap-2 text-sm text-white underline-offset-4 hover:underline"><FileText size={15} /> Công cụ biên tập trên thiết bị</Link>
+
+        {/* Bottom copyright */}
+        <div className="mt-12 border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#E7EFE4]/60">
+          <p>© {new Date().getFullYear()} BÌNH MỸ DU KÝ WEBSITE. Bản quyền thuộc về dự án nghiên cứu du lịch sinh thái Bình Mỹ.</p>
+          <p>Chạy trên nền tảng Vercel tĩnh · Dữ liệu JSON chuẩn hóa.</p>
         </div>
       </div>
-      <div className="border-t border-white/10"><div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-4 text-xs text-emerald-100/80 sm:px-6 md:flex-row md:justify-between lg:px-8"><span>© {new Date().getFullYear()} {siteData.name}</span><span>Thay đổi nội dung công khai bằng cách cập nhật JSON và redeploy.</span></div></div>
     </footer>
   );
 }

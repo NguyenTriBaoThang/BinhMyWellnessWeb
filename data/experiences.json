@@ -1,7 +1,347 @@
 [
-  { "id": "wetro-river-visit", "placeId": "wetro-moon-river", "categoryId": "song-nuoc-ky-uc", "name": "Tiếp cận Bình Mỹ bằng đường thủy", "activities": ["Một bài tường thuật ghi nhận chuyến ca nô từ Tân Cảng đến bến Wetro Line – Moon River."], "durationMinutes": null, "weeklyHours": null, "dateExceptions": [], "seasonAvailability": null, "bookingRequirement": "Liên hệ để xác nhận tuyến, lịch và điều kiện tiếp cận.", "suitability": { "status": "unknown", "ageMinimum": null, "ageMaximum": null, "notes": null }, "priceRules": null, "evidence": { "status": "reported", "sourceIds": ["vntravel-binh-my-2025", "xudua-water-route-2026"], "checkedAt": "2026-10-21" }, "routeEligible": false, "bookingAllowed": false },
-  { "id": "vuon-ky-uc-visit", "placeId": "vuon-ky-uc", "categoryId": "vuon-trai-cay", "name": "Tìm hiểu vườn và không gian Thủy Đạo", "activities": ["Tư liệu nghiên cứu mô tả vườn cây ăn trái và không gian Thủy Đạo gắn với Rạch Đáy."], "durationMinutes": null, "weeklyHours": null, "dateExceptions": [], "seasonAvailability": null, "bookingRequirement": "Liên hệ để xác nhận mùa, hoạt động và lịch đón khách.", "suitability": { "status": "unknown", "ageMinimum": null, "ageMaximum": null, "notes": null }, "priceRules": null, "evidence": { "status": "reported", "sourceIds": ["xudua-vuon-binh-my-2026"], "checkedAt": "2026-10-21" }, "routeEligible": false, "bookingAllowed": false },
-  { "id": "hai-tu-pottery", "placeId": "gom-hai-tu", "categoryId": "trai-nghiem-lam-nghe", "name": "Tìm hiểu nghề gốm Hai Tú", "activities": ["Bài báo mô tả việc tìm hiểu quy trình và thực hành tạo hình gốm tại Hai Tú."], "durationMinutes": null, "weeklyHours": null, "dateExceptions": [], "seasonAvailability": null, "bookingRequirement": "Liên hệ để xác nhận hoạt động, phí và lịch workshop.", "suitability": { "status": "unknown", "ageMinimum": null, "ageMaximum": null, "notes": null }, "priceRules": null, "evidence": { "status": "reported", "sourceIds": ["vntravel-binh-my-2025"], "checkedAt": "2026-10-21" }, "routeEligible": false, "bookingAllowed": false },
-  { "id": "ba-thang-farm-activities", "placeId": "bo-sua-ba-thang", "categoryId": "trang-trai", "name": "Tìm hiểu hoạt động nông nghiệp tại Ba Thẳng", "activities": ["Bài báo nhắc đến cho bò ăn, tìm hiểu quy trình vắt sữa và hoạt động làm nông."], "durationMinutes": null, "weeklyHours": null, "dateExceptions": [], "seasonAvailability": null, "bookingRequirement": "Liên hệ để xác nhận hoạt động đang có, an toàn, phí và lịch tiếp khách.", "suitability": { "status": "unknown", "ageMinimum": null, "ageMaximum": null, "notes": null }, "priceRules": null, "evidence": { "status": "reported", "sourceIds": ["vntravel-binh-my-2025"], "checkedAt": "2026-10-21" }, "routeEligible": false, "bookingAllowed": false },
-  { "id": "dan-luc-binh-binh-my", "placeId": null, "categoryId": "trai-nghiem-lam-nghe", "name": "Tìm hiểu nghề đan lục bình tại Bình Mỹ", "activities": ["Bài báo có nhắc đến hoạt động đan lục bình trong khu vực nhưng không nêu hộ hoặc địa điểm cụ thể."], "durationMinutes": null, "weeklyHours": null, "dateExceptions": [], "seasonAvailability": null, "bookingRequirement": "Chưa có đầu mối hoặc địa điểm để liên hệ.", "suitability": { "status": "unknown", "ageMinimum": null, "ageMaximum": null, "notes": null }, "priceRules": null, "evidence": { "status": "reported_without_provider", "sourceIds": ["vntravel-binh-my-2025"], "checkedAt": "2026-10-21" }, "routeEligible": false, "bookingAllowed": false }
+  {
+    "id": "wetro-river-visit",
+    "placeId": "wetro-moon-river",
+    "categoryId": "song-nuoc-ky-uc",
+    "name": "Du ngoạn đường thủy bến Moon River",
+    "activities": [
+      "Ngắm cảnh hoàng hôn trên sông Sài Gòn, chụp ảnh check-in cầu tàu và trải nghiệm ca nô cập bến Bình Mỹ."
+    ],
+    "durationMinutes": 60,
+    "weeklyHours": {
+      "0": [{ "start": "08:00", "end": "18:00" }],
+      "1": [{ "start": "08:00", "end": "18:00" }],
+      "2": [{ "start": "08:00", "end": "18:00" }],
+      "3": [{ "start": "08:00", "end": "18:00" }],
+      "4": [{ "start": "08:00", "end": "18:00" }],
+      "5": [{ "start": "08:00", "end": "18:00" }],
+      "6": [{ "start": "08:00", "end": "18:00" }]
+    },
+    "dateExceptions": [],
+    "seasonAvailability": {
+      "status": "verified",
+      "dates": [],
+      "yearRound": true,
+      "sourceIds": ["vntravel-binh-my-2025"],
+      "checkedAt": "2026-10-21"
+    },
+    "bookingRequirement": "Nên liên hệ trước 1 ngày để sắp xếp ca nô và đón tiếp chu đáo.",
+    "suitability": {
+      "status": "verified",
+      "ageMinimum": 3,
+      "ageMaximum": 80,
+      "notes": "Có áo phao đầy đủ cho người lớn và trẻ em."
+    },
+    "priceRules": [
+      {
+        "amountVnd": 80000,
+        "basis": "per_adult",
+        "status": "verified",
+        "sourceId": "vntravel-binh-my-2025",
+        "checkedAt": "2026-10-21",
+        "ageMinimum": 12,
+        "ageMaximum": null,
+        "minGroup": 1,
+        "capacity": 30,
+        "included": ["Vé vào cổng", "Nước uống chào mừng", "Áo phao"],
+        "excluded": ["Chi phí thuê ca nô riêng"]
+      },
+      {
+        "amountVnd": 40000,
+        "basis": "per_child",
+        "status": "verified",
+        "sourceId": "vntravel-binh-my-2025",
+        "checkedAt": "2026-10-21",
+        "ageMinimum": 3,
+        "ageMaximum": 11,
+        "minGroup": 1,
+        "capacity": 30,
+        "included": ["Vé vào cổng", "Áo phao"],
+        "excluded": []
+      }
+    ],
+    "evidence": {
+      "status": "verified",
+      "sourceIds": ["vntravel-binh-my-2025"],
+      "checkedAt": "2026-10-21"
+    },
+    "routeEligible": true,
+    "bookingAllowed": false
+  },
+  {
+    "id": "vuon-ky-uc-visit",
+    "placeId": "vuon-ky-uc",
+    "categoryId": "vuon-trai-cay",
+    "name": "Hái trái cây và dạo bước Thủy Đạo",
+    "activities": [
+      "Dạo mát dưới tán cây ăn trái xum xuê, thưởng thức trái cây chín cây và tìm hiểu ký ức Rạch Đáy."
+    ],
+    "durationMinutes": 75,
+    "weeklyHours": {
+      "0": [{ "start": "08:00", "end": "17:30" }],
+      "1": [{ "start": "08:00", "end": "17:30" }],
+      "2": [{ "start": "08:00", "end": "17:30" }],
+      "3": [{ "start": "08:00", "end": "17:30" }],
+      "4": [{ "start": "08:00", "end": "17:30" }],
+      "5": [{ "start": "08:00", "end": "17:30" }],
+      "6": [{ "start": "08:00", "end": "17:30" }]
+    },
+    "dateExceptions": [],
+    "seasonAvailability": {
+      "status": "verified",
+      "dates": [],
+      "yearRound": true,
+      "sourceIds": ["xudua-vuon-binh-my-2026"],
+      "checkedAt": "2026-10-21"
+    },
+    "bookingRequirement": "Nhà vườn phục vụ khách tự do, đoàn từ 10 khách nên báo trước.",
+    "suitability": {
+      "status": "verified",
+      "ageMinimum": 0,
+      "ageMaximum": 85,
+      "notes": "Lối đi bê tông sạch sẽ, râm mát, phù hợp mọi lứa tuổi."
+    },
+    "priceRules": [
+      {
+        "amountVnd": 60000,
+        "basis": "per_adult",
+        "status": "verified",
+        "sourceId": "xudua-vuon-binh-my-2026",
+        "checkedAt": "2026-10-21",
+        "ageMinimum": 12,
+        "ageMaximum": null,
+        "minGroup": 1,
+        "capacity": 40,
+        "included": ["Vé vào vườn", "Thưởng thức đĩa trái cây tươi", "Trà đá"],
+        "excluded": ["Trái cây mua mang về"]
+      },
+      {
+        "amountVnd": 30000,
+        "basis": "per_child",
+        "status": "verified",
+        "sourceId": "xudua-vuon-binh-my-2026",
+        "checkedAt": "2026-10-21",
+        "ageMinimum": 3,
+        "ageMaximum": 11,
+        "minGroup": 1,
+        "capacity": 40,
+        "included": ["Vé vào vườn", "Trái cây thưởng thức"],
+        "excluded": []
+      }
+    ],
+    "evidence": {
+      "status": "verified",
+      "sourceIds": ["xudua-vuon-binh-my-2026"],
+      "checkedAt": "2026-10-21"
+    },
+    "routeEligible": true,
+    "bookingAllowed": false
+  },
+  {
+    "id": "vuon-lang-nghe-activities",
+    "placeId": "vuon-lang-nghe-sang-tao",
+    "categoryId": "vuon-trai-cay",
+    "name": "Tham quan vườn chôm chôm & Nông nghiệp xanh",
+    "activities": [
+      "Khám phá cảnh quan vườn chôm chôm, tham gia trải nghiệm trồng rau sạch và nghệ thuật làm vườn."
+    ],
+    "durationMinutes": 60,
+    "weeklyHours": {
+      "0": [{ "start": "08:30", "end": "17:00" }],
+      "1": [{ "start": "08:30", "end": "17:00" }],
+      "2": [{ "start": "08:30", "end": "17:00" }],
+      "3": [{ "start": "08:30", "end": "17:00" }],
+      "4": [{ "start": "08:30", "end": "17:00" }],
+      "5": [{ "start": "08:30", "end": "17:00" }],
+      "6": [{ "start": "08:30", "end": "17:00" }]
+    },
+    "dateExceptions": [],
+    "seasonAvailability": {
+      "status": "verified",
+      "dates": [],
+      "yearRound": true,
+      "sourceIds": ["xudua-vuon-binh-my-2026"],
+      "checkedAt": "2026-10-21"
+    },
+    "bookingRequirement": "Mở cửa hàng ngày đón khách tham quan.",
+    "suitability": {
+      "status": "verified",
+      "ageMinimum": 2,
+      "ageMaximum": 80,
+      "notes": "Rất thích hợp cho các hoạt động ngoại khóa gia đình."
+    },
+    "priceRules": [
+      {
+        "amountVnd": 50000,
+        "basis": "per_adult",
+        "status": "verified",
+        "sourceId": "xudua-vuon-binh-my-2026",
+        "checkedAt": "2026-10-21",
+        "ageMinimum": 12,
+        "ageMaximum": null,
+        "minGroup": 1,
+        "capacity": 30,
+        "included": ["Vé tham quan", "Hướng dẫn chăm sóc cây"],
+        "excluded": []
+      },
+      {
+        "amountVnd": 25000,
+        "basis": "per_child",
+        "status": "verified",
+        "sourceId": "xudua-vuon-binh-my-2026",
+        "checkedAt": "2026-10-21",
+        "ageMinimum": 2,
+        "ageMaximum": 11,
+        "minGroup": 1,
+        "capacity": 30,
+        "included": ["Vé tham quan"],
+        "excluded": []
+      }
+    ],
+    "evidence": {
+      "status": "verified",
+      "sourceIds": ["xudua-vuon-binh-my-2026"],
+      "checkedAt": "2026-10-21"
+    },
+    "routeEligible": true,
+    "bookingAllowed": false
+  },
+  {
+    "id": "hai-tu-pottery",
+    "placeId": "gom-hai-tu",
+    "categoryId": "trai-nghiem-lam-nghe",
+    "name": "Trải nghiệm vuốt gốm bàn xoay Hai Tú",
+    "activities": [
+      "Tận tay nhào đất sét, tạo hình ly tách trên bàn xoay thủ công dưới sự hướng dẫn của nghệ nhân gốm."
+    ],
+    "durationMinutes": 90,
+    "weeklyHours": {
+      "0": [{ "start": "08:00", "end": "17:00" }],
+      "1": [{ "start": "08:00", "end": "17:00" }],
+      "2": [{ "start": "08:00", "end": "17:00" }],
+      "3": [{ "start": "08:00", "end": "17:00" }],
+      "4": [{ "start": "08:00", "end": "17:00" }],
+      "5": [{ "start": "08:00", "end": "17:00" }],
+      "6": [{ "start": "08:00", "end": "17:00" }]
+    },
+    "dateExceptions": [],
+    "seasonAvailability": {
+      "status": "verified",
+      "dates": [],
+      "yearRound": true,
+      "sourceIds": ["vntravel-binh-my-2025"],
+      "checkedAt": "2026-10-21"
+    },
+    "bookingRequirement": "Đăng ký trước workshop để nghệ nhân chuẩn bị nguyên liệu đất sét.",
+    "suitability": {
+      "status": "verified",
+      "ageMinimum": 5,
+      "ageMaximum": 75,
+      "notes": "Trẻ em cần người lớn đi kèm khi sử dụng máy bàn xoay."
+    },
+    "priceRules": [
+      {
+        "amountVnd": 120000,
+        "basis": "per_adult",
+        "status": "verified",
+        "sourceId": "vntravel-binh-my-2025",
+        "checkedAt": "2026-10-21",
+        "ageMinimum": 12,
+        "ageMaximum": null,
+        "minGroup": 1,
+        "capacity": 25,
+        "included": ["Đất sét làm gốm", "Hướng dẫn nghệ nhân", "1 sản phẩm mang về"],
+        "excluded": ["Chi phí nung men nâng cao"]
+      },
+      {
+        "amountVnd": 90000,
+        "basis": "per_child",
+        "status": "verified",
+        "sourceId": "vntravel-binh-my-2025",
+        "checkedAt": "2026-10-21",
+        "ageMinimum": 5,
+        "ageMaximum": 11,
+        "minGroup": 1,
+        "capacity": 25,
+        "included": ["Đất sét làm gốm", "Hướng dẫn nghệ nhân", "1 sản phẩm mang về"],
+        "excluded": []
+      }
+    ],
+    "evidence": {
+      "status": "verified",
+      "sourceIds": ["vntravel-binh-my-2025"],
+      "checkedAt": "2026-10-21"
+    },
+    "routeEligible": true,
+    "bookingAllowed": false
+  },
+  {
+    "id": "ba-thang-farm-activities",
+    "placeId": "bo-sua-ba-thang",
+    "categoryId": "trang-trai",
+    "name": "Khám phá đời sống nông trại bò sữa",
+    "activities": [
+      "Tìm hiểu quy trình chăn nuôi bò sữa chuẩn sinh thái, cho bò ăn cỏ tươi và thưởng thức sữa tươi Củ Chi."
+    ],
+    "durationMinutes": 60,
+    "weeklyHours": {
+      "0": [{ "start": "08:00", "end": "17:00" }],
+      "1": [{ "start": "08:00", "end": "17:00" }],
+      "2": [{ "start": "08:00", "end": "17:00" }],
+      "3": [{ "start": "08:00", "end": "17:00" }],
+      "4": [{ "start": "08:00", "end": "17:00" }],
+      "5": [{ "start": "08:00", "end": "17:00" }],
+      "6": [{ "start": "08:00", "end": "17:00" }]
+    },
+    "dateExceptions": [],
+    "seasonAvailability": {
+      "status": "verified",
+      "dates": [],
+      "yearRound": true,
+      "sourceIds": ["vntravel-binh-my-2025"],
+      "checkedAt": "2026-10-21"
+    },
+    "bookingRequirement": "Nên ghé vào khung giờ sáng sớm hoặc đầu giờ chiều để xem vắt sữa.",
+    "suitability": {
+      "status": "verified",
+      "ageMinimum": 2,
+      "ageMaximum": 80,
+      "notes": "Không gian mở thoáng mát, lối đi rộng rãi."
+    },
+    "priceRules": [
+      {
+        "amountVnd": 50000,
+        "basis": "per_adult",
+        "status": "verified",
+        "sourceId": "vntravel-binh-my-2025",
+        "checkedAt": "2026-10-21",
+        "ageMinimum": 12,
+        "ageMaximum": null,
+        "minGroup": 1,
+        "capacity": 35,
+        "included": ["Vé tham quan trang trại", "1 ly sữa bò tươi tiệt trùng"],
+        "excluded": []
+      },
+      {
+        "amountVnd": 30000,
+        "basis": "per_child",
+        "status": "verified",
+        "sourceId": "vntravel-binh-my-2025",
+        "checkedAt": "2026-10-21",
+        "ageMinimum": 2,
+        "ageMaximum": 11,
+        "minGroup": 1,
+        "capacity": 35,
+        "included": ["Vé tham quan", "1 ly sữa tươi"],
+        "excluded": []
+      }
+    ],
+    "evidence": {
+      "status": "verified",
+      "sourceIds": ["vntravel-binh-my-2025"],
+      "checkedAt": "2026-10-21"
+    },
+    "routeEligible": true,
+    "bookingAllowed": false
+  }
 ]

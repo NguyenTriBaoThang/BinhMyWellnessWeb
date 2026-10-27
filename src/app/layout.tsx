@@ -1,23 +1,32 @@
 import type { Metadata } from 'next';
+import { Be_Vietnam_Pro } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { siteData } from '@/lib/data/repository';
+import MobileNav from '@/components/MobileNav';
+
+const beVietnamPro = Be_Vietnam_Pro({
+  weight: ['400', '500', '600', '700', '800', '900'],
+  subsets: ['latin', 'vietnamese'],
+  display: 'swap',
+  variable: '--font-be-vietnam-pro',
+});
 
 export const metadata: Metadata = {
-  title: `${siteData.name} | Khám phá Bình Mỹ`,
-  description: siteData.introduction,
-  keywords: ['Bình Mỹ', 'khám phá Bình Mỹ', 'vườn trái cây', 'trải nghiệm làm nghề', 'sông nước'],
+  title: 'BÌNH MỸ DU KÝ — Khám phá Bình Mỹ, lên chuyến đi vừa ý',
+  description: 'Khám phá sông nước, miệt vườn, nghề thủ công và trang trại. Tự chọn hành trình phù hợp thời gian và túi tiền.',
+  keywords: ['Bình Mỹ Du Ký', 'Bình Mỹ', 'du lịch sinh thái', 'vườn trái cây', 'làng nghề thủ công', 'sông nước', 'Củ Chi', 'lập hành trình'],
   icons: { icon: '/favicon.svg' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi">
-      <body className="min-h-screen bg-[#F8FAF9] font-sans text-zinc-900 antialiased selection:bg-emerald-200 selection:text-emerald-950">
+    <html lang="vi" className={beVietnamPro.variable}>
+      <body className="min-h-screen bg-[#F7F4EA] font-sans text-[#26352E] antialiased selection:bg-[#E7EFE4] selection:text-[#174C3C] flex flex-col">
         <Header />
-        <main className="min-h-[60vh]">{children}</main>
+        <main className="flex-1 pb-20 md:pb-0">{children}</main>
         <Footer />
+        <MobileNav />
       </body>
     </html>
   );

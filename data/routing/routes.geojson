@@ -1,4 +1,273 @@
 {
   "type": "FeatureCollection",
-  "features": []
+  "features": [
+    {
+      "type": "Feature",
+      "id": "route-wetro-to-vuonkyuc",
+      "properties": { "distanceMeters": 2100, "durationSeconds": 480 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6620, 10.9325],
+          [106.6585, 10.9295],
+          [106.6540, 10.9265]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-vuonkyuc-to-wetro",
+      "properties": { "distanceMeters": 2100, "durationSeconds": 480 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6540, 10.9265],
+          [106.6585, 10.9295],
+          [106.6620, 10.9325]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-vuonkyuc-to-langnghe",
+      "properties": { "distanceMeters": 1800, "durationSeconds": 420 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6540, 10.9265],
+          [106.6495, 10.9235],
+          [106.6450, 10.9205]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-langnghe-to-vuonkyuc",
+      "properties": { "distanceMeters": 1800, "durationSeconds": 420 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6450, 10.9205],
+          [106.6495, 10.9235],
+          [106.6540, 10.9265]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-langnghe-to-haitu",
+      "properties": { "distanceMeters": 2400, "durationSeconds": 540 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6450, 10.9205],
+          [106.6415, 10.9175],
+          [106.6380, 10.9145]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-haitu-to-langnghe",
+      "properties": { "distanceMeters": 2400, "durationSeconds": 540 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6380, 10.9145],
+          [106.6415, 10.9175],
+          [106.6450, 10.9205]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-haitu-to-bathang",
+      "properties": { "distanceMeters": 2000, "durationSeconds": 480 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6380, 10.9145],
+          [106.6340, 10.9110],
+          [106.6300, 10.9080]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-bathang-to-haitu",
+      "properties": { "distanceMeters": 2000, "durationSeconds": 480 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6300, 10.9080],
+          [106.6340, 10.9110],
+          [106.6380, 10.9145]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-wetro-to-langnghe",
+      "properties": { "distanceMeters": 3500, "durationSeconds": 720 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6620, 10.9325],
+          [106.6540, 10.9265],
+          [106.6450, 10.9205]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-langnghe-to-wetro",
+      "properties": { "distanceMeters": 3500, "durationSeconds": 720 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6450, 10.9205],
+          [106.6540, 10.9265],
+          [106.6620, 10.9325]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-vuonkyuc-to-haitu",
+      "properties": { "distanceMeters": 3200, "durationSeconds": 660 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6540, 10.9265],
+          [106.6450, 10.9205],
+          [106.6380, 10.9145]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-haitu-to-vuonkyuc",
+      "properties": { "distanceMeters": 3200, "durationSeconds": 660 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6380, 10.9145],
+          [106.6450, 10.9205],
+          [106.6540, 10.9265]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-langnghe-to-bathang",
+      "properties": { "distanceMeters": 3100, "durationSeconds": 600 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6450, 10.9205],
+          [106.6380, 10.9145],
+          [106.6300, 10.9080]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-bathang-to-langnghe",
+      "properties": { "distanceMeters": 3100, "durationSeconds": 600 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6300, 10.9080],
+          [106.6380, 10.9145],
+          [106.6450, 10.9205]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-wetro-to-bathang",
+      "properties": { "distanceMeters": 5800, "durationSeconds": 1080 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6620, 10.9325],
+          [106.6540, 10.9265],
+          [106.6450, 10.9205],
+          [106.6380, 10.9145],
+          [106.6300, 10.9080]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-bathang-to-wetro",
+      "properties": { "distanceMeters": 5800, "durationSeconds": 1080 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6300, 10.9080],
+          [106.6380, 10.9145],
+          [106.6450, 10.9205],
+          [106.6540, 10.9265],
+          [106.6620, 10.9325]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-wetro-to-haitu",
+      "properties": { "distanceMeters": 4600, "durationSeconds": 900 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6620, 10.9325],
+          [106.6540, 10.9265],
+          [106.6450, 10.9205],
+          [106.6380, 10.9145]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-haitu-to-wetro",
+      "properties": { "distanceMeters": 4600, "durationSeconds": 900 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6380, 10.9145],
+          [106.6450, 10.9205],
+          [106.6540, 10.9265],
+          [106.6620, 10.9325]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-vuonkyuc-to-bathang",
+      "properties": { "distanceMeters": 4500, "durationSeconds": 840 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6540, 10.9265],
+          [106.6450, 10.9205],
+          [106.6380, 10.9145],
+          [106.6300, 10.9080]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "route-bathang-to-vuonkyuc",
+      "properties": { "distanceMeters": 4500, "durationSeconds": 840 },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [106.6300, 10.9080],
+          [106.6380, 10.9145],
+          [106.6450, 10.9205],
+          [106.6540, 10.9265]
+        ]
+      }
+    }
+  ]
 }

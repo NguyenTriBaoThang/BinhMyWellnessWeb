@@ -1,278 +1,997 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { ArrowDown, ArrowUp, CalendarDays, Check, Clock3, Download, Lock, Printer, Route, Save, Share2, TriangleAlert, Unlock, Users } from 'lucide-react';
+import { FormEvent, useEffect, useMemo, useState, Suspense } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import {
+  CalendarDays,
+  Clock,
+  Users,
+  Compass,
+  Route,
+  Sparkles,
+  MapPin,
+  Trash2,
+  Printer,
+  Download,
+  BookmarkCheck,
+  CheckCircle2,
+  Car,
+  Footprints,
+  Ship,
+  Bike,
+  SlidersHorizontal,
+  ChevronRight,
+  Info,
+  DollarSign,
+  Share2,
+} from 'lucide-react';
 import type { Category, Experience, Place, Source } from '@/lib/data/types';
 import { categoriesData, routeMatrix } from '@/lib/data/repository';
 import VerifiedPlaceMap from '@/components/explore/VerifiedPlaceMap';
-import { generateItineraryOptions, recalculateItinerary, type ItineraryOption, type PlannerResult, type PlannerTransport, type TripPace, type TripRequest } from '@/lib/planner/engine';
-import { downloadJson, emptyLocalData, newLocalId, readLocalData, writeLocalData, type LocalData, type SavedItinerary } from '@/lib/storage/local-data';
+import SeasonArtwork from '@/components/SeasonArtwork';
+import { getSeasonTheme } from '@/lib/seasons';
+import { placeImagePaths } from '@/lib/visual-assets';
+import {
+  generateItineraryOptions,
+  recalculateItinerary,
+  type ItineraryOption,
+  type PlannerResult,
+  type PlannerTransport,
+  type TripPace,
+  type TripRequest,
+  type ItineraryStop,
+} from '@/lib/planner/engine';
+import {
+  downloadJson,
+  emptyLocalData,
+  newLocalId,
+  readLocalData,
+  writeLocalData,
+  type LocalData,
+  type SavedItinerary,
+} from '@/lib/storage/local-data';
+
+const categoryArtwork: Record<string, 'spring' | 'summer' | 'autumn' | 'winter'> = {
+  'song-nuoc-ky-uc': 'spring', 'vuon-trai-cay': 'summer', 'trai-nghiem-lam-nghe': 'autumn', 'trang-trai': 'winter',
+};
 
 function dateInHcm(daysFromNow: number): string {
-  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
-  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-  const date = new Date(`${values.year}-${values.month}-${values.day}T00:00:00.000Z`);
-  date.setUTCDate(date.getUTCDate() + daysFromNow);
+  const date = new Date();
+  date.setDate(date.getDate() + daysFromNow);
   return date.toISOString().slice(0, 10);
 }
 
 function money(value: number | null): string {
-  return value === null ? 'Liên hệ để biết giá' : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value);
+  return value === null
+    ? 'Liên hệ để biết giá'
+    : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value);
 }
 
-export default function ItineraryPlanner({ places, experiences, categories, sources }: { places: Place[]; experiences: Experience[]; categories: Category[]; sources: Source[] }) {
+export default function ItineraryPlannerWrapper(props: {
+  places: Place[];
+  experiences: Experience[];
+  categories: Category[];
+  sources: Source[];
+}) {
+  return (
+    <Suspense fallback={<div className="py-12 text-center text-sm font-semibold text-[#174C3C]">Đang chuẩn bị công cụ lập hành trình...</div>}>
+      <ItineraryPlanner {...props} />
+    </Suspense>
+  );
+}
+
+function ItineraryPlanner({
+  places,
+  experiences,
+  categories,
+  sources,
+}: {
+  places: Place[];
+  experiences: Experience[];
+  categories: Category[];
+  sources: Source[];
+}) {
+  const searchParams = useSearchParams();
+  const initialSeason = getSeasonTheme(searchParams.get('season'));
+
+  // Form states
   const [date, setDate] = useState(() => dateInHcm(7));
   const [startTime, setStartTime] = useState('08:00');
   const [endTime, setEndTime] = useState('17:00');
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
-  const [childAgesText, setChildAgesText] = useState('');
-  const [budgetText, setBudgetText] = useState('');
-  const [childBudgetText, setChildBudgetText] = useState('');
-  const [includeMealCost, setIncludeMealCost] = useState(false);
-  const [mealCostText, setMealCostText] = useState('');
-  const [includeTransportCost, setIncludeTransportCost] = useState(false);
-  const [transportCostText, setTransportCostText] = useState('');
   const [budgetBasis, setBudgetBasis] = useState<'group' | 'person'>('group');
+  const [budgetText, setBudgetText] = useState('');
   const [transportMode, setTransportMode] = useState<PlannerTransport>('car');
   const [originPlaceId, setOriginPlaceId] = useState('');
   const [destinationPlaceId, setDestinationPlaceId] = useState('');
-  const [interestCategoryIds, setInterestCategoryIds] = useState<string[]>([]);
+  const [interestCategoryIds, setInterestCategoryIds] = useState<string[]>(initialSeason ? [initialSeason.categoryId] : []);
   const [requiredExperienceIds, setRequiredExperienceIds] = useState<string[]>([]);
-  const [lockedExperienceIds, setLockedExperienceIds] = useState<string[]>([]);
   const [pace, setPace] = useState<TripPace>('balanced');
   const [maxStops, setMaxStops] = useState(4);
-  const [costEstimateText, setCostEstimateText] = useState<Record<string, string>>({});
+
+  // Results & UI states
   const [result, setResult] = useState<PlannerResult | null>(null);
   const [selectedOptionId, setSelectedOptionId] = useState('');
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
-  const [mobileTab, setMobileTab] = useState<'conditions' | 'map' | 'plan'>('conditions');
+  const [mobileTab, setMobileTab] = useState<'conditions' | 'map' | 'timeline'>('conditions');
   const [localData, setLocalData] = useState<LocalData>(emptyLocalData());
-  const [savedItineraryId, setSavedItineraryId] = useState('');
-  const [notice, setNotice] = useState('');
+  const [loadedTripId, setLoadedTripId] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const mappablePlaces = useMemo(() => places.filter((place) => place.areaCode === 'BINH_MY' && place.verification.area.status === 'verified' && place.coordinates && place.coordinateStatus === 'verified' && place.verification.coordinates.status === 'verified'), [places]);
-  const routePlaceIds = useMemo(() => new Set(routeMatrix.edges.filter((edge) => edge.status === 'verified').flatMap((edge) => [edge.fromPlaceId, edge.toPlaceId])), []);
-  const startChoices = useMemo(() => places.filter((place) => routePlaceIds.has(place.id) && place.areaCode === 'BINH_MY' && place.verification.area.status === 'verified' && place.coordinates && place.coordinateStatus === 'verified'), [places, routePlaceIds]);
-  const selectedOption = result?.options.find((option) => option.id === selectedOptionId) ?? result?.options[0] ?? null;
+  // Mappable places
+  const mappablePlaces = useMemo(
+    () =>
+      places.filter(
+        (p) =>
+          p.areaCode === 'BINH_MY' &&
+          p.verification.area.status === 'verified' &&
+          p.coordinates &&
+          p.coordinateStatus === 'verified' &&
+          p.verification.coordinates.status === 'verified'
+      ),
+    [places]
+  );
 
+  const routableExperiences = useMemo(
+    () => experiences.filter((e) => e.routeEligible),
+    [experiences]
+  );
+
+  // Selected option
+  const selectedOption =
+    result?.options.find((opt) => opt.id === selectedOptionId) ||
+    result?.options[0] ||
+    null;
+
+  // Initial load: parse URL parameters & local storage
   useEffect(() => {
     const stored = readLocalData();
     setLocalData(stored.data);
-    if (stored.warning) setNotice(stored.warning);
-    const params = new URLSearchParams(window.location.search);
-    const sharedText = params.get('share');
-    if (sharedText !== null) {
-      try {
-        if (window.location.href.length > 1800) throw new Error('too-long');
-        const value: unknown = JSON.parse(sharedText);
-        if (!value || typeof value !== 'object') throw new Error('invalid');
-        const shared = value as Record<string, unknown>;
-        const ids = shared.experiences;
-        const categories = shared.categories;
-        if (shared.v !== 1 || typeof shared.date !== 'string' || typeof shared.start !== 'string' || typeof shared.end !== 'string'
-          || !['car', 'bike', 'walk', 'boat'].includes(String(shared.mode)) || typeof shared.origin !== 'string' || typeof shared.destination !== 'string'
-          || !Array.isArray(ids) || ids.length < 2 || ids.length > 6 || ids.some((id) => typeof id !== 'string' || !experiences.some((item) => item.id === id && item.routeEligible))
-          || new Set(ids).size !== ids.length || !Array.isArray(categories) || categories.length > 4 || categories.some((id) => typeof id !== 'string' || !categoriesData.some((item) => item.id === id))
-          || !startChoices.some((place) => place.id === shared.origin) || !startChoices.some((place) => place.id === shared.destination)
-          || !/^\d{4}-\d{2}-\d{2}$/.test(shared.date) || !/^\d{2}:\d{2}$/.test(shared.start) || !/^\d{2}:\d{2}$/.test(shared.end)) throw new Error('invalid');
-        const request: TripRequest = {
-          date: shared.date, startTime: shared.start, endTime: shared.end, adults: 2, children: 0, childAges: [],
-          budgetVnd: null, childBudgetVnd: null, budgetBasis: 'group', includeMealCost: false, mealCostVnd: null,
-          includeTransportCost: false, transportCostVnd: null, transportMode: shared.mode as PlannerTransport,
-          originPlaceId: shared.origin, destinationPlaceId: shared.destination, interestCategoryIds: categories as string[],
-          requiredExperienceIds: ids as string[], pace: 'balanced', maxStops: ids.length, groupCostEstimatesVnd: {},
-        };
-        setDate(request.date); setStartTime(request.startTime); setEndTime(request.endTime); setTransportMode(request.transportMode);
-        setOriginPlaceId(request.originPlaceId!); setDestinationPlaceId(request.destinationPlaceId!); setInterestCategoryIds(request.interestCategoryIds); setRequiredExperienceIds(request.requiredExperienceIds); setMaxStops(request.maxStops);
-        const sharedResult = generateItineraryOptions(request, { places, experiences, sources, matrix: routeMatrix });
-        setResult(sharedResult); setSelectedOptionId(sharedResult.options[0]?.id ?? ''); setSelectedPlaceId(sharedResult.options[0]?.stops[0]?.placeId ?? null); setMobileTab('plan');
-        setNotice(sharedResult.options.length ? 'Đã tải lựa chọn được chia sẻ. Hãy kiểm tra dữ liệu và xác nhận trực tiếp trước khi đi.' : 'Lựa chọn đã tải, nhưng dữ liệu tuyến hiện có chưa đủ để tính hành trình.');
-      } catch {
-        setNotice('Liên kết chia sẻ không hợp lệ hoặc quá dài; các lựa chọn cũ không được thay đổi.');
+
+    // Initial origin/destination fallback
+    if (mappablePlaces.length > 0) {
+      if (!originPlaceId) setOriginPlaceId(mappablePlaces[0].id);
+      if (!destinationPlaceId) setDestinationPlaceId(mappablePlaces[0].id);
+    }
+
+    // Check URL for required experience
+    const reqExp = searchParams.get('experience');
+    if (reqExp && routableExperiences.some((e) => e.id === reqExp)) {
+      setRequiredExperienceIds([reqExp]);
+    }
+
+    // Load saved trip if requested
+    const loadId = searchParams.get('load');
+    if (loadId) {
+      const saved = stored.data.itineraries.find((it) => it.id === loadId);
+      if (saved) {
+        setLoadedTripId(saved.id);
+        const req = saved.request;
+        setDate(req.date);
+        setStartTime(req.startTime);
+        setEndTime(req.endTime);
+        setAdults(req.adults);
+        setChildren(req.children);
+        setTransportMode(req.transportMode);
+        setOriginPlaceId(req.originPlaceId || mappablePlaces[0]?.id || '');
+        setDestinationPlaceId(req.destinationPlaceId || mappablePlaces[0]?.id || '');
+        setInterestCategoryIds(req.interestCategoryIds);
+        setRequiredExperienceIds(req.requiredExperienceIds);
+        setResult({
+          options: saved.options,
+          blockingReasons: [],
+          consideredExperienceIds: [],
+          visitedSearchNodes: 0,
+        });
+        setSelectedOptionId(saved.options[0]?.id || '');
+        setMobileTab('timeline');
+        return;
       }
+    }
+
+    // Auto-generate initial itinerary recommendation on first mount
+    if (mappablePlaces.length >= 2) {
+      const defaultReq: TripRequest = {
+        date: dateInHcm(7),
+        startTime: '08:00',
+        endTime: '17:00',
+        adults: 2,
+        children: 0,
+        childAges: [],
+        budgetVnd: null,
+        childBudgetVnd: null,
+        budgetBasis: 'group',
+        includeMealCost: false,
+        mealCostVnd: null,
+        includeTransportCost: false,
+        transportCostVnd: null,
+        transportMode: 'car',
+        originPlaceId: mappablePlaces[0].id,
+        destinationPlaceId: mappablePlaces[0].id,
+        interestCategoryIds: initialSeason ? [initialSeason.categoryId] : [],
+        requiredExperienceIds: reqExp ? [reqExp] : [],
+        pace: 'balanced',
+        maxStops: 4,
+        groupCostEstimatesVnd: {},
+      };
+      const initialRes = generateItineraryOptions(defaultReq, {
+        places,
+        experiences,
+        sources,
+        matrix: routeMatrix,
+      });
+      setResult(initialRes);
+      if (initialRes.options.length > 0) {
+        setSelectedOptionId(initialRes.options[0].id);
+        setSelectedPlaceId(initialRes.options[0].stops[0]?.placeId || null);
+      }
+    }
+  }, [places, experiences, sources, mappablePlaces, routableExperiences, searchParams, originPlaceId, destinationPlaceId, initialSeason]);
+
+  useEffect(() => {
+    if (searchParams.get('load')) return;
+    const season = getSeasonTheme(searchParams.get('season'));
+    if (season) setInterestCategoryIds([season.categoryId]);
+  }, [searchParams]);
+
+  // Handle submit form
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+
+    const parsedBudget = budgetText.trim() ? Number(budgetText.replace(/\D/g, '')) : null;
+
+    const request: TripRequest = {
+      date,
+      startTime,
+      endTime,
+      adults: Math.max(1, adults),
+      children: Math.max(0, children),
+      childAges: [],
+      budgetVnd: parsedBudget,
+      childBudgetVnd: null,
+      budgetBasis,
+      includeMealCost: false,
+      mealCostVnd: null,
+      includeTransportCost: false,
+      transportCostVnd: null,
+      transportMode,
+      originPlaceId: originPlaceId || mappablePlaces[0]?.id || null,
+      destinationPlaceId: destinationPlaceId || mappablePlaces[0]?.id || null,
+      interestCategoryIds,
+      requiredExperienceIds,
+      pace,
+      maxStops,
+      groupCostEstimatesVnd: {},
+    };
+
+    const plannerResult = generateItineraryOptions(request, {
+      places,
+      experiences,
+      sources,
+      matrix: routeMatrix,
+    });
+
+    setResult(plannerResult);
+    if (plannerResult.options.length > 0) {
+      setSelectedOptionId(plannerResult.options[0].id);
+      setSelectedPlaceId(plannerResult.options[0].stops[0]?.placeId || null);
+      setToastMessage('Đã tính toán hành trình đề xuất!');
+      setTimeout(() => setToastMessage(null), 2500);
+      setMobileTab('timeline');
+    } else {
+      setToastMessage('Không tìm thấy tuyến phù hợp điều kiện. Thử nới rộng thời gian hoặc chọn điểm khác.');
+      setTimeout(() => setToastMessage(null), 4000);
+    }
+  };
+
+  // Toggle category in favorites
+  const toggleCategory = (catId: string) => {
+    setInterestCategoryIds((prev) =>
+      prev.includes(catId) ? prev.filter((id) => id !== catId) : [...prev, catId]
+    );
+  };
+
+  // Toggle required stop
+  const toggleRequiredExperience = (expId: string) => {
+    setRequiredExperienceIds((prev) =>
+      prev.includes(expId) ? prev.filter((id) => id !== expId) : [...prev, expId]
+    );
+  };
+
+  // Remove a stop from current option and recalculate
+  const handleRemoveStop = (stopIndex: number) => {
+    if (!selectedOption || selectedOption.stops.length <= 2) {
+      setToastMessage('Hành trình cần tối thiểu 2 điểm dừng.');
+      setTimeout(() => setToastMessage(null), 2500);
       return;
     }
-    const savedId = params.get('load');
-    if (savedId) {
-      const saved = stored.data.itineraries.find((item) => item.id === savedId);
-      if (!saved) { setNotice('Không tìm thấy hành trình đã lưu trên thiết bị này.'); return; }
-      const request = saved.request;
-      setDate(request.date); setStartTime(request.startTime); setEndTime(request.endTime); setAdults(request.adults); setChildren(request.children); setChildAgesText(request.childAges.join(', '));
-      setBudgetText(request.budgetVnd?.toString() ?? ''); setChildBudgetText(request.childBudgetVnd?.toString() ?? ''); setBudgetBasis(request.budgetBasis);
-      setIncludeMealCost(request.includeMealCost); setMealCostText(request.mealCostVnd?.toString() ?? ''); setIncludeTransportCost(request.includeTransportCost); setTransportCostText(request.transportCostVnd?.toString() ?? '');
-      setTransportMode(request.transportMode); setOriginPlaceId(request.originPlaceId ?? ''); setDestinationPlaceId(request.destinationPlaceId ?? '');
-      setInterestCategoryIds(request.interestCategoryIds); setRequiredExperienceIds(request.requiredExperienceIds); setPace(request.pace); setMaxStops(request.maxStops);
-      setCostEstimateText(Object.fromEntries(Object.entries(request.groupCostEstimatesVnd).map(([id, value]) => [id, String(value)])));
-      const generated = generateItineraryOptions(request, { places, experiences, sources, matrix: routeMatrix });
-      const savedOption = saved.options[0];
-      const recalculated = savedOption ? recalculateItinerary(request, savedOption.stops.map((stop) => stop.experienceId), { places, experiences, sources, matrix: routeMatrix }, savedOption.label) : null;
-      const restored = recalculated ? { ...generated, options: [recalculated, ...generated.options.filter((item) => item.id !== recalculated.id)].slice(0, 3) } : generated;
-      setResult(restored); setSelectedOptionId(restored.options[0]?.id ?? ''); setSelectedPlaceId(restored.options[0]?.stops[0]?.placeId ?? null); setMobileTab('plan');
-      setNotice(recalculated ? 'Đã mở lại hành trình trên thiết bị và kiểm tra lại giờ, giá, sức chứa, đường đi.' : 'Hành trình cũ đã mở; dữ liệu tuyến hiện tại không còn đủ để xác nhận các điểm đã lưu.');
+
+    const nextStops = selectedOption.stops.filter((_, idx) => idx !== stopIndex);
+    const stopExperienceIds = nextStops.map((s) => s.experienceId);
+
+    const request: TripRequest = {
+      date,
+      startTime,
+      endTime,
+      adults,
+      children,
+      childAges: [],
+      budgetVnd: null,
+      childBudgetVnd: null,
+      budgetBasis: 'group',
+      includeMealCost: false,
+      mealCostVnd: null,
+      includeTransportCost: false,
+      transportCostVnd: null,
+      transportMode,
+      originPlaceId,
+      destinationPlaceId,
+      interestCategoryIds,
+      requiredExperienceIds: requiredExperienceIds.filter((id) => stopExperienceIds.includes(id)),
+      pace,
+      maxStops,
+      groupCostEstimatesVnd: {},
+    };
+
+    const recalculated = recalculateItinerary(
+      request,
+      stopExperienceIds,
+      { places, experiences, sources, matrix: routeMatrix },
+      selectedOption.label
+    );
+
+    if (recalculated) {
+      const updatedOptions = result?.options.map((opt) =>
+        opt.id === selectedOption.id ? recalculated : opt
+      ) || [recalculated];
+
+      setResult({
+        options: updatedOptions,
+        blockingReasons: [],
+        consideredExperienceIds: result?.consideredExperienceIds || [],
+        visitedSearchNodes: result?.visitedSearchNodes || 0,
+      });
+      setSelectedOptionId(recalculated.id);
+      setToastMessage('Đã cập nhật lại lịch trình.');
+      setTimeout(() => setToastMessage(null), 2000);
     }
-    const experienceId = params.get('experience');
-    if (!savedId && experienceId) {
-      const experience = experiences.find((item) => item.id === experienceId && item.routeEligible && item.evidence.status === 'verified');
-      if (experience) { setRequiredExperienceIds([experience.id]); setNotice('Đã thêm trải nghiệm này làm điểm bắt buộc. Nhập điều kiện rồi tính hành trình.'); }
-      else setNotice('Trải nghiệm này chưa đủ dữ liệu xác minh để thêm vào tuyến tự động.');
+  };
+
+  const handleMoveStop = (stopIndex: number, direction: -1 | 1) => {
+    if (!selectedOption) return;
+    const destinationIndex = stopIndex + direction;
+    if (destinationIndex < 0 || destinationIndex >= selectedOption.stops.length) return;
+    const stopIds = selectedOption.stops.map((stop) => stop.experienceId);
+    [stopIds[stopIndex], stopIds[destinationIndex]] = [stopIds[destinationIndex], stopIds[stopIndex]];
+    const request: TripRequest = {
+      date, startTime, endTime, adults, children, childAges: [],
+      budgetVnd: null, childBudgetVnd: null, budgetBasis: 'group',
+      includeMealCost: false, mealCostVnd: null, includeTransportCost: false,
+      transportCostVnd: null, transportMode, originPlaceId, destinationPlaceId,
+      interestCategoryIds, requiredExperienceIds: requiredExperienceIds.filter((id) => stopIds.includes(id)),
+      pace, maxStops, groupCostEstimatesVnd: {},
+    };
+    const reordered = recalculateItinerary(request, stopIds, { places, experiences, sources, matrix: routeMatrix }, selectedOption.label);
+    if (!reordered) {
+      setToastMessage('Thứ tự này chưa ghép được với tuyến đường đã xác minh.');
+      setTimeout(() => setToastMessage(null), 2500);
+      return;
     }
-  }, [places, experiences, sources, startChoices]);
+    const options = result?.options.map((option) => option.id === selectedOption.id ? reordered : option) || [reordered];
+    setResult({ options, blockingReasons: [], consideredExperienceIds: result?.consideredExperienceIds || [], visitedSearchNodes: result?.visitedSearchNodes || 0 });
+    setSelectedOptionId(reordered.id);
+    setToastMessage('Đã cập nhật thứ tự điểm dừng.');
+    setTimeout(() => setToastMessage(null), 2000);
+  };
 
-  const buildRequest = (): TripRequest => {
-    const parseOptional = (value: string) => value.trim() ? Number(value) : null;
-    const ages = childAgesText.trim() ? childAgesText.split(/[\s,;]+/).filter(Boolean).map(Number) : [];
-    const estimates = Object.fromEntries(Object.entries(costEstimateText).filter(([, value]) => value.trim()).map(([id, value]) => [id, Number(value)]));
-    return {
-      date, startTime, endTime, adults, children, childAges: ages,
-      budgetVnd: parseOptional(budgetText), childBudgetVnd: parseOptional(childBudgetText), budgetBasis,
-      includeMealCost, mealCostVnd: parseOptional(mealCostText), includeTransportCost, transportCostVnd: parseOptional(transportCostText), transportMode,
-      originPlaceId: originPlaceId || null, destinationPlaceId: destinationPlaceId || null,
-      interestCategoryIds, requiredExperienceIds, pace, maxStops, groupCostEstimatesVnd: estimates,
+  // Save current trip to localStorage
+  const handleSaveTrip = () => {
+    if (!selectedOption) return;
+    const existingTrip = localData.itineraries.find((item) => item.id === loadedTripId);
+    const now = new Date().toISOString();
+
+    const trip: SavedItinerary = {
+      id: loadedTripId || newLocalId(),
+      title: `Chuyến đi Bình Mỹ · ${selectedOption.label} (${selectedOption.stops.length} điểm)`,
+      createdAt: existingTrip?.createdAt || now,
+      updatedAt: now,
+      request: {
+        date,
+        startTime,
+        endTime,
+        adults,
+        children,
+        childAges: [],
+        budgetVnd: budgetText ? Number(budgetText.replace(/\D/g, '')) : null,
+        childBudgetVnd: null,
+        budgetBasis,
+        includeMealCost: false,
+        mealCostVnd: null,
+        includeTransportCost: false,
+        transportCostVnd: null,
+        transportMode,
+        originPlaceId,
+        destinationPlaceId,
+        interestCategoryIds,
+        requiredExperienceIds,
+        pace,
+        maxStops,
+        groupCostEstimatesVnd: {},
+      },
+      options: [selectedOption],
     };
-  };
 
-  const applyRequest = (request: TripRequest) => {
-    setDate(request.date); setStartTime(request.startTime); setEndTime(request.endTime);
-    setAdults(request.adults); setChildren(request.children); setChildAgesText(request.childAges.join(', '));
-    setBudgetText(request.budgetVnd?.toString() ?? ''); setChildBudgetText(request.childBudgetVnd?.toString() ?? '');
-    setBudgetBasis(request.budgetBasis); setIncludeMealCost(request.includeMealCost); setMealCostText(request.mealCostVnd?.toString() ?? '');
-    setIncludeTransportCost(request.includeTransportCost); setTransportCostText(request.transportCostVnd?.toString() ?? '');
-    setTransportMode(request.transportMode); setOriginPlaceId(request.originPlaceId ?? ''); setDestinationPlaceId(request.destinationPlaceId ?? '');
-    setInterestCategoryIds(request.interestCategoryIds); setRequiredExperienceIds(request.requiredExperienceIds); setPace(request.pace); setMaxStops(request.maxStops);
-    setCostEstimateText(Object.fromEntries(Object.entries(request.groupCostEstimatesVnd).map(([id, value]) => [id, String(value)])));
-  };
-
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const next = generateItineraryOptions(buildRequest(), { places, experiences, sources, matrix: routeMatrix });
-    setResult(next);
-    setSelectedOptionId(next.options[0]?.id ?? '');
-    setSelectedPlaceId(next.options[0]?.stops[0]?.placeId ?? null);
-    setLockedExperienceIds([]);
-    setMobileTab('plan');
-    setNotice(next.options.length ? 'Đây là hành trình dự kiến; hãy xác nhận thông tin trực tiếp trước khi đi.' : 'Chưa đủ dữ liệu xác minh để tính một tuyến khả thi.');
-  };
-
-  const saveItinerary = () => {
-    if (!result || !selectedOption) return;
-    const timestamp = new Date().toISOString();
-    const saved: SavedItinerary = {
-      id: newLocalId(), title: `Bình Mỹ · ${date}`, createdAt: timestamp, updatedAt: timestamp,
-      request: buildRequest(), options: [selectedOption],
+    const stored = readLocalData();
+    const nextData = {
+      ...stored.data,
+      itineraries: [trip, ...stored.data.itineraries.filter((t) => t.id !== trip.id)],
     };
-    const next = { ...localData, itineraries: [saved, ...localData.itineraries].slice(0, 25) };
-    const write = writeLocalData(next);
-    if (write.ok) setLocalData(next);
-    setNotice(write.message);
+
+    const res = writeLocalData(nextData);
+    if (res.ok) {
+      setLocalData(nextData);
+      setToastMessage(existingTrip ? 'Đã cập nhật hành trình đã lưu.' : 'Đã lưu hành trình vào thiết bị của bạn!');
+      setTimeout(() => setToastMessage(null), 3000);
+    }
   };
 
-  const exportCurrent = () => {
+  // Download JSON export
+  const handleDownload = () => {
     if (!selectedOption) return;
-    downloadJson(`binh-my-hanh-trinh-${date}.json`, { schemaVersion: 1, exportedAt: new Date().toISOString(), request: buildRequest(), option: selectedOption });
-    setNotice('Đã tải JSON hành trình xuống thiết bị.');
+    downloadJson(`hanh-trinh-binh-my-${date}.json`, {
+      date,
+      option: selectedOption,
+      stops: selectedOption.stops,
+      createdAt: new Date().toISOString(),
+    });
   };
 
-  const copySummary = async () => {
-    if (!selectedOption) return;
-    const summary = [`Hành trình dự kiến Bình Mỹ — ${date}`, ...selectedOption.stops.map((stop, index) => `${index + 1}. ${stop.arrivalTime} ${stop.name} · ${money(stop.costVnd)}`), `Tổng: ${money(selectedOption.totalCostVnd)}`, 'Giá, lịch và lối vào cần xác nhận trực tiếp.'].join('\n');
-    try { await navigator.clipboard.writeText(summary); setNotice('Đã sao chép tóm tắt hành trình.'); }
-    catch { setNotice('Trình duyệt không cho phép sao chép. Hãy dùng nút Xuất JSON hoặc In.'); }
+  // Print itinerary
+  const handlePrint = () => {
+    window.print();
   };
 
-  const copyShareLink = async () => {
-    if (!selectedOption) return;
-    const request = buildRequest();
-    const shared = {
-      v: 1, date: request.date, start: request.startTime, end: request.endTime, mode: request.transportMode,
-      origin: request.originPlaceId, destination: request.destinationPlaceId,
-      experiences: selectedOption.stops.map((stop) => stop.experienceId), categories: request.interestCategoryIds,
-    };
-    const url = new URL('/itinerary', window.location.origin);
-    url.searchParams.set('share', JSON.stringify(shared));
-    if (url.href.length > 1800) { setNotice('Liên kết vượt giới hạn 1.800 ký tự; hãy rút gọn lựa chọn trước khi chia sẻ.'); return; }
-    try { await navigator.clipboard.writeText(url.href); setNotice('Đã sao chép liên kết; liên kết chỉ chứa mã điểm và lựa chọn chuyến đi.'); }
-    catch { setNotice('Trình duyệt không cho phép sao chép liên kết.'); }
-  };
+  // Map places to show (stops in selected option)
+  const mapPlaces = useMemo(() => {
+    if (!selectedOption || !selectedOption.stops.length) return mappablePlaces;
+    const stopPlaceIds = new Set(selectedOption.stops.map((s) => s.placeId));
+    if (originPlaceId) stopPlaceIds.add(originPlaceId);
+    if (destinationPlaceId) stopPlaceIds.add(destinationPlaceId);
+    return mappablePlaces.filter((p) => stopPlaceIds.has(p.id));
+  }, [selectedOption, originPlaceId, destinationPlaceId, mappablePlaces]);
 
-  const editOrder = (from: number, to: number) => {
-    if (!selectedOption) return;
-    const ids = selectedOption.stops.map((stop) => stop.experienceId);
-    if (to < 0 || to >= ids.length) return;
-    if (lockedExperienceIds.includes(ids[from]) || lockedExperienceIds.includes(ids[to])) { setNotice('Mở khóa điểm trước khi đổi thứ tự.'); return; }
-    [ids[from], ids[to]] = [ids[to], ids[from]];
-    const updated = recalculateItinerary(buildRequest(), ids, { places, experiences, sources, matrix: routeMatrix }, selectedOption.label);
-    if (!updated) { setNotice('Thứ tự này không còn thỏa giờ mở cửa, thời lượng hoặc đường đi đã xác minh.'); return; }
-    setResult((current) => current ? { ...current, options: current.options.map((item) => item.id === selectedOption.id ? updated : item) } : current);
-    setSelectedOptionId(updated.id);
-    setSelectedPlaceId(updated.stops[Math.min(from, updated.stops.length - 1)]?.placeId ?? null);
-    setNotice('Đã tính lại giờ và chi phí cho thứ tự mới.');
-  };
+  return (
+    <div className="mx-auto max-w-[1440px] space-y-7 px-4 py-7 pb-28 sm:px-6 sm:py-10 md:pb-14 lg:px-8">
+      {/* Toast */}
+      {toastMessage && (
+        <div role="status" aria-live="polite" className="fixed top-20 right-6 z-50 rounded-2xl bg-[#174C3C] text-white px-4 py-2.5 shadow-2xl border border-[#D6A545]/40 text-xs sm:text-sm font-bold animate-fade-in flex items-center gap-2">
+          <CheckCircle2 size={16} className="text-[#D6A545]" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
 
-  const removeStop = (index: number) => {
-    if (!selectedOption) return;
-    const experienceId = selectedOption.stops[index]?.experienceId;
-    if (experienceId && (requiredExperienceIds.includes(experienceId) || lockedExperienceIds.includes(experienceId))) return;
-    const ids = selectedOption.stops.map((stop) => stop.experienceId).filter((_, stopIndex) => stopIndex !== index);
-    const updated = recalculateItinerary(buildRequest(), ids, { places, experiences, sources, matrix: routeMatrix }, selectedOption.label);
-    if (!updated) { setNotice('Không thể bỏ điểm này vì hành trình cần ít nhất hai điểm và phải tính lại được toàn tuyến.'); return; }
-    setResult((current) => current ? { ...current, options: current.options.map((item) => item.id === selectedOption.id ? updated : item) } : current);
-    setSelectedOptionId(updated.id);
-    setSelectedPlaceId(updated.stops[0]?.placeId ?? null);
-    setNotice('Đã cập nhật hành trình và tính lại các ràng buộc.');
-  };
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-[#174C3C]/10">
+        <div>
+          <span className="text-sm font-bold text-[#A9761F]">
+            Theo sở thích, thời gian và ngân sách
+          </span>
+          <h1 className="mt-2 text-3xl font-extrabold leading-tight text-[#174C3C] sm:text-4xl lg:text-5xl">
+            Lập hành trình Bình Mỹ
+          </h1>
+          <p className="mt-2 max-w-2xl text-base leading-7 text-[#59675E]">
+            Xem phương án khi có đủ thông tin về lịch, chi phí và tuyến đường. Bạn chủ động kiểm tra điều kiện thực tế trước khi đi.
+          </p>
+        </div>
 
-  const candidates = experiences.filter((item) => item.routeEligible && item.placeId && item.evidence.status === 'verified');
-  const currentMapPlaces = useMemo(() => selectedOption ? mappablePlaces.filter((place) => selectedOption.stops.some((stop) => stop.placeId === place.id)) : mappablePlaces, [mappablePlaces, selectedOption]);
+        {/* Action Buttons Top */}
+        {selectedOption && (
+          <div className="flex items-center gap-2 shrink-0 no-print">
+            <button
+              type="button"
+              onClick={handleSaveTrip}
+              className="btn-tactile btn-primary-forest min-h-11 rounded-full px-4 text-sm"
+            >
+              <BookmarkCheck size={14} className="text-[#D6A545]" />
+              <span>Lưu hành trình</span>
+            </button>
 
-  return <section className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8">
-    <div className="mb-6"><p className="text-xs font-bold uppercase tracking-[.18em] text-[#40916C]">Lập hành trình</p><h1 className="mt-2 text-3xl font-black tracking-tight text-[#1B4332] sm:text-4xl">Sắp xếp chuyến Bình Mỹ theo điều kiện của bạn</h1><p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-600">Bộ tính toán dùng dữ liệu đường và hoạt động đã xác minh. Không có đường đi hoặc thông tin bắt buộc thì trang sẽ nêu rõ lý do, không tự vẽ tuyến.</p></div>
-    {localData.itineraries.length > 0 && <div className="mb-4 flex flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-3 sm:flex-row"><label className="flex-1 text-xs font-semibold text-zinc-600">Mở hành trình đã lưu<select value={savedItineraryId} onChange={(event) => setSavedItineraryId(event.target.value)} className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm">{savedItineraryId === '' && <option value="">Chọn hành trình trên thiết bị này</option>}{localData.itineraries.map((trip) => <option key={trip.id} value={trip.id}>{trip.title} · {trip.request.date}</option>)}</select></label><button type="button" disabled={!savedItineraryId} onClick={() => window.location.assign(`/itinerary?load=${encodeURIComponent(savedItineraryId)}`)} className="self-end rounded-lg bg-[#1B4332] px-4 py-2.5 text-xs font-bold text-white disabled:opacity-40">Mở lại và kiểm tra</button></div>}
-    <div className="mb-4 grid grid-cols-3 rounded-xl border border-zinc-200 bg-white p-1 lg:hidden">{([['conditions', 'Điều kiện'], ['map', 'Bản đồ'], ['plan', 'Hành trình']] as const).map(([id, label]) => <button key={id} type="button" aria-pressed={mobileTab === id} onClick={() => setMobileTab(id)} className={`rounded-lg px-2 py-2.5 text-xs font-bold ${mobileTab === id ? 'bg-[#1B4332] text-white' : 'text-zinc-600'}`}>{label}</button>)}</div>
-    <div className="grid items-start gap-4 print:grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)_380px]">
-      <aside className={`${mobileTab === 'conditions' ? 'block' : 'hidden'} print:hidden lg:block rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm`}>
-        <h2 className="flex items-center gap-2 font-extrabold text-[#1B4332]"><CalendarDays size={17} /> Điều kiện chuyến đi</h2>
-        <form onSubmit={submit} className="mt-4 space-y-3">
-          <label className="grid gap-1 text-xs font-semibold text-zinc-600">Ngày đi<input required type="date" min={dateInHcm(0)} value={date} onChange={(event) => setDate(event.target.value)} className="rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900" /></label>
-          <div className="grid grid-cols-2 gap-2"><label className="grid gap-1 text-xs font-semibold text-zinc-600">Người lớn<input type="number" min={0} max={50} value={adults} onChange={(event) => setAdults(Number(event.target.value))} className="rounded-lg border border-zinc-200 px-3 py-2.5 text-sm" /></label><label className="grid gap-1 text-xs font-semibold text-zinc-600">Trẻ em<input type="number" min={0} max={50} value={children} onChange={(event) => setChildren(Number(event.target.value))} className="rounded-lg border border-zinc-200 px-3 py-2.5 text-sm" /></label></div>
-          {children > 0 && <label className="grid gap-1 text-xs font-semibold text-zinc-600">Tuổi từng trẻ, cách nhau bằng dấu phẩy<input value={childAgesText} onChange={(event) => setChildAgesText(event.target.value)} placeholder="Ví dụ: 5, 9" className="rounded-lg border border-zinc-200 px-3 py-2.5 text-sm" /><span className="font-normal text-zinc-500">Không dùng giá người lớn thay cho trẻ em.</span></label>}
-          <div className="grid grid-cols-2 gap-2"><label className="grid gap-1 text-xs font-semibold text-zinc-600">Bắt đầu<input type="time" value={startTime} onChange={(event) => setStartTime(event.target.value)} className="rounded-lg border border-zinc-200 px-3 py-2.5 text-sm" /></label><label className="grid gap-1 text-xs font-semibold text-zinc-600">Kết thúc<input type="time" value={endTime} onChange={(event) => setEndTime(event.target.value)} className="rounded-lg border border-zinc-200 px-3 py-2.5 text-sm" /></label></div>
-          <label className="grid gap-1 text-xs font-semibold text-zinc-600">Ngân sách VND<input inputMode="numeric" value={budgetText} onChange={(event) => setBudgetText(event.target.value.replace(/[^0-9]/g, ''))} placeholder="Để trống nếu chưa xác định" className="rounded-lg border border-zinc-200 px-3 py-2.5 text-sm" /></label>
-          <label className="grid gap-1 text-xs font-semibold text-zinc-600">Tính ngân sách<select value={budgetBasis} onChange={(event) => setBudgetBasis(event.target.value as 'group' | 'person')} className="rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm"><option value="group">Cả nhóm</option><option value="person">Mỗi người</option></select></label>
-          {budgetBasis === 'person' && children > 0 && <label className="grid gap-1 text-xs font-semibold text-zinc-600">Dự trù riêng cho mỗi trẻ<input inputMode="numeric" value={childBudgetText} onChange={(event) => setChildBudgetText(event.target.value.replace(/[^0-9]/g, ''))} placeholder="VND / trẻ" className="rounded-lg border border-zinc-200 px-3 py-2.5 text-sm" /></label>}
-          <p className="rounded-lg bg-[#F8FAF9] p-3 text-xs leading-5 text-zinc-600">Ngân sách mỗi người được nhân theo số người lớn và mức riêng bạn nhập cho trẻ em. Chi phí chưa có nguồn sẽ không được coi là 0 đồng.</p>
-          <fieldset className="space-y-2 rounded-xl border border-zinc-200 p-3"><legend className="px-1 text-xs font-bold text-zinc-700">Các khoản tính vào ngân sách</legend><label className="flex items-center gap-2 text-xs text-zinc-700"><input type="checkbox" checked={includeMealCost} onChange={(event) => setIncludeMealCost(event.target.checked)} className="accent-[#1B4332]" />Ăn uống cho cả nhóm</label>{includeMealCost && <input aria-label="Dự trù ăn uống cho cả nhóm, VND" inputMode="numeric" value={mealCostText} onChange={(event) => setMealCostText(event.target.value.replace(/[^0-9]/g, ''))} placeholder="Dự trù ăn uống (VND)" className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-xs" />}<label className="flex items-center gap-2 text-xs text-zinc-700"><input type="checkbox" checked={includeTransportCost} onChange={(event) => setIncludeTransportCost(event.target.checked)} className="accent-[#1B4332]" />Di chuyển cho cả nhóm</label>{includeTransportCost && <input aria-label="Dự trù di chuyển cho cả nhóm, VND" inputMode="numeric" value={transportCostText} onChange={(event) => setTransportCostText(event.target.value.replace(/[^0-9]/g, ''))} placeholder="Dự trù di chuyển (VND)" className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-xs" />}<p className="text-[11px] leading-5 text-zinc-500">Đây là mức bạn tự nhập. Nếu đã đặt ngân sách giới hạn, cần nhập số tiền cho mỗi khoản đã chọn.</p></fieldset>
-          <label className="grid gap-1 text-xs font-semibold text-zinc-600">Phương tiện<select value={transportMode} onChange={(event) => setTransportMode(event.target.value as PlannerTransport)} className="rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm"><option value="car">Ô tô</option><option value="bike">Xe máy</option><option value="walk">Đi bộ</option><option value="boat">Đường thủy</option></select></label>
-          <label className="grid gap-1 text-xs font-semibold text-zinc-600">Điểm xuất phát<select value={originPlaceId} onChange={(event) => setOriginPlaceId(event.target.value)} disabled={!startChoices.length} className="rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm disabled:bg-zinc-100"><option value="">{startChoices.length ? 'Chọn điểm xuất phát' : 'Chưa có điểm và tuyến xác minh'}</option>{startChoices.map((place) => <option key={place.id} value={place.id}>{place.name}</option>)}</select></label>
-          <label className="grid gap-1 text-xs font-semibold text-zinc-600">Điểm kết thúc<select value={destinationPlaceId} onChange={(event) => setDestinationPlaceId(event.target.value)} disabled={!startChoices.length} className="rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm disabled:bg-zinc-100"><option value="">{startChoices.length ? 'Chọn điểm kết thúc' : 'Chưa có điểm và tuyến xác minh'}</option>{startChoices.map((place) => <option key={place.id} value={place.id}>{place.name}</option>)}</select></label>
-          <fieldset><legend className="text-xs font-semibold text-zinc-600">Nhịp chuyến đi</legend><div className="mt-1 grid grid-cols-3 gap-1">{([['relaxed', 'Thong thả'], ['balanced', 'Vừa'], ['active', 'Nhanh']] as const).map(([value, label]) => <button key={value} type="button" aria-pressed={pace === value} onClick={() => setPace(value)} className={`rounded-lg border px-2 py-2 text-[11px] font-bold ${pace === value ? 'border-[#1B4332] bg-[#EAF4EE] text-[#1B4332]' : 'border-zinc-200 text-zinc-600'}`}>{label}</button>)}</div></fieldset>
-          <label className="grid gap-1 text-xs font-semibold text-zinc-600">Số điểm tối đa<input type="number" min={2} max={6} value={maxStops} onChange={(event) => setMaxStops(Number(event.target.value))} className="rounded-lg border border-zinc-200 px-3 py-2.5 text-sm" /></label>
-          <fieldset><legend className="text-xs font-semibold text-zinc-600">Nhóm bạn muốn ưu tiên</legend><div className="mt-2 grid gap-1.5">{categories.map((category) => <label key={category.id} className="flex items-center gap-2 text-xs text-zinc-700"><input type="checkbox" checked={interestCategoryIds.includes(category.id)} onChange={(event) => setInterestCategoryIds((items) => event.target.checked ? [...items, category.id] : items.filter((id) => id !== category.id))} className="accent-[#1B4332]" />{category.name}</label>)}</div></fieldset>
-          <fieldset><legend className="text-xs font-semibold text-zinc-600">Điểm bắt buộc</legend><div className="mt-2 grid gap-1.5">{candidates.length ? candidates.map((experience) => <label key={experience.id} className="flex items-start gap-2 text-xs text-zinc-700"><input type="checkbox" checked={requiredExperienceIds.includes(experience.id)} onChange={(event) => setRequiredExperienceIds((items) => event.target.checked ? [...items, experience.id] : items.filter((id) => id !== experience.id))} className="mt-0.5 accent-[#1B4332]" />{experience.name}</label>) : <p className="text-xs leading-5 text-zinc-500">Chưa có điểm đủ dữ liệu xác minh để đưa vào tuyến.</p>}</div></fieldset>
-          {experiences.length > 0 && <details className="rounded-lg border border-zinc-200 p-3"><summary className="cursor-pointer text-xs font-bold text-zinc-700">Nhập dự trù cá nhân cho hoạt động</summary><p className="mt-2 text-[11px] leading-5 text-zinc-500">Mức này chỉ là dự trù cả nhóm do bạn nhập, không phải giá của nhà vườn.</p>{experiences.map((experience) => <label key={experience.id} className="mt-2 grid gap-1 text-[11px] text-zinc-600">{experience.name}<input inputMode="numeric" value={costEstimateText[experience.id] ?? ''} onChange={(event) => setCostEstimateText((values) => ({ ...values, [experience.id]: event.target.value.replace(/[^0-9]/g, '') }))} placeholder="VND cho cả nhóm" className="rounded-md border border-zinc-200 px-2 py-2 text-xs" /></label>)}</details>}
-          <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#1B4332] px-4 py-3 text-sm font-bold text-white hover:bg-[#143627]"><Route size={16} /> Tìm tuyến phù hợp</button>
-        </form>
-      </aside>
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="btn-tactile btn-secondary-sage min-h-11 rounded-full px-3 text-sm"
+              title="Tải tệp lịch trình JSON"
+            >
+              <Download size={14} />
+              <span className="hidden sm:inline">Tải về</span>
+            </button>
 
-      <div className={`${mobileTab === 'map' ? 'block' : 'hidden'} print:hidden lg:block lg:sticky lg:top-24`}><VerifiedPlaceMap places={currentMapPlaces} selectedId={selectedPlaceId} onSelect={setSelectedPlaceId} geometryRefs={selectedOption?.geometryRefs} /></div>
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="btn-tactile btn-secondary-sage min-h-11 rounded-full px-3 text-sm"
+              title="In lịch trình"
+            >
+              <Printer size={14} />
+              <span className="hidden sm:inline">In</span>
+            </button>
+          </div>
+        )}
+      </div>
 
-      <aside className={`${mobileTab === 'plan' ? 'block' : 'hidden'} lg:block rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm`}>
-        <div className="flex items-center justify-between gap-3"><h2 className="flex items-center gap-2 font-extrabold text-[#1B4332]"><Clock3 size={17} /> Hành trình dự kiến</h2>{selectedOption && <span className="rounded-full bg-[#EAF4EE] px-2.5 py-1 text-[11px] font-bold text-[#1B4332]">{selectedOption.label}</span>}</div>
-        {!result && <div className="mt-4 rounded-xl border border-dashed border-zinc-300 p-5 text-sm leading-6 text-zinc-600">Nhập điều kiện chuyến đi rồi chọn <strong>Tìm tuyến phù hợp</strong>. Kết quả sẽ có giờ đến, giờ rời và căn cứ chọn từng điểm.</div>}
-        {result && !selectedOption && <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4"><div className="flex items-start gap-2"><TriangleAlert size={18} className="mt-0.5 shrink-0 text-amber-700" /><div><h3 className="font-bold text-amber-950">Chưa đủ dữ liệu để tính tuyến</h3><ul className="mt-2 list-disc space-y-1 pl-4 text-xs leading-5 text-amber-950">{result.blockingReasons.map((reason) => <li key={reason}>{reason}</li>)}</ul><p className="mt-3 text-xs leading-5 text-amber-950">Hiện dữ liệu không có điểm nào đồng thời có tọa độ, giờ hoạt động, thời lượng và chặng đường được xác minh. Hãy xem các điểm đang có tư liệu; chi tiết còn thiếu được liệt kê ở từng trang.</p></div></div></div>}
-        {selectedOption && <>
-          {result && result.options.length > 1 && <div className="mt-4 grid gap-2">{result.options.map((option) => <button key={option.id} type="button" aria-pressed={option.id === selectedOption.id} onClick={() => setSelectedOptionId(option.id)} className={`rounded-xl border p-3 text-left ${option.id === selectedOption.id ? 'border-[#1B4332] bg-[#EAF4EE]' : 'border-zinc-200 bg-white'}`}><span className="flex items-center justify-between gap-2 text-xs font-extrabold text-[#1B4332]"><span>{option.label}</span><span>{money(option.totalCostVnd)}</span></span><span className="mt-1 block text-[11px] text-zinc-600">{option.stops.length} điểm · {option.totalTravelMinutes} phút di chuyển · {option.totalDurationMinutes} phút tổng</span></button>)}</div>}
-          <div className="mt-4 rounded-xl bg-[#F8FAF9] p-3"><p className="text-xs text-zinc-500">Tổng chi phí</p><p className="mt-1 font-extrabold text-[#1B4332]">{money(selectedOption.totalCostVnd)}</p><p className="mt-1 text-[11px] text-zinc-500">{selectedOption.totalDurationMinutes} phút trong khung chuyến · {selectedOption.totalTravelMinutes} phút di chuyển</p></div>
-          <ol className="mt-4 space-y-3">{selectedOption.stops.map((stop, index) => <li key={`${stop.experienceId}-${index}`} className={`rounded-xl border p-3 transition ${selectedPlaceId === stop.placeId ? 'border-[#40916C] bg-[#F3F8F5]' : 'border-zinc-200'}`}><button type="button" onClick={() => { setSelectedPlaceId(stop.placeId); setMobileTab('map'); }} className="w-full text-left"><span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#40916C]"><Check size={13} /> ĐIỂM {index + 1} · {stop.arrivalTime}–{stop.departureTime}</span><span className="mt-1 block font-bold leading-5 text-zinc-900">{stop.name}</span><span className="mt-1 block text-xs leading-5 text-zinc-600">{stop.explanation}</span></button><div className="mt-2 flex items-center justify-between gap-2 border-t border-zinc-100 pt-2"><span className="text-[11px] text-zinc-500">{stop.travelMinutesFromPrevious} phút chặng trước · {money(stop.costVnd)}{stop.costSource === 'user_estimate' ? ' · dự trù của bạn' : ''}</span><span className="flex shrink-0 gap-1"><button type="button" onClick={() => editOrder(index, index - 1)} disabled={index === 0} className="rounded-md p-1 text-zinc-600 hover:bg-zinc-100 disabled:opacity-30" aria-label="Đưa điểm lên trước"><ArrowUp size={15} /></button><button type="button" onClick={() => editOrder(index, index + 1)} disabled={index === selectedOption.stops.length - 1} className="rounded-md p-1 text-zinc-600 hover:bg-zinc-100 disabled:opacity-30" aria-label="Đưa điểm xuống sau"><ArrowDown size={15} /></button><button type="button" onClick={() => removeStop(index)} className="rounded-md px-2 py-1 text-[11px] font-semibold text-[#E76F51] hover:bg-orange-50">Bỏ</button></span></div></li>)}</ol>
-          <div className="mt-3 space-y-2">{selectedOption.stops.map((stop) => <details key={`details-${stop.experienceId}`} className="rounded-xl border border-zinc-200 px-3 py-2"><summary className="cursor-pointer text-xs font-bold text-zinc-700">Hoạt động và điều kiện tại {stop.name}</summary><ul className="mt-2 list-disc space-y-1 pl-4 text-xs leading-5 text-zinc-600">{stop.activities.map((activity) => <li key={activity}>{activity}</li>)}</ul><p className="mt-2 text-xs leading-5 text-zinc-600">{stop.bookingRequirement}</p><button type="button" aria-pressed={lockedExperienceIds.includes(stop.experienceId)} onClick={() => setLockedExperienceIds((ids) => ids.includes(stop.experienceId) ? ids.filter((id) => id !== stop.experienceId) : [...ids, stop.experienceId])} className="mt-2 inline-flex items-center gap-1 rounded-lg border border-zinc-200 px-2.5 py-1.5 text-[11px] font-bold text-zinc-700">{lockedExperienceIds.includes(stop.experienceId) ? <Lock size={13} /> : <Unlock size={13} />}{lockedExperienceIds.includes(stop.experienceId) ? 'Đã khóa vị trí' : 'Khóa vị trí điểm này'}</button>{requiredExperienceIds.includes(stop.experienceId) && <span className="ml-2 text-[11px] font-bold text-[#1B4332]">Điểm bắt buộc</span>}</details>)}</div>
-          <p className="mt-3 rounded-lg bg-[#F8FAF9] p-3 text-[11px] leading-5 text-zinc-600">Bộ tính toán chừa giờ nghỉ trưa 12:00–13:00 nếu lịch tham quan trùng khoảng này. Mọi khoảng đợi vẫn nằm trong tổng thời gian.</p>
-          <ul className="mt-4 space-y-1.5 text-[11px] leading-5 text-zinc-600">{selectedOption.warnings.map((warning) => <li key={warning} className="flex gap-2"><TriangleAlert size={13} className="mt-0.5 shrink-0 text-[#E76F51]" />{warning}</li>)}</ul>
-          <div className="mt-4 grid grid-cols-2 gap-2"><button type="button" onClick={saveItinerary} className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#1B4332] px-3 py-2.5 text-xs font-bold text-white"><Save size={14} /> Lưu trên thiết bị</button><button type="button" onClick={exportCurrent} className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 py-2.5 text-xs font-bold text-zinc-700"><Download size={14} /> Xuất JSON</button><button type="button" onClick={() => window.print()} className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 py-2.5 text-xs font-bold text-zinc-700"><Printer size={14} /> In / PDF</button><button type="button" onClick={copySummary} className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 py-2.5 text-xs font-bold text-zinc-700"><Share2 size={14} /> Sao chép</button></div>
-          <button type="button" onClick={copyShareLink} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 py-2.5 text-xs font-bold text-zinc-700"><Share2 size={14} /> Sao chép liên kết chỉ gồm lựa chọn công khai</button>
-        </>}
-        {notice && <p role="status" className="mt-3 text-xs leading-5 text-zinc-600">{notice}</p>}
-        <div className="mt-4 flex items-start gap-2 rounded-xl bg-[#F8FAF9] p-3 text-[11px] leading-5 text-zinc-600"><Users size={14} className="mt-0.5 shrink-0" />Hành trình chỉ lưu trên thiết bị này. Website không gửi yêu cầu đặt chỗ, không giữ chỗ và không thu tiền.</div>
-      </aside>
+      {/* MOBILE 3-TAB SWITCH (VISIBLE ON PHONE/TABLET) */}
+      <div className="lg:hidden flex rounded-2xl border border-[#DCE5DB] bg-white p-1 shadow-sm no-print" role="group" aria-label="Các phần của hành trình">
+        {[
+          { id: 'conditions', label: '1. Điều kiện', icon: SlidersHorizontal },
+          { id: 'map', label: '2. Bản đồ', icon: Route },
+          { id: 'timeline', label: '3. Lịch trình', icon: CalendarDays },
+        ].map((tab) => {
+          const isSelected = mobileTab === tab.id;
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setMobileTab(tab.id as typeof mobileTab)}
+              aria-pressed={isSelected}
+              className={`min-h-11 flex-1 flex items-center justify-center gap-1.5 rounded-xl px-1.5 text-xs font-bold transition-all ${
+                isSelected
+                  ? 'bg-[#174C3C] text-white shadow-sm'
+                  : 'text-[#26352E]/70 hover:text-[#174C3C]'
+              }`}
+            >
+              <Icon size={14} />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 3-COLUMN DESKTOP LAYOUT (25% Conditions - 45% Map - 30% Timeline) */}
+      <div className="grid items-start gap-5 lg:grid-cols-[1.1fr_1.8fr_1.3fr] xl:gap-6">
+        {/* COLUMN 1: TRIP CONDITIONS FORM (approx 25%) */}
+        <section
+          className={`card-3d p-5 sm:p-6 space-y-5 bg-white ${
+            mobileTab !== 'conditions' ? 'hidden lg:block' : 'block'
+          }`}
+        >
+          <div className="flex items-center gap-2 text-sm font-black text-[#174C3C] pb-2 border-b border-[#174C3C]/10">
+            <SlidersHorizontal size={16} className="text-[#D6A545]" />
+            <span>Điều kiện chuyến đi</span>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
+            <p className="rounded-xl bg-[#F7F4EA] px-3 py-2 text-[11px] leading-5 text-[#59675E]">
+              Lịch trình chỉ được tính từ trải nghiệm có đủ giờ, thời lượng, vị trí và tuyến đường đã xác minh. Bạn sẽ cần xác nhận trực tiếp với nhà vườn trước chuyến đi.
+            </p>
+            {/* Ngày đi */}
+            <div>
+                  <label htmlFor="trip-date" className="block font-bold text-[#174C3C] mb-1">Ngày khởi hành</label>
+              <div className="relative">
+                <input
+                  type="date"
+                  id="trip-date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  min={dateInHcm(0)}
+                  className="w-full rounded-xl border border-[#174C3C]/20 bg-[#F7F4EA]/40 px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#174C3C] focus:bg-white"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Giờ bắt đầu & kết thúc */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="trip-start-time" className="block font-bold text-[#174C3C] mb-1">Giờ bắt đầu</label>
+                <input
+                  type="time"
+                  id="trip-start-time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className="w-full rounded-xl border border-[#174C3C]/20 bg-[#F7F4EA]/40 px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#174C3C] focus:bg-white"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="trip-end-time" className="block font-bold text-[#174C3C] mb-1">Giờ kết thúc</label>
+                <input
+                  type="time"
+                  id="trip-end-time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="w-full rounded-xl border border-[#174C3C]/20 bg-[#F7F4EA]/40 px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#174C3C] focus:bg-white"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Số người */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="trip-adults" className="block font-bold text-[#174C3C] mb-1">Người lớn</label>
+                <input
+                  type="number"
+                  id="trip-adults"
+                  min="1"
+                  max="40"
+                  value={adults}
+                  onChange={(e) => setAdults(Number(e.target.value))}
+                  className="w-full rounded-xl border border-[#174C3C]/20 bg-[#F7F4EA]/40 px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#174C3C] focus:bg-white"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="trip-children" className="block font-bold text-[#174C3C] mb-1">Trẻ em</label>
+                <input
+                  type="number"
+                  id="trip-children"
+                  min="0"
+                  max="20"
+                  value={children}
+                  onChange={(e) => setChildren(Number(e.target.value))}
+                  className="w-full rounded-xl border border-[#174C3C]/20 bg-[#F7F4EA]/40 px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#174C3C] focus:bg-white"
+                />
+              </div>
+            </div>
+
+            {/* Ngân sách */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label htmlFor="trip-budget" className="font-bold text-[#174C3C]">Dự trù ngân sách (VND)</label>
+                <div className="inline-flex text-[10px] rounded-lg border border-zinc-200 p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setBudgetBasis('group')}
+                    aria-pressed={budgetBasis === 'group'}
+                    className={`px-1.5 py-0.5 rounded ${
+                      budgetBasis === 'group' ? 'bg-[#174C3C] text-white font-bold' : 'text-zinc-600'
+                    }`}
+                  >
+                    Cả nhóm
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBudgetBasis('person')}
+                    aria-pressed={budgetBasis === 'person'}
+                    className={`px-1.5 py-0.5 rounded ${
+                      budgetBasis === 'person' ? 'bg-[#174C3C] text-white font-bold' : 'text-zinc-600'
+                    }`}
+                  >
+                    Mỗi người
+                  </button>
+                </div>
+              </div>
+              <input
+                type="text"
+                id="trip-budget"
+                placeholder="VD: 500.000 (để trống nếu không giới hạn)"
+                value={budgetText}
+                onChange={(e) => setBudgetText(e.target.value)}
+                className="w-full rounded-xl border border-[#174C3C]/20 bg-[#F7F4EA]/40 px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#174C3C] focus:bg-white"
+              />
+            </div>
+
+            {/* Điểm xuất phát & Phương tiện */}
+            <div className="space-y-3 pt-2 border-t border-zinc-100">
+              <div>
+                <label htmlFor="trip-origin" className="block font-bold text-[#174C3C] mb-1">Điểm bắt đầu & Kết thúc</label>
+                <select
+                  id="trip-origin"
+                  value={originPlaceId}
+                  onChange={(e) => {
+                    setOriginPlaceId(e.target.value);
+                    setDestinationPlaceId(e.target.value);
+                  }}
+                  className="w-full rounded-xl border border-[#174C3C]/20 bg-[#F7F4EA]/40 px-3 py-2 text-xs sm:text-sm outline-none focus:border-[#174C3C] focus:bg-white"
+                >
+                  <option value="">{mappablePlaces.length ? 'Chọn điểm đã xác minh' : 'Chưa có điểm ghé đủ dữ liệu bản đồ'}</option>
+                  {mappablePlaces.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-[#174C3C] mb-1">Phương tiện di chuyển</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { mode: 'car', label: 'Ô tô / Taxi', icon: Car },
+                    { mode: 'bike', label: 'Xe máy', icon: Bike },
+                    { mode: 'walk', label: 'Đi bộ dạo', icon: Footprints },
+                    { mode: 'boat', label: 'Đường thủy', icon: Ship },
+                  ].map((t) => {
+                    const isSelected = transportMode === t.mode;
+                    const Icon = t.icon;
+                    return (
+                      <button
+                        key={t.mode}
+                        type="button"
+                        onClick={() => setTransportMode(t.mode as PlannerTransport)}
+                        aria-pressed={isSelected}
+                        className={`flex min-h-11 items-center gap-1.5 p-2 rounded-xl border text-xs font-bold transition-all ${
+                          isSelected
+                            ? 'bg-[#174C3C] text-white border-[#174C3C]'
+                            : 'bg-[#F7F4EA]/40 border-zinc-200 text-[#26352E]/80 hover:bg-[#E7EFE4]'
+                        }`}
+                      >
+                        <Icon size={14} className={isSelected ? 'text-[#D6A545]' : ''} />
+                        <span>{t.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Nhóm trải nghiệm yêu thích */}
+            <div className="space-y-2 pt-2 border-t border-zinc-100">
+              <label className="block font-bold text-[#174C3C]">Nhóm trải nghiệm ưu tiên</label>
+              <div className="grid grid-cols-2 gap-2">
+                {categoriesData.map((cat) => {
+                  const isChecked = interestCategoryIds.includes(cat.id);
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => toggleCategory(cat.id)}
+                      aria-pressed={isChecked}
+                      className={`min-h-11 text-left p-2 rounded-xl border text-[11px] font-bold transition-all ${
+                        isChecked
+                          ? 'bg-[#E7EFE4] text-[#174C3C] border-[#174C3C]'
+                          : 'bg-[#F7F4EA]/40 border-zinc-200 text-[#26352E]/70'
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Điểm muốn ghé bắt buộc */}
+            <div className="space-y-2 pt-2 border-t border-zinc-100">
+              <label className="block font-bold text-[#174C3C]">Điểm chắc chắn muốn ghé</label>
+              <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                {routableExperiences.map((exp) => {
+                  const isChecked = requiredExperienceIds.includes(exp.id);
+                  return (
+                    <label
+                      key={exp.id}
+                      className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-[#F7F4EA] cursor-pointer text-xs"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => toggleRequiredExperience(exp.id)}
+                        className="rounded accent-[#174C3C]"
+                      />
+                      <span className="truncate">{exp.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Big CTA: Đề xuất hành trình */}
+            <div className="pt-3">
+              <button
+                type="submit"
+                className="btn-tactile btn-accent-gold min-h-12 w-full text-center text-sm py-3.5 shadow-lg active:scale-97"
+              >
+                <Sparkles size={16} className="text-[#174C3C]" />
+                <span>Đề xuất hành trình</span>
+              </button>
+            </div>
+          </form>
+        </section>
+
+        {/* COLUMN 2: INTERACTIVE LEAFLET MAP (approx 45%) */}
+        <section
+          className={`space-y-3 ${
+            mobileTab !== 'map' ? 'hidden lg:block' : 'block'
+          }`}
+        >
+          <div className="card-3d p-2 overflow-hidden bg-white">
+            <VerifiedPlaceMap
+              places={mapPlaces}
+              selectedId={selectedPlaceId}
+              onSelect={(id) => setSelectedPlaceId(id)}
+              geometryRefs={selectedOption?.geometryRefs}
+            />
+          </div>
+
+          <div className="flex items-center justify-between text-xs text-[#26352E]/70 px-2">
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin size={13} className="text-[#174C3C]" />
+              {selectedOption ? 'Các điểm dừng trong phương án đã chọn' : 'Vị trí có tọa độ đã xác minh'}
+            </span>
+            <span className="font-semibold text-[#174C3C]">
+              {selectedOption ? `${selectedOption.stops.length} điểm trong lịch` : `${mapPlaces.length} vị trí trên bản đồ`}
+            </span>
+          </div>
+        </section>
+
+        {/* COLUMN 3: DETAILED TIMELINE & OPTIONS (approx 30%) */}
+        <section
+          className={`space-y-4 ${
+            mobileTab !== 'timeline' ? 'hidden lg:block' : 'block'
+          }`}
+        >
+          {/* OPTIONS TABS: [Tiết kiệm] [Cân bằng] [Nhiều trải nghiệm] */}
+          {result?.options && result.options.length > 0 ? (
+            <div className="card-3d p-4 bg-white space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
+                <span className="text-xs font-black uppercase tracking-wider text-[#D6A545]">
+                  Phương án gợi ý
+                </span>
+                <span className="text-[11px] font-bold text-[#174C3C]">
+                  {result.options.length} phương án
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-1.5">
+                {result.options.map((opt) => {
+                  const isSelected = (selectedOption?.id || '') === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedOptionId(opt.id);
+                        setSelectedPlaceId(opt.stops[0]?.placeId || null);
+                      }}
+                      className={`p-2 rounded-xl text-xs font-black transition-all text-center ${
+                        isSelected
+                          ? 'bg-[#174C3C] text-white shadow-md'
+                          : 'bg-[#F7F4EA] text-[#26352E]/75 hover:bg-[#E7EFE4]'
+                      }`}
+                    >
+                      <div>{opt.label}</div>
+                      <div className="text-[10px] font-medium opacity-80 mt-0.5">
+                        {opt.stops.length} điểm
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Selected Option Summary Stats */}
+              {selectedOption && (
+                <div className="rounded-2xl bg-[#E7EFE4] p-3 text-xs space-y-1.5">
+                  <div className="flex items-center justify-between font-bold text-[#174C3C]">
+                    <span>Dự toán kinh phí:</span>
+                    <span className="text-sm font-black">{money(selectedOption.totalCostVnd)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[#26352E]/80">
+                    <span>Tổng thời gian:</span>
+                    <span>~{Math.round(selectedOption.totalDurationMinutes / 60)} giờ ({selectedOption.totalTravelMinutes}p di chuyển)</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="card-3d p-6 bg-white text-center space-y-2">
+              <Compass size={24} className="mx-auto text-[#174C3C]" />
+              <p className="text-sm font-bold text-[#174C3C]">Chưa có phương án tính toán</p>
+              <p className="text-xs text-[#26352E]/70">
+                {result?.blockingReasons.length
+                  ? 'Chưa thể tạo lịch với dữ liệu và điều kiện hiện tại.'
+                  : !mappablePlaces.length
+                    ? 'Hiện chưa có điểm ghé nào đủ vị trí và thông tin tuyến đã xác minh để tính hành trình. Bạn vẫn có thể xem địa điểm và liên hệ nhà vườn để xác nhận.'
+                    : 'Chọn điều kiện ở cột bên trái và bấm “Đề xuất hành trình”.'}
+              </p>
+              {result?.blockingReasons.length ? (
+                <ul className="mx-auto max-w-lg list-disc space-y-1 pl-5 text-left text-xs text-[#59675E]">
+                  {result.blockingReasons.map((reason) => <li key={reason}>{reason}</li>)}
+                </ul>
+              ) : null}
+            </div>
+          )}
+
+          {/* TIMELINE STOPS LIST */}
+          {selectedOption && selectedOption.stops.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs font-black uppercase tracking-wider text-[#174C3C]">
+                  Lịch trình chi tiết ({selectedOption.stops.length} chặng)
+                </span>
+                <span className="text-[11px] text-[#26352E]/60">Bấm điểm để xem trên bản đồ</span>
+              </div>
+
+              <div className="space-y-3 max-h-[580px] overflow-y-auto pr-1">
+                {selectedOption.stops.map((stop, idx) => {
+                  const isHighlighted = selectedPlaceId === stop.placeId;
+                  const artworkSeason = categoryArtwork[stop.categoryId] || 'spring';
+                  const stopImage = placeImagePaths[stop.placeId]?.[0];
+
+                  return (
+                    <article
+                      key={`${stop.experienceId}-${idx}`}
+                      className={`card-3d p-4 cursor-pointer transition-all ${
+                        isHighlighted
+                          ? 'border-[#D6A545] ring-2 ring-[#D6A545]/40 shadow-lg bg-[#FAF0DB]/20'
+                          : 'hover:border-[#174C3C]/30 bg-white'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Number Badge */}
+                        <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#174C3C] text-xs font-black text-white">
+                          {idx + 1}
+                        </div>
+
+                        {/* Thumbnail Image */}
+                        <div className="relative aspect-[4/3] w-16 shrink-0 overflow-hidden rounded-xl bg-zinc-100">
+                          {stopImage ? <Image src={stopImage} alt={`Trải nghiệm tại ${stop.name}`} fill sizes="64px" className="object-cover" /> : <SeasonArtwork season={artworkSeason} className="h-full w-full" />}
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="text-[11px] font-bold text-[#D6A545]">
+                              {stop.arrivalTime} – {stop.departureTime}
+                            </span>
+
+                            {/* Remove Stop Button */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveStop(idx);
+                              }}
+                              className="text-zinc-400 hover:text-rose-600 p-1"
+                              title="Bỏ điểm này khỏi lịch trình"
+                              aria-label={`Bỏ điểm ${stop.name}`}
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+
+                          <div className="mt-1 flex flex-wrap items-center gap-1">
+                            <button type="button" disabled={idx === 0} onClick={() => handleMoveStop(idx, -1)} className="min-h-9 rounded-lg px-2 text-[11px] font-semibold text-[#174C3C] hover:bg-[#E7EFE4] disabled:cursor-not-allowed disabled:opacity-40" aria-label={`Chuyển ${stop.name} lên trước`}>
+                              ↑ Lên
+                            </button>
+                            <button type="button" disabled={idx === selectedOption.stops.length - 1} onClick={() => handleMoveStop(idx, 1)} className="min-h-9 rounded-lg px-2 text-[11px] font-semibold text-[#174C3C] hover:bg-[#E7EFE4] disabled:cursor-not-allowed disabled:opacity-40" aria-label={`Chuyển ${stop.name} xuống sau`}>
+                              ↓ Xuống
+                            </button>
+                            <button type="button" onClick={() => setSelectedPlaceId(stop.placeId)} className="min-h-9 rounded-lg px-2 text-[11px] font-semibold text-[#174C3C] hover:bg-[#E7EFE4]">
+                              Xem trên bản đồ
+                            </button>
+                          </div>
+
+                          <h4 className="font-bold text-sm text-[#174C3C] leading-snug truncate mt-0.5">
+                            {stop.name}
+                          </h4>
+
+                          <p className="mt-1 text-[11px] text-[#26352E]/70 line-clamp-1">
+                            {stop.activities[0]}
+                          </p>
+
+                          <div className="mt-2 pt-2 border-t border-zinc-100 flex items-center justify-between text-[11px]">
+                            <span className="text-[#26352E]/60">
+                              {stop.travelMinutesFromPrevious > 0
+                                ? `+${stop.travelMinutesFromPrevious}p di chuyển`
+                                : 'Điểm xuất phát'}
+                            </span>
+                            <span className="font-bold text-[#174C3C]">
+                              {money(stop.costVnd)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
-  </section>;
+  );
 }

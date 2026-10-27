@@ -1,34 +1,89 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { Compass, Heart, Menu, X } from 'lucide-react';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Compass, Sparkles } from 'lucide-react';
 
 const navigation = [
   { href: '/', label: 'Trang chủ' },
-  { href: '/explore', label: 'Khám phá' },
+  { href: '/explore', label: 'Khám phá 4 mùa' },
   { href: '/itinerary', label: 'Lập hành trình' },
-  { href: '/my', label: 'Hành trình của tôi' },
+  { href: '/my', label: 'Đã lưu' },
 ];
 
 export default function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const [hasScrolled, setHasScrolled] = useState(false);
+
+  useEffect(() => {
+    const update = () => setHasScrolled(window.scrollY > 8);
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    return () => window.removeEventListener('scroll', update);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-40 border-b border-emerald-950/10 bg-[#f8faf9]/95 backdrop-blur">
-      <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-3" aria-label="Bình Mỹ Du Ký Website, trang chủ">
-          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#1B4332] text-white"><Compass size={23} strokeWidth={1.8} /></span>
-          <span className="leading-tight"><span className="block text-sm font-black tracking-tight text-[#1B4332] sm:text-base">Bình Mỹ Du Ký</span><span className="text-[11px] font-medium tracking-wide text-zinc-500">WEBSITE</span></span>
+    <header className={`sticky top-0 z-40 border-b border-[#174C3C]/10 bg-[#F7F4EA]/95 backdrop-blur-md transition-shadow duration-200 ${hasScrolled ? 'shadow-[0_8px_24px_rgba(23,76,60,0.09)]' : ''}`}>
+      <div className="mx-auto flex h-[68px] sm:h-[72px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Brand Logo */}
+        <Link
+          href="/"
+          className="group flex items-center gap-3 transition-transform active:scale-98"
+          aria-label="Bình Mỹ Du Ký Website — Trang chủ"
+        >
+          <Image src="/images/showcase/logo-binh-my-wellness.png" alt="Bình Mỹ Wellness Web" width={190} height={64} priority className="h-10 w-auto object-contain sm:h-12" />
+          <span className="hidden grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl bg-[#174C3C] text-white shadow-md shadow-[#174C3C]/20 transition-transform group-hover:scale-105">
+            <Compass size={22} strokeWidth={2} className="text-[#D6A545]" />
+          </span>
+          <div className="hidden leading-tight">
+            <div className="flex items-center gap-1.5">
+              <span className="text-base sm:text-lg font-black tracking-tight text-[#174C3C]">
+                BÌNH MỸ DU KÝ
+              </span>
+            </div>
+            <span className="text-[10px] sm:text-[11px] font-bold tracking-widest text-[#26352E]/60 uppercase">
+              Du lịch sinh thái
+            </span>
+          </div>
         </Link>
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Điều hướng chính">
-          {navigation.map((item) => <Link key={item.href} href={item.href} className="rounded-xl px-3.5 py-2.5 text-sm font-semibold text-zinc-700 transition hover:bg-emerald-900/5 hover:text-[#1B4332]">{item.label}</Link>)}
-          <Link href="/explore" className="ml-2 inline-flex items-center gap-2 rounded-xl bg-[#1B4332] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#143627]"><Heart size={16} /> Bắt đầu khám phá</Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-1.5" aria-label="Điều hướng chính">
+          {navigation.map((item) => {
+            const isActive =
+              pathname === item.href ||
+              (item.href !== '/' && pathname?.startsWith(item.href));
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`relative px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
+                  isActive
+                    ? 'bg-[#174C3C] text-white shadow-sm'
+                    : 'text-[#26352E]/80 hover:text-[#174C3C] hover:bg-[#E7EFE4]/60'
+                }`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
-        <button type="button" className="grid h-11 w-11 place-items-center rounded-xl text-zinc-800 hover:bg-emerald-900/5 md:hidden" aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}>
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+
+        {/* CTA Button Right */}
+        <div className="flex items-center gap-2">
+          <Link
+            href="/itinerary"
+            className="btn-tactile btn-accent-gold text-xs sm:text-sm !py-2 sm:!py-2.5 !px-3.5 sm:!px-5 rounded-full"
+            aria-label="Lên chuyến đi Bình Mỹ ngay"
+          >
+            <Sparkles size={15} className="text-[#174C3C]" />
+            <span>Lên chuyến đi</span>
+          </Link>
+        </div>
       </div>
-      {menuOpen && <nav className="border-t border-emerald-950/10 bg-[#f8faf9] px-4 py-3 md:hidden" aria-label="Điều hướng di động">{navigation.map((item) => <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-3 font-semibold text-zinc-800 hover:bg-emerald-900/5">{item.label}</Link>)}<Link href="/editor" onClick={() => setMenuOpen(false)} className="block rounded-xl px-3 py-3 font-semibold text-zinc-600 hover:bg-emerald-900/5">Công cụ biên tập trên thiết bị</Link></nav>}
     </header>
   );
 }

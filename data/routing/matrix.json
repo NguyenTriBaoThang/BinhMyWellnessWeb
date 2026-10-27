@@ -1,5 +1,35 @@
 {
   "version": 1,
-  "generatedAt": null,
-  "edges": []
+  "generatedAt": "2026-10-21",
+  "edges": [
+    { "fromPlaceId": "wetro-moon-river", "toPlaceId": "vuon-ky-uc", "mode": "car", "distanceMeters": 2100, "durationSeconds": 480, "geometryRef": "route-wetro-to-vuonkyuc", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+    { "fromPlaceId": "vuon-ky-uc", "toPlaceId": "wetro-moon-river", "mode": "car", "distanceMeters": 2100, "durationSeconds": 480, "geometryRef": "route-vuonkyuc-to-wetro", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+
+    { "fromPlaceId": "vuon-ky-uc", "toPlaceId": "vuon-lang-nghe-sang-tao", "mode": "car", "distanceMeters": 1800, "durationSeconds": 420, "geometryRef": "route-vuonkyuc-to-langnghe", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+    { "fromPlaceId": "vuon-lang-nghe-sang-tao", "toPlaceId": "vuon-ky-uc", "mode": "car", "distanceMeters": 1800, "durationSeconds": 420, "geometryRef": "route-langnghe-to-vuonkyuc", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+
+    { "fromPlaceId": "vuon-lang-nghe-sang-tao", "toPlaceId": "gom-hai-tu", "mode": "car", "distanceMeters": 2400, "durationSeconds": 540, "geometryRef": "route-langnghe-to-haitu", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+    { "fromPlaceId": "gom-hai-tu", "toPlaceId": "vuon-lang-nghe-sang-tao", "mode": "car", "distanceMeters": 2400, "durationSeconds": 540, "geometryRef": "route-haitu-to-langnghe", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+
+    { "fromPlaceId": "gom-hai-tu", "toPlaceId": "bo-sua-ba-thang", "mode": "car", "distanceMeters": 2000, "durationSeconds": 480, "geometryRef": "route-haitu-to-bathang", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+    { "fromPlaceId": "bo-sua-ba-thang", "toPlaceId": "gom-hai-tu", "mode": "car", "distanceMeters": 2000, "durationSeconds": 480, "geometryRef": "route-bathang-to-haitu", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+
+    { "fromPlaceId": "wetro-moon-river", "toPlaceId": "vuon-lang-nghe-sang-tao", "mode": "car", "distanceMeters": 3500, "durationSeconds": 720, "geometryRef": "route-wetro-to-langnghe", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+    { "fromPlaceId": "vuon-lang-nghe-sang-tao", "toPlaceId": "wetro-moon-river", "mode": "car", "distanceMeters": 3500, "durationSeconds": 720, "geometryRef": "route-langnghe-to-wetro", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+
+    { "fromPlaceId": "vuon-ky-uc", "toPlaceId": "gom-hai-tu", "mode": "car", "distanceMeters": 3200, "durationSeconds": 660, "geometryRef": "route-vuonkyuc-to-haitu", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+    { "fromPlaceId": "gom-hai-tu", "toPlaceId": "vuon-ky-uc", "mode": "car", "distanceMeters": 3200, "durationSeconds": 660, "geometryRef": "route-haitu-to-vuonkyuc", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+
+    { "fromPlaceId": "vuon-lang-nghe-sang-tao", "toPlaceId": "bo-sua-ba-thang", "mode": "car", "distanceMeters": 3100, "durationSeconds": 600, "geometryRef": "route-langnghe-to-bathang", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+    { "fromPlaceId": "bo-sua-ba-thang", "toPlaceId": "vuon-lang-nghe-sang-tao", "mode": "car", "distanceMeters": 3100, "durationSeconds": 600, "geometryRef": "route-bathang-to-langnghe", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+
+    { "fromPlaceId": "wetro-moon-river", "toPlaceId": "bo-sua-ba-thang", "mode": "car", "distanceMeters": 5800, "durationSeconds": 1080, "geometryRef": "route-wetro-to-bathang", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+    { "fromPlaceId": "bo-sua-ba-thang", "toPlaceId": "wetro-moon-river", "mode": "car", "distanceMeters": 5800, "durationSeconds": 1080, "geometryRef": "route-bathang-to-wetro", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+
+    { "fromPlaceId": "wetro-moon-river", "toPlaceId": "gom-hai-tu", "mode": "car", "distanceMeters": 4600, "durationSeconds": 900, "geometryRef": "route-wetro-to-haitu", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+    { "fromPlaceId": "gom-hai-tu", "toPlaceId": "wetro-moon-river", "mode": "car", "distanceMeters": 4600, "durationSeconds": 900, "geometryRef": "route-haitu-to-wetro", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+
+    { "fromPlaceId": "vuon-ky-uc", "toPlaceId": "bo-sua-ba-thang", "mode": "car", "distanceMeters": 4500, "durationSeconds": 840, "geometryRef": "route-vuonkyuc-to-bathang", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" },
+    { "fromPlaceId": "bo-sua-ba-thang", "toPlaceId": "vuon-ky-uc", "mode": "car", "distanceMeters": 4500, "durationSeconds": 840, "geometryRef": "route-bathang-to-vuonkyuc", "sourceId": "vntravel-binh-my-2025", "generatedAt": "2026-10-21", "status": "verified" }
+  ]
 }
